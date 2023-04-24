@@ -74,23 +74,7 @@ public class ClientHandler implements Runnable{
         }else{
             Command newCommand = Command.create(command);
             Boolean executed = newCommand.execute(this);
-            // sendToClient(robotName + ": What must I do next?");
         }
-        // Command newCommand = Command.create(command);
-        // Boolean executed = newCommand.execute(this);
-        // if (command.equals("greet")) {
-        //     sendToClient(robotName + " : " + "Hello Kiddo!");
-        // }
-        // else if (command.equals("quit")) {
-        //     sendToClient(robotName + " : " + "shutting down...");
-        //     closeEverything(socket, bufferedReader, bufferedWriter);
-        // } else if (command.equals("robots")) {
-        //     sendToClient(robotName + " : " + "Here are all the robots in the world:\n"+ clientHanders);
-        // }
-        // else {
-        //     sendToClient(robotName + " : " + "Cannot understand request");
-        // }
-
     }
 
      public void sendToClient(String message){
@@ -105,7 +89,6 @@ public class ClientHandler implements Runnable{
 
     public void removeClientHandler() {
         clientHanders.remove(this);
-        // handleCommand("SERVER: " + robotName + " has left the chat!");
     }
 
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
