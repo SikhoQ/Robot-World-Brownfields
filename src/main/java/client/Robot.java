@@ -13,8 +13,6 @@ public class Robot {
 
     public Robot(String name) {
         this.name = name;
-        // this.status = "Ready";
-        // this.world = new TextWorld();
     }
 
     // public Robot(String name, String world) {
@@ -45,8 +43,4 @@ public class Robot {
     public String getName() {
         return name;
     }
-
-    // public void showObstacles() {
-    //     world.showObstacles();
-    // }
 }

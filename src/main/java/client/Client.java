@@ -38,7 +38,6 @@ public class Client {
 
             Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
-                // System.out.println(username + ": What must I do next?");
                 String command = scanner.nextLine();
                 if (command.equals("state")) {
                     executeCommand(command);
@@ -71,7 +70,6 @@ public class Client {
                         msgFromGroupChat = bufferedReader.readLine();
                         System.out.println(msgFromGroupChat);
                         if (msgFromGroupChat.contains("shutting down...")) {
-                            // System.out.println("bye");
                             closeEverything(socket, bufferedReader, bufferedWriter);
                             System.exit(0);
                         }
@@ -108,8 +106,5 @@ public class Client {
         Client client =  new Client(socket, username);
         client.listenFormessage();
         client.sendMessage();
-        // ServerSocket serverSocket = new ServerSocket(5000);
-        // Server server =  new Server(serverSocket);
-        // server.startServer();
     }
 }
