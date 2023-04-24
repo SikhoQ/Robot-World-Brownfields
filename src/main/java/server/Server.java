@@ -19,7 +19,6 @@ public class Server {
         this.world = new TextWorld();
     }
 
-
     public void startServer() {
         System.out.println("Listening on port 5000...");
 
@@ -29,11 +28,10 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 System.out.println("A new client has connected!");
                 ClientHandler clientHandler = new ClientHandler(socket, world);
-
+                //create client's thread
                 Thread thread = new Thread(clientHandler);
                 thread.start();
-        
-            }
+           }
         } catch (IOException e) {
             e.printStackTrace();
         }
