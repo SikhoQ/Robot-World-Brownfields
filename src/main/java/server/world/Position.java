@@ -17,6 +17,10 @@ public class Position {
         return y;
     }
 
+    public int[] getPositionArray() {
+        return new int[] {x, y};
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

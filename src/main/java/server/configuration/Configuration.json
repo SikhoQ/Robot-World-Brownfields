@@ -1,0 +1,11 @@
+{
+  "server": {
+    "port": 5000,
+    "host": "localhost"
+  },
+  "world": {
+    "visibility": 10,
+    "reload": 5,
+    "repair": 5
+  }
+}

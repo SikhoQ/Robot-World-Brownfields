@@ -1,20 +1,18 @@
 package client.commands;
 
 import client.Robot;
+import client.request.Request;
 
 public class StateCommand extends Command{
 
-    public StateCommand(){
-        super("state");
-    }
+   public StateCommand(){
+       super("state");
+   }
 
-    @Override
-    public boolean execute(Robot target) {
-    System.out.println(target.getName() + ": At position (0,0)");
-    System.out.println(target.getName() + ": Is facing NORTH");
-    System.out.println(target.getName() + ": What must I do next?");
-    return true;
-    }
+   @Override
+   public Request execute(Robot target) {
+       return new Request(target.getName(), "state", new String[]{});
+   }
 
-    
+
 }

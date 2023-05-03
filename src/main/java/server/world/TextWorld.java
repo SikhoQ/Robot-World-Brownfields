@@ -14,6 +14,7 @@ public class TextWorld extends AbstractWorld{
     }
 
     public List<Obstacle> createObstacles() {
+        //TODO: Add random obstacles to obstacles array.
         List<Obstacle> obstacles = new ArrayList<>();
         SquareObstacle obstacle = new SquareObstacle(20, 40);
         obstacles.add(obstacle);

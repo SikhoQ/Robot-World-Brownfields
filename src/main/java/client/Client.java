@@ -1,61 +1,116 @@
 package client;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+
+import client.commands.Command;
+import client.commands.LaunchCommand;
+import client.commands.QuitCommand;
+import client.request.Request;
+import client.json.JsonHandler;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
-import client.commands.Command;
-
-import java.net.Socket;
-
 public class Client {
+    private Scanner scanner;
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-    private String username;
+    // private String username;
     private Robot robot;
+    private static String currentCommand;
 
-    public Client(Socket socket, String usernameString) {
+    private String stringToOutput;
+
+    public Client(Socket socket) {
         try {
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter((socket.getOutputStream()))); // write to server
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // read from server.
-            this.username  = usernameString;
-            this.robot = new Robot(usernameString);
+            this.scanner = new Scanner(System.in);
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
-    } 
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public BufferedReader getBufferedReader() {
+        return bufferedReader;
+    }
+
+    public BufferedWriter getBufferedWriter() {
+        return bufferedWriter;
+    }
 
     public void sendMessage() {
         try {
-            bufferedWriter.write(username);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
+            connectClientToServer();
 
-            Scanner scanner = new Scanner(System.in);
             while (socket.isConnected()) {
-                String command = scanner.nextLine();
-                if (command.equals("state")) {
-                    executeCommand(command);
-                }else{
-                    bufferedWriter.write(command);
-                    bufferedWriter.newLine();
-                    bufferedWriter.flush();
-                }
-               
+                String userInput = scanner.nextLine();
+                handleUserInput(userInput);
             }
         } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
 
-    public void executeCommand(String command) {
-        Command newCommand = Command.create(command);
-        Boolean executed = newCommand.execute(robot);
+    public void handleUserInput(String userInput) throws IOException {
+        // create a command that when executed will return a request.
+        // System.out.println(userInput);
+        Command newCommand;
+        try {
+            newCommand = Command.create(userInput);
+            System.out.println("command: " + newCommand);
+        } catch (IllegalArgumentException e) { 
+            // if illegal command, tell user and break out of method.
+            System.out.println(e.getMessage());
+            return;
+        }
+    
+        
+        // if the command is launch
+        if (newCommand instanceof LaunchCommand) {
+            if (robot == null) { // user hasn't launched robot yet.
+                String[] args = userInput.split(" ");
+                // System.out.println(args);
+                robot = new Robot(args[2]);
+            }
+            else {
+                // robot has already been launched so break out of this method.4
+                System.out.println(robot + " has already been launched into the world.");
+                return;
+            }
+        }
+
+        if (robot != null || newCommand instanceof QuitCommand) {
+            Request request = newCommand.execute(robot);
+            // System.out.println("req obj: " + request);
+            String requestJsonString = JsonHandler.serializeRequest(request);
+            // System.out.println("req: " +requestJsonString);
+            writeToBuffer(requestJsonString);
+        }
+        // robot has not been launched, and command is not launch or quit.
+        else if (!(newCommand instanceof QuitCommand)) {
+            System.out.println("Robot must be initialized first with the launch command.");
+        }
+    }
+
+    public void writeToBuffer(String requestJsonString) throws IOException{
+        bufferedWriter.write(requestJsonString);
+        bufferedWriter.newLine();
+        bufferedWriter.flush();
+    }
+
+    public void connectClientToServer() throws IOException {
+        // send initial request to connect to server...
+        Request connectionRequest = new Request(String.valueOf(socket.getLocalSocketAddress()), "connect", new String[]{});
+        String connectionRequestString = JsonHandler.serializeRequest(connectionRequest);
+        writeToBuffer(connectionRequestString);
+        currentCommand = "connect";
     }
 
     public void listenFormessage() {
@@ -63,16 +118,13 @@ public class Client {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String msgFromGroupChat;
+                String responseFromServer;
 
                 while(socket.isConnected()) {
                     try {
-                        msgFromGroupChat = bufferedReader.readLine();
-                        System.out.println(msgFromGroupChat);
-                        if (msgFromGroupChat.contains("shutting down...")) {
-                            closeEverything(socket, bufferedReader, bufferedWriter);
-                            System.exit(0);
-                        }
+                        responseFromServer = bufferedReader.readLine();
+                    //    System.out.println("response: " + responseFromServer);
+                        handleResponse(responseFromServer);
                     } catch (IOException e) {
                         closeEverything(socket, bufferedReader, bufferedWriter);
                     }
@@ -82,6 +134,30 @@ public class Client {
         }).start();
     }
 
+    public void handleResponse(String response) {
+        JsonNode responseJson = JsonHandler.deserializeJsonTString(response);
+        if (currentCommand == "quit") {
+            System.out.println(response);
+            closeEverything(getSocket(), getBufferedReader(), getBufferedWriter());
+            System.exit(0);
+        }
+        if (responseJson.get("result").asText().equals("OK")) {
+            System.out.println(response);
+            output("Connected to server.");
+        }
+        else{
+            System.out.println(response);
+        }
+    }
+
+    public static void setCurrentCommand(String command) { currentCommand = command; }
+
+    public void setRobot(Robot robot) { this.robot = robot; }
+
+    private void output(String outputString) {
+//        System.out.println(robot + "> " + outputString);
+        System.out.println(robot + "> What should I do next?");
+    }
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         try {
             if (bufferedReader != null) {
@@ -99,11 +175,9 @@ public class Client {
     } 
 
     public static void main(String[] args) throws IOException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your robot name: ");
-        String username = scanner.nextLine();
+        // change to get port number from command-line
         Socket socket = new Socket("localhost",5000);
-        Client client =  new Client(socket, username);
+        Client client =  new Client(socket);
         client.listenFormessage();
         client.sendMessage();
     }
