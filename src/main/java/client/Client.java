@@ -5,8 +5,10 @@ import client.commands.LaunchCommand;
 import client.commands.QuitCommand;
 import client.request.Request;
 import client.json.JsonHandler;
+import client.robots.Fighter;
 import client.robots.Robot;
 import client.robots.Sniper;
+import client.robots.Venom;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.*;
@@ -93,6 +95,11 @@ public class Client {
                 case "sniper":
                     robot = new Sniper(args[2]);
                     break;
+                case "venom":
+                    robot= new Venom(args[2]);
+                    break;
+                case "fighter":
+                    robot = new Fighter(args[2]);
                 default:
                     robot = new Robot(args[2]);
             }
@@ -217,8 +224,8 @@ public class Client {
 
     public static void main(String[] args) throws IOException {
         // change to get port number from command-line
-        // Socket socket = new Socket("localhost",8147);
-        Socket socket = new Socket("20.20.10.161", 8147); // Nomah's inet address
+         Socket socket = new Socket("localhost",8147);
+//        Socket socket = new Socket("20.20.10.161", 8147); // Nomah's inet address
         // Socket socket = new Socket("20.20.10.154",8147); // Mzee's inet address
         Client client = new Client(socket);
         client.listenFormessage();

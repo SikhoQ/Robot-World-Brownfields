@@ -1,5 +1,7 @@
 package server.world;
 
+import server.configuration.ConfigurationManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,9 +16,9 @@ enum Direction {
 
 
 public class World {
-
-    protected final Position TOP_LEFT = new Position(-100,200);
-    protected final Position BOTTOM_RIGHT = new Position(100,-200);
+    private ConfigurationManager worldConfiguration= new ConfigurationManager();
+    protected final Position TOP_LEFT = new Position(-worldConfiguration.getXConstraint(), worldConfiguration.getYConstraint());
+    protected final Position BOTTOM_RIGHT = new Position(worldConfiguration.getXConstraint(), -worldConfiguration.getYConstraint());
     private final Position CENTRE =  new Position(0, 0);
 
     private List<Obstacle> obstacles;
@@ -29,11 +31,21 @@ public class World {
         // this.startingPositions = createStartingPositions();
     }
 
+    private int randomInt(int start, int stop) {
+        Random random = new Random();
+        return start + random.nextInt(stop - start + 1);
+    }
+
     public List<Obstacle> createObstacles() {
         //TODO: Add random obstacles to obstacles array.
         List<Obstacle> obstacles = new ArrayList<>();
-        SquareObstacle obstacle = new SquareObstacle(20, 40);
-        obstacles.add(obstacle);
+        int numberOfObstacles= randomInt(5,15);
+        for (int i = 0; i < numberOfObstacles ; i++) {
+            int x= randomInt(TOP_LEFT.getX(), BOTTOM_RIGHT.getX());
+            int y = randomInt(BOTTOM_RIGHT.getY(), TOP_LEFT.getY());
+            SquareObstacle obstacle = new SquareObstacle(x, y);
+            obstacles.add(obstacle);
+        }
         return obstacles;
     }
 
