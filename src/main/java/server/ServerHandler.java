@@ -59,7 +59,7 @@ public class ServerHandler implements Runnable {
 
     public void robots() {
         if (world.getRobots().size() < 1) {
-            output("Ther are no ronots cureently in world.");
+            output("Ther are no robots currently in world.");
         }else{
             output(getRobotsString());
         }

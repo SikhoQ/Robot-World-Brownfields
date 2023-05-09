@@ -23,12 +23,11 @@ public class World {
 
     private List<Obstacle> obstacles;
     public static ArrayList<Robot> robots;
-    private Position[] startingPositions;
+    
 
     public World(){
         robots = new ArrayList<>();
         this.obstacles = createObstacles();
-        // this.startingPositions = createStartingPositions();
     }
 
     private int randomInt(int start, int stop) {
@@ -37,7 +36,6 @@ public class World {
     }
 
     public List<Obstacle> createObstacles() {
-        //TODO: Add random obstacles to obstacles array.
         List<Obstacle> obstacles = new ArrayList<>();
         int numberOfObstacles= randomInt(5,15);
         for (int i = 0; i < numberOfObstacles ; i++) {
@@ -63,14 +61,6 @@ public class World {
         }
     }
 
-    // private Position[] createStartingPositions() {
-    //     return new Position[] {
-    //         new Position(CENTRE.getX() + 30, CENTRE.getY() + 30),
-    //         new Position(CENTRE.getX() + 50, CENTRE.getY() - 50),
-    //         new Position(CENTRE.getX() - 10, CENTRE.getY() - 10),
-    //         new Position(CENTRE.getX() - 60, CENTRE.getY() + 60),
-    //     };
-    // }
     
     public ArrayList<Robot> getRobots() {
         return robots;
@@ -148,90 +138,7 @@ public class World {
 
         return new Object[]{UpdateResponse.FAILED_OUTSIDE_WORLD};
     };
-    
 
-    // public UpdateResponse updatePosition(Robot robot, int nrSteps) {
-
-    //     int newX = robot.getPosition().getX();
-    //     int newY = robot.getPosition().getY();
-    //     Position lastValidPosition = robot.getPosition();
-    
-    //     if (Direction.NORTH.equals(robot.getDirection())) {
-    //         newY = newY + nrSteps;
-    //     }
-    //     else if (Direction.EAST.equals(robot.getDirection())) {
-    //         newX = newX + nrSteps;
-    //     }
-    //     else if (Direction.SOUTH.equals(robot.getDirection())) {
-    //         newY = newY - nrSteps;
-    //     }
-    //     else if (Direction.WEST.equals(robot.getDirection()) ) {
-    //         newX = newX - nrSteps;
-    //     }
-    
-    //     Position newPosition = new Position(newX, newY);
-    
-    //     while (!SquareObstacle.blocksPath(robot.getPosition(), newPosition, robot) && newPosition.isIn(this.TOP_LEFT,this.BOTTOM_RIGHT)) {
-    //         lastValidPosition = newPosition;
-    //         // robot.setPosition(newPosition);
-    //         newX = robot.getPosition().getX();
-    //         newY = robot.getPosition().getY();
-    //         if (Direction.NORTH.equals(robot.getDirection())) {
-    //             newY = newY + nrSteps;
-    //         }
-    //         else if (Direction.EAST.equals(robot.getDirection())) {
-    //             newX = newX + nrSteps;
-    //         }
-    //         else if (Direction.SOUTH.equals(robot.getDirection())) {
-    //             newY = newY - nrSteps;
-    //         }
-    //         else if (Direction.WEST.equals(robot.getDirection()) ) {
-    //             newX = newX - nrSteps;
-    //         }
-    //         newPosition = new Position(newX, newY);
-    //     }
-    
-    //     if (!newPosition.isIn(this.TOP_LEFT,this.BOTTOM_RIGHT)) {
-    //         return UpdateResponse.FAILED_OUTSIDE_WORLD;
-    //     }
-    
-    //     robot.setPosition(lastValidPosition);
-    //     return UpdateResponse.FAILED_OBSTRUCTED;
-    // };
-    
-
-
-    // public UpdateResponse updatePosition(Robot robot, int nrSteps) {
-
-    //     int newX = robot.getPosition().getX();
-    //     int newY = robot.getPosition().getY();
-
-    //     if (Direction.NORTH.equals(robot.getDirection())) {
-    //         newY = newY + nrSteps;
-    //     }
-    //     else if (Direction.EAST.equals(robot.getDirection())) {
-    //         newX = newX + nrSteps;
-    //     }
-    //     else if (Direction.SOUTH.equals(robot.getDirection())) {
-    //         newY = newY - nrSteps;
-    //     }
-    //     else if (Direction.WEST.equals(robot.getDirection()) ) {
-    //         newX = newX - nrSteps;
-    //     }
-
-    //     Position newPosition = new Position(newX, newY);
-
-    //     if (SquareObstacle.blocksPath(robot.getPosition(), newPosition)) {
-    //         System.out.println("path blocked"); //not entering here. Why ??? is it stil not entering??
-    //         return UpdateResponse.FAILED_OBSTRUCTED;
-    //     }
-    //     else if (newPosition.isIn(this.TOP_LEFT,this.BOTTOM_RIGHT)){
-    //         robot.setPosition(newPosition);
-    //         return UpdateResponse.SUCCESS;
-    //     }
-
-    //     return UpdateResponse.FAILED_OUTSIDE_WORLD;
-    // };
 
     public void updateDirection(Robot robot, boolean turnRight){
         if (turnRight) {
@@ -267,20 +174,5 @@ public class World {
             }
         }
     }
-
-    // public boolean isNewPositionAllowed(Robot robot, Position position) {
-    //     Position currentPosition = robot.getPosition();
-    //     // Obstacle dummyObst = new SquareObstacle(0, 0);
-    //     if (SquareObstacle.blocksPath(currentPosition, position)){
-    //         return false;
-    //     }else if (!position.isIn(TOP_LEFT, BOTTOM_RIGHT)) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
-    // public Position[] getStartingPositions() {
-    //     return startingPositions;
-    // }
 
 }
