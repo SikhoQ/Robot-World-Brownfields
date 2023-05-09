@@ -1,7 +1,6 @@
 package client.commands;
 
-import client.Client;
-import client.Robot;
+import client.robots.Robot;
 import client.request.Request;
 
 
@@ -10,16 +9,14 @@ public abstract class Command {
 
     public Command(String name){
         this.name = name.trim().toLowerCase();
-        Client.setCurrentCommand(name);
     }
 
-    public String getName() {                                                                           //<2>
+    public String getName() {                  
         return name;
     }
 
     public static Command create(String instruction) {
         String[] args = instruction.toLowerCase().trim().split(" ");
-//        System.out.println(Arrays.toString(args));
 
         switch (args[0]){
             case "off":
@@ -27,13 +24,15 @@ public abstract class Command {
             case "shutdown":
                 return new QuitCommand();
             case "launch":
+            try{
                 return new LaunchCommand(args[1], args[2]);
+            }catch(ArrayIndexOutOfBoundsException e) {
+                throw new IllegalArgumentException("Command: " + args[0] + "requires 2 arguments: <kind> and <name>.");
+            }
             case "state":
                 return new StateCommand();
-            case "dump":
-                return new DumpCommand();
-            case "robots":
-                return new RobotsCommand();
+            case "fire":
+                return new FireCommand();
 
             default:
                 throw new IllegalArgumentException("Unsupported command: " + args[0]);

@@ -12,7 +12,7 @@ public class State {
     private int shields;
     private int shots;
     private String status;
-    private HashMap state;
+    private HashMap<String, Object> state;
 
     public State(int[] position, String direction, int shields, int shots, String status) {
         this.position = position;
@@ -24,7 +24,7 @@ public class State {
     }
 
     private void setState() {
-        this.state = new HashMap<>();
+        this.state = new HashMap<String, Object>();
         this.state.put("position", position);
         this.state.put("direction", direction);
         this.state.put("shields", shields);
@@ -33,7 +33,7 @@ public class State {
     }
 
     @JsonIgnore
-    public HashMap getStateAsHashMap() {
+    public HashMap<String, Object> getStateAsHashMap() {
         return this.state;
     }
 

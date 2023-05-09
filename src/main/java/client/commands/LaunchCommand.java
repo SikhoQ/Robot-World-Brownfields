@@ -1,7 +1,7 @@
 package client.commands;
 
 
-import client.Robot;
+import client.robots.Robot;
 import client.request.Request;
 
 
@@ -17,6 +17,8 @@ public class LaunchCommand extends Command{
 
     @Override
     public Request execute(Robot target) {
-        return new Request(robotName, "launch", new String[]{make, target.getShields(), target.getShots()});
+        String sheilds = String.valueOf(target.getShields());
+        String shots = String.valueOf( target.getShots());
+        return new Request(robotName, "launch", new String[]{make, sheilds, shots});
     }
 }

@@ -1,6 +1,6 @@
 package client.commands;
 
-import client.Robot;
+import client.robots.Robot;
 import client.request.Request;
 
 public class StateCommand extends Command{

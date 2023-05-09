@@ -27,7 +27,7 @@ public interface Obstacle {
      * @param position the position to check
      * @return return `true` if the x,y coordinate falls within the obstacle's area
      */
-    boolean blocksPosition(Position position);
+    // boolean blocksPosition(Position position);
 
     /**
      * Checks if this obstacle blocks the path that goes from coordinate (x1, y1) to (x2, y2).
@@ -36,5 +36,5 @@ public interface Obstacle {
      * @param b second position
      * @return `true` if this obstacle is in the way
      */
-    boolean blocksPath(Position a, Position b);
+    // boolean blocksPath(Position a, Position b);
 }

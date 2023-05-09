@@ -1,37 +1,47 @@
 package server;
+
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
-import server.world.IWorld;
-import server.world.TextWorld;
+import server.world.World;
 
-import java.io.IOException;
 
 public class Server {
 
-    protected ServerSocket serverSocket; 
-    protected IWorld world;
+    private ServerSocket serverSocket; 
+    private World world;
 
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
-        this.world = new TextWorld();
+        this.world = new World();
     }
 
     public void startServer() {
-        System.out.println("Listening on port 5000...");
+        try {
+            System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress()  + "> " + ": Listening on port 8147..." );
+            ServerHandler serverCommands = new ServerHandler(world); // listens for imput on server and handles executing server command on a seperate thread.
+            Thread serverThread = new Thread(serverCommands);
+            serverThread.start();
+        }
+        catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
 
         try{
             while (!serverSocket.isClosed()) {
         
-                Socket socket = serverSocket.accept();
-                System.out.println("A new client has connected!");
-                ClientHandler clientHandler = new ClientHandler(socket, world);
+                Socket socket = serverSocket.accept(); // accept a client
+                System.out.println("A new client" + " <" + socket.getInetAddress().getHostName() + "> " + "has connected!");
+                ClientHandler clientHandler = new ClientHandler(socket, world); // create a clientHandler which sprouts a sperate thread for communicating with client.
 
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -47,7 +57,7 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(5000);
+        ServerSocket serverSocket = new ServerSocket(8147);
         Server server =  new Server(serverSocket);
         server.startServer();
     }

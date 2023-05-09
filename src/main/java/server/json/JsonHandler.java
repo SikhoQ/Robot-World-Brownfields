@@ -41,4 +41,26 @@ public class JsonHandler {
         }
         return jsonNode;
     }
+
+    public static Boolean isJsonString(String string) {
+        try {
+            objectMapper.readTree(string);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // public static int[] convertToIntArray(String intArray) {
+    //     int[] result = null;
+
+    //     try {
+    //         result = objectMapper.readValue(intArray, int[].class);
+    //     } catch (JsonMappingException e) {
+    //         e.printStackTrace();
+    //     } catch (JsonProcessingException e) {
+    //         e.printStackTrace();
+    //     }
+    //     return result;
+    // }
 }

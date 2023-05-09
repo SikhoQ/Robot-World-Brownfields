@@ -1,10 +1,12 @@
 {
   "server": {
-    "port": 5000,
-    "host": "localhost"
+    "port": 8147,
+    "host": "20.20.10.154"
   },
   "world": {
-    "visibility": 10,
+    "x_constraint": 100,
+    "y_constraint": 200,
+    "visibility": 20,
     "reload": 5,
     "repair": 5
   }

@@ -40,4 +40,11 @@ public class ConfigurationManager {
         return configurationFile.get("world").get("repair").asText();
     }
 
+    public int getXConstraint() {
+        return configurationFile.get("world").get("x_constraint").asInt();
+    }
+
+    public int getYConstraint() {
+        return configurationFile.get("world").get("y_constraint").asInt();
+    }
 }

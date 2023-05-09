@@ -17,7 +17,7 @@ public class Position {
         return y;
     }
 
-    public int[] getPositionArray() {
+    public int[] asArray() {
         return new int[] {x, y};
     }
 

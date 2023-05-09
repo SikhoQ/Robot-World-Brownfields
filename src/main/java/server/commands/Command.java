@@ -7,20 +7,28 @@ import server.response.Response;
 
 public abstract class Command {
     private final String name;
-
-    public abstract Response execute(ClientHandler clientHandler);
+    private String argument;
 
     public Command(String name){
         this.name = name.trim().toLowerCase();
+        this.argument = "";
     }
 
-    public String getName() {                                                                           //<2>
+    public Command(String name, String argument) {
+        this(name);
+        this.argument = argument.trim();
+    }
+
+    public String getName() {                                                                      
         return name;
+    }
+
+    public String getArgument() {
+        return argument;
     }
 
     public static Command create(String request) {
 
-        System.out.println("request: " + request);
         // deserialize the request string into a Json node and then extract the info you need.
         JsonNode requestJson = JsonHandler.deserializeJsonTString(request);
         String command = requestJson.get("command").asText();
@@ -37,14 +45,14 @@ public abstract class Command {
                 return new QuitCommand();
             case "state":
                 return new StateCommand();
-            case "robots":
-                return new RobotsCommand();
-            case "dump":
-                return new DumpCommand();
+            case "fire":
+                return new FireCommand();
             default:
                 throw new IllegalArgumentException("Unsupported command: " + command);
         }
     }
+
+    public abstract Response execute(ClientHandler clientHandler);
 
     @Override
     public String toString() {
