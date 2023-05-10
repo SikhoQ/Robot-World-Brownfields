@@ -49,6 +49,12 @@ public abstract class Command {
                 return new FireCommand();
             case "look":
                 return new LookCommand();
+            case "forward":
+                return new ForwardCommand(args.get(0).asText());
+            case "back":
+                return new BackCommand(args.get(0).asText());
+            case "turn":
+                return new TurnCommand(args.get(0).asText());
             default:
                 throw new IllegalArgumentException("Unsupported command: " + command);
         }

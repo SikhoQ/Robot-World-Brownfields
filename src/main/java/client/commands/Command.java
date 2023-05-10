@@ -24,17 +24,32 @@ public abstract class Command {
             case "shutdown":
                 return new QuitCommand();
             case "launch":
-            try{
-                return new LaunchCommand(args[1], args[2]);
-            }catch(ArrayIndexOutOfBoundsException e) {
-                throw new IllegalArgumentException("Command: " + args[0] + "requires 2 arguments: <kind> and <name>.");
-            }
+                try{
+                    return new LaunchCommand(args[1], args[2]);
+                }catch(ArrayIndexOutOfBoundsException e) {
+                    throw new IllegalArgumentException("Command: " + args[0] + "requires 2 arguments: <kind> and <name>.");
+                }
             case "state":
                 return new StateCommand();
             case "fire":
                 return new FireCommand();
             case "look":
                 return new LookCommand();
+            case "forward":
+                try{
+                    return new ForwardCommand(args[1]);
+                }catch(ArrayIndexOutOfBoundsException e) {
+                    throw new IllegalArgumentException("Command: " + args[0] + "requires argument steps");
+                }
+            case "back":
+                try{
+                    return new BackCommand(args[1]);
+                }catch(ArrayIndexOutOfBoundsException e) {
+                    throw new IllegalArgumentException("Command: " + args[0] + "requires argument steps");
+                }
+            case "left":
+            case "right":
+                    return new TurnCommand(args[0]);
 
             default:
                 throw new IllegalArgumentException("Unsupported command: " + args[0]);
