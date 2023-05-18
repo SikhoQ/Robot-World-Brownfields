@@ -50,7 +50,6 @@ public abstract class Command {
             case "left":
             case "right":
                     return new TurnCommand(args[0]);
-
             default:
                 throw new IllegalArgumentException("Unsupported command: " + args[0]);
         }
@@ -62,4 +61,16 @@ public abstract class Command {
     public String toString() {
         return this.getName() + " ";
     }
+
+    public abstract boolean execute(Robot target);
+
+    public abstract boolean execute(Robot target);
+
+    public abstract boolean execute(Robot target);
+
+    public abstract boolean execute(Robot target);
+
+    public abstract boolean execute(Robot target);
+
+    public abstract boolean execute(Robot target);
 }
