@@ -4,10 +4,12 @@
     "host": "20.20.10.154"
   },
   "world": {
-    "x_constraint": 100,
+    "x_constraint": 200,
     "y_constraint": 200,
-    "visibility": 20,
-    "reload": 5,
-    "repair": 5
+    "visibility": 80,
+    "reload": 8,
+    "repair": 8,
+    "max_sheilds": 10,
+    "tileSize": 16
   }
 }

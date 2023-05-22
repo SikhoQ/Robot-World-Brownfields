@@ -1,8 +1,12 @@
 package server.commands;
 
+import java.util.HashMap;
+
 import server.ClientHandler;
-import server.response.BasicResponse;
+import server.json.JsonHandler;
+import server.response.*;
 import server.response.Response;
+import server.world.Robot;
 
 
 public class QuitCommand extends Command{
@@ -12,10 +16,24 @@ public class QuitCommand extends Command{
     }
 
     @Override
-    public Response execute(ClientHandler target) {
-        target.setCurrentCommand(getName());
-        ClientHandler.clientHanders.remove(target);
-        target.getWorld().getRobots().remove(target.getRobot());
+    public Response execute(ClientHandler clientHandler) {
+        clientHandler.setCurrentCommand(getName());
+        ClientHandler.clientHanders.remove(clientHandler);
+
+        Robot robot = clientHandler.getRobot();
+        clientHandler.getWorld().getRobots().remove(robot);
+
+        // broadcast to other clients
+        for (ClientHandler cH : ClientHandler.clientHanders) {
+            if (cH.getRobot() != null && cH != clientHandler) { // has launched robot into world.
+                Response res = new StandardResponse(new HashMap<>(){{
+                    put("message", "remove enemy");
+                    put("robotName", robot.getName());
+                }}, null);
+                cH.sendToClient(JsonHandler.serializeResponse(res));
+            }
+        }
+
         return new BasicResponse("Successfully disconnected from server.");
     }
     

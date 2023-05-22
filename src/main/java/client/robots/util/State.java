@@ -1,5 +1,6 @@
-package client.robots;
+package client.robots.util;
 
+import java.util.Arrays;
 
 public class State {
     private int[] position;
@@ -28,4 +29,10 @@ public class State {
     public String getStatus() { return status; }
     
     public void setStatus(String status) { this.status = status; }
+
+    @Override
+    public String toString() {
+        return "State(positon: "+ Arrays.toString(position) + " direction: "  + direction 
+                + " shots: " + shots + " shields: " + shields +  " status: " + status + ")";
+    }
 }

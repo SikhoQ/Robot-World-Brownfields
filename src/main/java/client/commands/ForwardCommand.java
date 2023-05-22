@@ -14,6 +14,5 @@ public class ForwardCommand extends Command {
     @Override
     public Request execute(Robot target) {
         return new Request(target.getName(), "forward", new String[]{argument});
-    }
-    
+    }  
 }

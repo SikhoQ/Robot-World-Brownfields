@@ -1,7 +1,5 @@
 package server;
 
-// MOVE THIS OUT OF COMMANDS AND RENAME IT TO SERVERHANDLER.
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -38,6 +36,9 @@ public class ServerHandler implements Runnable {
                 case "quit":
                     quit();
                     break;
+                case "clear":
+                    clear();
+                    break;
                 default:
                     System.out.println("Unsupported command: " + command);
             }
@@ -59,7 +60,7 @@ public class ServerHandler implements Runnable {
 
     public void robots() {
         if (world.getRobots().size() < 1) {
-            output("Ther are no robots currently in world.");
+            output("There are currently no robots in this world.");
         }else{
             output(getRobotsString());
         }
@@ -67,7 +68,7 @@ public class ServerHandler implements Runnable {
 
     public String getRobotsString() {
         StringBuilder string = new StringBuilder();
-        string.append("\nHere are the robots currently in this world:\n");
+        string.append("\nHere are the robots in this world:\n");
         for (Robot robot : world.getRobots()) {
             string.append("\t- " + robot + "\n");
         }
@@ -90,6 +91,11 @@ public class ServerHandler implements Runnable {
 
         output(string.toString());
     } 
+
+    public void clear() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 
     private void output(String string) {
         try {

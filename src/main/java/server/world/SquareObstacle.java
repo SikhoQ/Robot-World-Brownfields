@@ -3,11 +3,15 @@ package server.world;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SquareObstacle implements Obstacle{
+import server.world.util.Position;
+
+
+public class SquareObstacle implements Obstacle {
+    
     private Position position;
     public static List<Position> obstacles = new ArrayList<>();
 
-    private static int size = 5;
+    private static int size = World.getWorldConfiguration().getTileSize();
 
     public SquareObstacle(int x, int y) {
         this.position = new Position(x, y);
@@ -26,47 +30,6 @@ public class SquareObstacle implements Obstacle{
         return size;
     }
 
-    /**
-     * Checks if this obstacle blocks access to the specified position.
-     * @param position the position to check
-     * @return return `true` if the x,y coordinate falls within the obstacle's area
-     */
-    // public static boolean blocksPosition(Position position, Robot robot) {
-    //     // Check for obstacles
-    //     for (Position obstacle: obstacles) {
-    //         if ((obstacle.getX() <= position.getX() && position.getX() < obstacle.getX() + size) &&
-    //                 (obstacle.getY() <= position.getY() && position.getY() < obstacle.getY() + size)) {
-    //             return true;
-    //         }
-    //     }
-    
-    //     // Check for other robots
-    //     for (Robot otherRobot: World.robots) {
-    //         // Ignore the current robot
-    //         if (otherRobot == robot) {
-    //             continue;
-    //         }
-    
-    //         // Calculate the other robot's boundary
-    //         int otherX1 = otherRobot.getPosition().getX();
-    //         int otherY1 = otherRobot.getPosition().getY();
-    //         int otherX2 = otherX1 + size;
-    //         int otherY2 = otherY1 + size;
-
-    //         // System.out.println("position: " + position);
-    //         // System.out.println("otherX1 <= position.getX(): " + (otherX1 <= position.getX()) + " position.getX() < otherX2: " +( position.getX() < otherX2));
-    //         // System.out.println("otherY1 <= position.getY(): " + (otherY1 <= position.getY() )+ " position.getY() < otherY2): " +( position.getY() < otherY2));
-    //         // System.out.println();
-    
-    //         // Check if the current position is inside the other robot's boundary
-    //         if ((otherX1 <= position.getX() && position.getX() < otherX2) &&
-    //                 (otherY1 <= position.getY() && position.getY() < otherY2)) {
-    //             return true;
-    //         }
-    //     }
-        
-    //     return false;
-    // }
 
     public static Object[] blocksPosition(Position position, Robot robot) {
         // Check for obstacles
@@ -78,29 +41,49 @@ public class SquareObstacle implements Obstacle{
         }
     
         // Check for other robots
-        for (Robot otherRobot: World.robots) {
+        // for (Robot otherRobot: World.robots) {
+        //     // Ignore the current robot
+        //     if (otherRobot == robot) {
+        //         continue;
+        //     }
+    
+        //     // Calculate the other robot's boundary
+        //     int otherX1 = otherRobot.getPosition().getX();
+        //     int otherY1 = otherRobot.getPosition().getY();
+        //     int otherX2 = otherX1 + size;
+        //     int otherY2 = otherY1 + size;
+    
+        //     // Check if the current position is inside the other robot's boundary
+        //     if ((otherX1 <= position.getX() && position.getX() < otherX2) &&
+        //             (otherY1 <= position.getY() && position.getY() < otherY2)) {
+        //         return new Object[]{true, otherRobot};
+        //     }
+        // }
+
+        // Check for other robots
+        for (Robot otherRobot : World.robots) {
             // Ignore the current robot
             if (otherRobot == robot) {
                 continue;
             }
-    
-            // Calculate the other robot's boundary
-            int otherX1 = otherRobot.getPosition().getX();
-            int otherY1 = otherRobot.getPosition().getY();
-            int otherX2 = otherX1 + size;
-            int otherY2 = otherY1 + size;
+        
+            // Calculate the center coordinates of each square
+            int otherRobotX = otherRobot.getPosition().getX();
+            int otherRobotY = otherRobot.getPosition().getY();
+            int robotPositionX = position.getX();
+            int robotPositionY = position.getY();
 
-            // System.out.println("position: " + position);
-            // System.out.println("otherX1 <= position.getX(): " + (otherX1 <= position.getX()) + " position.getX() < otherX2: " +( position.getX() < otherX2));
-            // System.out.println("otherY1 <= position.getY(): " + (otherY1 <= position.getY() )+ " position.getY() < otherY2): " +( position.getY() < otherY2));
-            // System.out.println();
-    
+            // Calculate the distance between the centers of the squares
+            int distanceX = Math.abs(otherRobotX - robotPositionX);
+            int distanceY = Math.abs(otherRobotY - robotPositionY);
+        
             // Check if the current position is inside the other robot's boundary
-            if ((otherX1 <= position.getX() && position.getX() < otherX2) &&
-                    (otherY1 <= position.getY() && position.getY() < otherY2)) {
+            if (distanceX < size && distanceY < size) {
                 return new Object[]{true, otherRobot};
             }
         }
+        
+
         
         return new Object[]{false};
     }
@@ -143,8 +126,9 @@ public class SquareObstacle implements Obstacle{
         return new Object[]{false};
     }
 
+    // a = oldPos, b = newPos
     public static Object[] blocksXPath(Position a, Position b, Robot robot) {
-        if ( b.getX() > a.getX()) { // robot moving up
+        if ( b.getX() > a.getX()) { // robot moving to the right
             for (int i=a.getX(); i <= b.getX(); i++) {
                 Object[] result = blocksPosition(new Position(i, a.getY()), robot);
                 if ((boolean) result[0]) {
@@ -166,8 +150,8 @@ public class SquareObstacle implements Obstacle{
 
     @Override
     public String toString() {
-        int endposX = getBottomLeftX() + 5;
-        int endposY = getBottomLeftY() + 5;
-        return "-At position " + getBottomLeftX() + "," + getBottomLeftY() + " " + "(" +  endposX + "," + endposY+ ")";
+        int endposX = getBottomLeftX() + size;
+        int endposY = getBottomLeftY() + size;
+        return "-At position (" + getBottomLeftX() + "," + getBottomLeftY() + ") to " + "(" +  endposX + "," + endposY+ ")";
     }
 }

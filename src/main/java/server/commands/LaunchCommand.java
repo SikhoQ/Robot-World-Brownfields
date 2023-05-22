@@ -1,18 +1,22 @@
 package server.commands;
 
+import java.util.HashMap;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import server.ClientHandler;
+import server.configuration.ConfigurationManager;
+import server.json.JsonHandler;
 import server.response.ErrorResponse;
 import server.response.StandardResponse;
-import server.response.Response;
 import server.world.Robot;
+import server.response.Response;
 
 public class LaunchCommand extends Command {
 
     private Robot robot;
     private String robotName;
     private String kind;
-    private int shield;
+    private int shields;
     private int shots;
 
     public LaunchCommand(String robotName, JsonNode args) {
@@ -20,27 +24,42 @@ public class LaunchCommand extends Command {
         // Extract each element in the args array:
         this.robotName = robotName;
         this.kind = args.get(0).asText();
-        this.shield = args.get(1).asInt();
+        int maxSheilds = new ConfigurationManager().getMaxSheilds();
+        int robotSheilds = args.get(1).asInt();
+        this.shields = robotSheilds > maxSheilds? maxSheilds : robotSheilds;
         this.shots = args.get(2).asInt();
     }
 
     @Override
-    public Response execute(ClientHandler target) {
+    public Response execute(ClientHandler clientHandler) {
 
-        if (target.getWorld().getRobots().size() >= 4) { //add this 4 to configuration file
+        if (clientHandler.getWorld().getRobots().size() >= 4) { //add this 4 to configuration file
             return new ErrorResponse("No more space in this world");
         }
 
         // create robot.
-        this.robot = new Robot(robotName, kind, shield, shots);
+        this.robot = new Robot(robotName, kind, shields, shots, clientHandler);
 
         // only add robot if it is not already in world.
-        if (!target.getWorld().robotInWorld(robot)) {
-            // might need to move robots list to world
-            target.getWorld().addRobotToWorld(robot);
+        if (!clientHandler.getWorld().robotInWorld(robot)) {
+            clientHandler.getWorld().addRobotToWorld(robot);
             // store robot into robot variable in clientHandler. this way each instance of ClientHandler is connected to a single instance of robot.
-            target.setRobot(robot);
-            return new StandardResponse(target.getRobot().getData(), target.getRobot().getState());
+            clientHandler.setRobot(robot);
+
+            // tell other robots in server about this robot
+            for (ClientHandler cH : ClientHandler.clientHanders) {
+                if (cH.getRobot() != null && cH != clientHandler) { // has launched robot into world.
+                    Response res = new StandardResponse(new HashMap<>(){{
+                        put("message", "new robot launched into world");
+                        put("robotName", robot.getName());
+                        put("robotKind", robot.getKind());
+                        put("robotState", robot.getState());
+                    }}, null);
+                    cH.sendToClient(JsonHandler.serializeResponse(res));
+                }
+            }
+            
+            return new StandardResponse(clientHandler.getRobot().getData(), clientHandler.getRobot().getState());
         }
         else {
             return new ErrorResponse("Too many of you in this world");

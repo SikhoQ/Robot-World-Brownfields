@@ -1,15 +1,17 @@
 package client.json;
 
 import client.request.Request;
-import client.robots.State;
+import client.robots.util.State;
+import client.userInterface.util.Position;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonHandler {
 
@@ -26,12 +28,6 @@ public class JsonHandler {
         return jsonString;
     }
 
-    public static JsonNode deserializeJsonFile(File file) throws IOException {
-        // deserialize json file into JsonNode.
-        JsonNode jsonNode =  objectMapper.readTree(file);
-        return jsonNode;
-    }
-
     public static JsonNode deserializeJsonTString(String jsonString) {
         JsonNode jsonNode = null;
         try{
@@ -42,6 +38,21 @@ public class JsonHandler {
             e.printStackTrace();
         }
         return jsonNode;
+    }
+
+    public static List<Position> deserializeObstacles(JsonNode obstaclesArray) {
+        List<Position> obstacles = new ArrayList<>();
+
+        for (int i = 0; i < obstaclesArray.size(); i++) {
+            JsonNode obstacle = obstaclesArray.get(i);
+            int x = obstacle.get("x").asInt();
+            int y = obstacle.get("y").asInt();
+            Position position = new Position(x, y);
+            obstacles.add(position);
+        }
+
+        return obstacles;
+
     }
 
     public static int[] convertToIntArray(String intArray) {
@@ -67,5 +78,26 @@ public class JsonHandler {
             e.printStackTrace();
         }
         return state;
+    }
+
+    public static State getState(JsonNode stateNode) {
+        State state = null;
+        try {
+            state = objectMapper.readValue(stateNode.toString(), State.class);
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return state;
+    }
+
+    public static Boolean isJsonString(String string) {
+        try {
+            objectMapper.readTree(string);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

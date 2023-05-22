@@ -1,6 +1,8 @@
 package server.world;
 
 import server.configuration.ConfigurationManager;
+import server.world.util.Position;
+import server.world.util.UpdateResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,7 @@ enum Direction {
 
 
 public class World {
-    private ConfigurationManager worldConfiguration= new ConfigurationManager();
+    public static  ConfigurationManager worldConfiguration = new ConfigurationManager();
     protected final Position TOP_LEFT = new Position(-worldConfiguration.getXConstraint(), worldConfiguration.getYConstraint());
     protected final Position BOTTOM_RIGHT = new Position(worldConfiguration.getXConstraint(), -worldConfiguration.getYConstraint());
     private final Position CENTRE =  new Position(0, 0);
@@ -30,6 +32,10 @@ public class World {
         this.obstacles = createObstacles();
     }
 
+    public static ConfigurationManager getWorldConfiguration() {
+        return worldConfiguration;
+    }
+
     private int randomInt(int start, int stop) {
         Random random = new Random();
         return start + random.nextInt(stop - start + 1);
@@ -39,10 +45,13 @@ public class World {
         List<Obstacle> obstacles = new ArrayList<>();
         int numberOfObstacles= randomInt(5,15);
         for (int i = 0; i < numberOfObstacles ; i++) {
-            int x= randomInt(TOP_LEFT.getX(), BOTTOM_RIGHT.getX());
+            int x = randomInt(TOP_LEFT.getX(), BOTTOM_RIGHT.getX());
             int y = randomInt(BOTTOM_RIGHT.getY(), TOP_LEFT.getY());
-            SquareObstacle obstacle = new SquareObstacle(x, y);
-            obstacles.add(obstacle);
+            // rather check if the position is blocked.
+            if (!SquareObstacle.obstacles.contains(new Position(x, y))) {
+                SquareObstacle obstacle = new SquareObstacle(x, y);
+                obstacles.add(obstacle);
+            }
         }
         return obstacles;
     }
@@ -83,14 +92,14 @@ public class World {
         return false;
     }
 
-    public Object[] updatePosition(Robot robot, int nrSteps, Boolean isBullet) {
+    public Object[] updatePosition(Robot robot, int nrSteps) { // remove isBullet from this method
 
         int increment = (nrSteps > 0)? 1 : -1;
         Object[] updateResponse = null;
 
         // move robot by 1 / -1 step until it reaches its destination or it is obstructed / out of safezone
         for (int i=1; i<=Math.abs(nrSteps); i++) {
-            updateResponse = updatePosition_helper(robot, increment, isBullet); 
+            updateResponse = updatePosition_helper(robot, increment, false); 
             if (updateResponse[0] != UpdateResponse.SUCCESS) { //obstructed or out of world.
                 return updateResponse;
             }
@@ -98,6 +107,10 @@ public class World {
 
         return updateResponse;
     };
+
+    public Object[] fireGun(Robot robot, int nrSteps) {
+        return updatePosition_helper(robot, nrSteps, true); 
+    }
 
     Object[] updatePosition_helper(Robot robot, int nrSteps, Boolean isBullet) {
         int newX = robot.getPosition().getX();
@@ -129,7 +142,7 @@ public class World {
         }
         else if (newPosition.isIn(this.TOP_LEFT,this.BOTTOM_RIGHT)){ 
             // if path not blocked and in constraint box, check result length. 
-            // Only update position if robot is moving not bullet. How?? isBullet - true/false.
+            // Only update position if robot is moving not bullet. How? isBullet - true/false.
             if (!isBullet) {
                 robot.setPosition(newPosition);
             }

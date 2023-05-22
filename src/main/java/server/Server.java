@@ -22,7 +22,7 @@ public class Server {
     public void startServer() {
         try {
             System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress()  + "> " + ": Listening on port 8147..." );
-            ServerHandler serverCommands = new ServerHandler(world); // listens for imput on server and handles executing server command on a seperate thread.
+            ServerHandler serverCommands = new ServerHandler(world); // listens for input on server and handles executing server command on a seperate thread.
             Thread serverThread = new Thread(serverCommands);
             serverThread.start();
         }
@@ -35,8 +35,7 @@ public class Server {
         
                 Socket socket = serverSocket.accept(); // accept a client
                 System.out.println("A new client" + " <" + socket.getInetAddress().getHostName() + "> " + "has connected!");
-                ClientHandler clientHandler = new ClientHandler(socket, world); // create a clientHandler which sprouts a sperate thread for communicating with client.
-
+                ClientHandler clientHandler = new ClientHandler(socket, world); // create a clientHandler & sprouts a sperate thread for communicating with client.
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
@@ -62,5 +61,3 @@ public class Server {
         server.startServer();
     }
 }
-
-

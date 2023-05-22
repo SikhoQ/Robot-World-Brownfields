@@ -1,15 +1,18 @@
 package server;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import server.commands.Command;
+import server.commands.LaunchCommand;
 import server.json.JsonHandler;
-import server.response.ErrorResponse;
-import server.response.Response;
+import server.response.*;
 import server.world.Robot;
 import server.world.World;
 
@@ -22,6 +25,7 @@ public class ClientHandler implements Runnable {
     private World world;
     private Robot robot;
     private String currentCommand;
+    private boolean launched = false;
 
     // use OutputStream & InputStream instead of bufferedReader & bufferedWriter
     private OutputStream outputStream;
@@ -63,6 +67,15 @@ public class ClientHandler implements Runnable {
         return this.world;
     }
 
+    public void setLaunched(boolean launched) {
+        this.launched = launched;
+    }
+
+    public boolean getLaunched() {
+        return launched;
+    }
+    
+
     @Override
     public void run() {
         String requestFromCleint;
@@ -85,13 +98,12 @@ public class ClientHandler implements Runnable {
         world.removeRobot(robot);
     }
 
-    public String getRequestFromClient() throws IOException{
+    public String getRequestFromClient() throws IOException {
         byte[] buffer = new byte[1024];
         int bytesRead = inputStream.read(buffer);
-        // No data was read, so return an empty string
         if (bytesRead == -1) { return ""; }
-        String request = new String(buffer, 0, bytesRead);
-        return request;
+        String request = new String(buffer, 0, bytesRead); // No data was read, so return an empty string
+        return request; 
     }
 
     public void handleRequest(String request) {
@@ -101,6 +113,27 @@ public class ClientHandler implements Runnable {
 
             String responseJsonString = JsonHandler.serializeResponse(response);
             sendToClient(responseJsonString);
+
+            // if command is 'launch', send a list of all robots currently in world
+            if (newCommand instanceof LaunchCommand) {                
+                List<HashMap<String, Object>> robotsList = new ArrayList<>();
+
+                for (ClientHandler cH: ClientHandler.clientHanders) {
+                    if (cH.getRobot() != null && cH!= this) { 
+                        HashMap<String, Object> robotInfo = new HashMap<>();
+                        robotInfo.put("robotName", cH.getRobot().getName());
+                        robotInfo.put("robotKind", cH.getRobot().getKind());
+                        robotInfo.put("robotState", cH.getRobot().getState());
+                        robotsList.add(robotInfo);
+                    }
+                }
+                
+                Response message = new StandardResponse(new HashMap<>(){{
+                    put("message", "robots currently in world");
+                    put("robots", robotsList);
+                }}, null);
+                sendToClient(JsonHandler.serializeResponse(message));
+            }
 
             // if command is 'quit' disconnect everything.
             if (currentCommand.equals("quit")) {

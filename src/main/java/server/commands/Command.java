@@ -33,7 +33,6 @@ public abstract class Command {
         JsonNode requestJson = JsonHandler.deserializeJsonTString(request);
         String command = requestJson.get("command").asText();
         String robotName = requestJson.get("robot").asText();
-        System.out.println(command);
         JsonNode args = requestJson.get("arguments");
 
         switch (command){
@@ -49,6 +48,10 @@ public abstract class Command {
                 return new FireCommand();
             case "look":
                 return new LookCommand();
+            case "repair":
+                return new RepairCommand();
+            case "reload":
+                return new ReloadCommand();    
             case "forward":
                 return new ForwardCommand(args.get(0).asText());
             case "back":

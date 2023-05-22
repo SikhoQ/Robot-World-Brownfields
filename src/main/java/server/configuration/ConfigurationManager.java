@@ -20,7 +20,6 @@ public class ConfigurationManager {
     }
 
     public int getPort() {
-//        System.out.println(configurationFile.get("server").get("port"));
         return configurationFile.get("server").get("port").asInt();
     }
 
@@ -47,4 +46,13 @@ public class ConfigurationManager {
     public int getYConstraint() {
         return configurationFile.get("world").get("y_constraint").asInt();
     }
+
+    public int getMaxSheilds() {
+        return configurationFile.get("world").get("max_sheilds").asInt();
+    }
+
+    public int getTileSize() {
+        return configurationFile.get("world").get("tileSize").asInt();
+    }
+    
 }

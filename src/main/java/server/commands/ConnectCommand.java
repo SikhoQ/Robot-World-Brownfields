@@ -1,8 +1,11 @@
 package server.commands;
 
+import java.util.HashMap;
+
 import server.ClientHandler;
-import server.response.BasicResponse;
 import server.response.Response;
+import server.response.StandardResponse;
+import server.world.SquareObstacle;
 
 public class ConnectCommand extends Command {
     public ConnectCommand() {
@@ -10,8 +13,13 @@ public class ConnectCommand extends Command {
     }
 
     @Override
-    public Response execute(ClientHandler target) {
-        target.setCurrentCommand(getName());
-        return new BasicResponse("Connected to server");
+    public Response execute(ClientHandler clientHandler) {
+        clientHandler.setCurrentCommand(getName());
+        // return new BasicResponse("Connected to server");
+        return new StandardResponse(new HashMap<>(){{
+            put("message", "connected"); 
+            put("obstacles", SquareObstacle.obstacles); 
+            // put("visibility", SquareObstacle.obstacles); 
+        }}, new HashMap<>(){});
     }
 }

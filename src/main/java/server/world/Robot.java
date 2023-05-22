@@ -1,6 +1,10 @@
 package server.world;
 
+import server.ClientHandler;
 import server.configuration.ConfigurationManager;
+import server.world.util.Position;
+import server.world.util.State;
+
 import java.util.HashMap;
 import java.util.Random;
 
@@ -16,19 +20,26 @@ public class Robot {
     private HashMap<String, Object> state;
     private Position position;
     private Direction direction;
-    private ConfigurationManager configurationManager;
-    private final int bulletDistance;
 
-    public Robot(String name, String kind, int shields, int shots) {
+    private final int maxShots;
+    private final int maxSheilds;
+    private final int bulletDistance;
+    private final ConfigurationManager configurationManager;
+    private final ClientHandler clientHandler;
+
+    public Robot(String name, String kind, int shields, int shots, ClientHandler clientHandler) {
         this.name = name;
         this.kind = kind;
-        this.shields = shields;
         this.shots = shots;
+        this.shields = shields;
+        this.maxSheilds = shields;
+        this.maxShots = shots;
         this.status = "NORMAL";
         this.direction = Direction.NORTH;
-        this.bulletDistance = 30;
+        this.bulletDistance = 100;
         this.configurationManager = new ConfigurationManager();
         this.position = getStartingPosition();
+        this.clientHandler = clientHandler;
         this.state = new State(position.asArray(), String.valueOf(direction), shields, shots, status).getStateAsHashMap();
     }
 
@@ -50,6 +61,10 @@ public class Robot {
         return randomStartingPosition;
     }
 
+    public ClientHandler getClientHandler() {
+        return clientHandler;
+    }
+
     @JsonIgnore
     public String getStatus() {
         return status;
@@ -58,6 +73,16 @@ public class Robot {
     @JsonIgnore
     public int getBulletDistance() {
         return bulletDistance;
+    }
+
+    @JsonIgnore
+    public int getMaxSheilds() {
+        return maxSheilds;
+    }
+
+    @JsonIgnore
+    public int getMaxShots() {
+        return maxShots;
     }
 
     public void setStatus(String status) {
@@ -85,16 +110,15 @@ public class Robot {
         return shields;
     }
 
-    public void setShield(int shield) {
-        this.shields = shield;
+    public void setShiels(int shields) {
+        this.shields = shields;
+        state.replace("shields", shields);
     }
 
     @JsonIgnore
     public void decreaseSheilds() {
-        if (shields > 0) {
-            this.shields--;
-            state.replace("shields", shields);
-        }
+        this.shields--;
+        state.replace("shields", shields);
     }
 
     @JsonIgnore
@@ -104,14 +128,13 @@ public class Robot {
 
     public void setShots(int shots) {
         this.shots = shots;
+        state.replace("shots", shots);
     }
 
     @JsonIgnore
     public void decreaseShots() {
-        if (shots > 0) {
-            this.shots--;
-            state.replace("shots", shots);
-        }
+        this.shots--;
+        state.replace("shots", shots);
     }
 
     public HashMap<String, Object> getState() {
@@ -146,7 +169,13 @@ public class Robot {
     @JsonIgnore
     public int getDistance(Robot otherRobot){
         return (int) Math.sqrt(Math.pow(otherRobot.getPosition().getX() - this.getPosition().getX(), 2) + 
-                               Math.pow(otherRobot.getPosition().getY() - this.getPosition().getY(), 2));
+                Math.pow(otherRobot.getPosition().getY() - this.getPosition().getY(), 2));
+    }
+
+    @JsonIgnore
+    public int getDistance(Position position){
+        return (int) Math.sqrt(Math.pow(position.getX() - this.getPosition().getX(), 2) +
+                Math.pow(position.getY() - this.getPosition().getY(), 2));
     }
 
     @JsonIgnore

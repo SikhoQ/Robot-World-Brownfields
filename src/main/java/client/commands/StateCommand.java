@@ -13,6 +13,4 @@ public class StateCommand extends Command{
    public Request execute(Robot target) {
        return new Request(target.getName(), "state", new String[]{});
    }
-
-
 }

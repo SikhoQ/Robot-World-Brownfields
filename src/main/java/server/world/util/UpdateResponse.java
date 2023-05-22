@@ -1,4 +1,4 @@
-package server.world;
+package server.world.util;
 
 /**
 * Enum that indicates response for updatePosition request

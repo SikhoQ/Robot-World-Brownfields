@@ -1,4 +1,4 @@
-package server.world;
+package client.userInterface.util;
 
 public class Position {
     private final int x;

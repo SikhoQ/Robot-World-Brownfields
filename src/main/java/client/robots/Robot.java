@@ -1,5 +1,9 @@
 package client.robots;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import client.robots.util.State;
 
 public class Robot {
 
@@ -7,7 +11,10 @@ public class Robot {
     private int shields;
     private int shots;;
     private State state;
-    private String kind = "Generic";
+    private String kind;
+    private List<Robot> enemies = new ArrayList<>();
+    private List<String> enemyNames = new ArrayList<>();
+    public static int bulletDistance = 100;
 
     // class variables, the same for all robots.
     private static int reload;
@@ -18,6 +25,37 @@ public class Robot {
         this.name = name;
         this.shields = 0;
         this.shots = 10;
+    }
+
+    public Robot(String name, String kind, State state) {
+        this.name = name;
+        this.kind = kind;
+        this.state = state;
+    }
+
+    public List<Robot> getEnemyRobots() {
+        return enemies;
+    }
+
+    public void addEnemy(Robot enemy) {
+        enemies.add(enemy);
+    }
+
+    public void addEnemyName(String enemyName) {
+        enemyNames.add(enemyName);
+    }
+
+    public void removeEnemy(String enemyName) {
+        int enemyIndex = enemyNames.indexOf(enemyName);
+        // Robot enemyRobot = enemies.get(enemyIndex);
+        enemyNames.remove(enemyName);
+        enemies.remove(enemyIndex);
+    }
+
+    public void updateEnemyState(String enemyName, State enemyState) {
+        int enemyIndex = enemyNames.indexOf(enemyName);
+        Robot enemyRobot = enemies.get(enemyIndex);
+        enemyRobot.setState(enemyState);
     }
 
     public int getShields() {
@@ -83,12 +121,16 @@ public class Robot {
         setShields(state.getShields());
     }
 
+    public State getState() {
+        return state;
+    }
+
     @Override
     public String toString() {
         return this.state.getPosition() != null?
                 (
                 "[" + this.state.getPosition()[0]+ "," + this.state.getPosition()[1] + "] "
-                + this.name.toUpperCase() + " <" + this.kind + "> " + this.state.getStatus() 
+                + this.name.toUpperCase() + " <" + this.kind + "> " + this.state.getDirection()
                 )
                 : 
                 this.name;
