@@ -5,8 +5,7 @@ import client.robots.Robot;
 public class Enemy extends Player{
 
     public Enemy(Robot robot) {
-        super(robot);
-        // this.getPlayer().hide();
+        super(robot, true);
     }
     
 }

@@ -15,11 +15,9 @@ public class ConnectCommand extends Command {
     @Override
     public Response execute(ClientHandler clientHandler) {
         clientHandler.setCurrentCommand(getName());
-        // return new BasicResponse("Connected to server");
         return new StandardResponse(new HashMap<>(){{
             put("message", "connected"); 
             put("obstacles", SquareObstacle.obstacles); 
-            // put("visibility", SquareObstacle.obstacles); 
         }}, new HashMap<>(){});
     }
 }

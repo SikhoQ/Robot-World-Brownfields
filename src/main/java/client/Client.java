@@ -130,8 +130,6 @@ public class Client {
     public String instantiateRobot(String userInput) {
         if (robot == null) { // user hasn't launched robot yet.
             String[] args = userInput.toLowerCase().trim().split(" ");
-            // initialize robot based on user's chosen make, if doesn't exist initialize
-            // sniper is initialized
             switch (args[1]) {
                 case "venom":
                     robot = new Venom(args[2]);
@@ -225,7 +223,7 @@ public class Client {
         }
 
         // A new robot has been launched into the worlds
-        if (msgStr != null && msgStr.contains("new robot")) {
+        if (robot != null && msgStr != null && msgStr.contains("new robot")) {
             String enemyName = responseJson.get("data").get("robotName").asText();
             String enemyKind = responseJson.get("data").get("robotKind").asText();
             State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
@@ -237,10 +235,10 @@ public class Client {
         }
 
         // All the robots currently in world. Server sends this after you launch.
-        if (msgStr != null && msgStr.equals("robots currently in world")) {
+        if (robot != null && msgStr != null && msgStr.equals("robots currently in world")) {
             JsonNode robotsNode = responseJson.get("data").get("robots");
 
-            if (robotsNode != null) {
+            if (robot != null &&  robotsNode != null) {
                 for (int i=0; i < robotsNode.size(); i++) {
 
                     String enemyName = robotsNode.get(i).get("robotName").asText();
@@ -256,13 +254,13 @@ public class Client {
         }
 
         // handle response server sends when another player quits. (should also do this if that player dies)
-        if (msgStr != null && msgStr.equals("remove enemy")) {
+        if (robot != null && msgStr != null && msgStr.equals("remove enemy")) {
             robot.removeEnemy(responseJson.get("data").get("robotName").asText());
             return;
         }
 
         // handle response server sends when an enemy's state changes.
-        if (msgStr != null && msgStr.equals("enemy state changed")){
+        if (robot != null && msgStr != null && msgStr.equals("enemy state changed")){
             String enemyName =  responseJson.get("data").get("robotName").asText();
             State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
             robot.updateEnemyState(enemyName, enemyState);
@@ -270,7 +268,7 @@ public class Client {
         }
         
         // handle response server sends when an enemy fires a gun.
-        if (msgStr != null && msgStr.contains("enemy fired gun")) {
+        if (robot != null && msgStr != null && msgStr.contains("enemy fired gun")) {
             String enemyName =  responseJson.get("data").get("robotName").asText();
             int bulletDistance =  responseJson.get("data").get("distance").asInt();
             textInterface.getGui().getEnemyPlayer(enemyName).fire(bulletDistance);
@@ -327,6 +325,7 @@ public class Client {
             }
             Command.currentCommand = "error";
             textInterface.output(msgStr);
+            return;
         }
     }
 

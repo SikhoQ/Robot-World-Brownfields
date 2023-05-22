@@ -15,27 +15,42 @@ public class Player {
     Turtle bullet;
 
 
-    public Player(Robot robot) {
-
+    public Player(Robot robot, boolean isEnemy) {
         this.robot = robot;
         player = new Turtle();
         player.hide();
         player.shapeSize(size, size);
         player.shape("arrow");
-        player.fillColor(getColor(robot.getKind()));
-        player.outlineColor(getColor(robot.getKind()));
+        player.fillColor(getColor(robot.getKind(), isEnemy));
+        player.outlineColor(getColor(robot.getKind(), isEnemy));
         player.setDirection(90);
         player.up();
+        
+        // Player's bullet
+        bullet = new Turtle(player.getX(), player.getY());
+        bullet.hide();
     }
     
-    private Color getColor(String make) {
-        switch(make) {
-            case "venom":
-                return Color.red;
-            case "fighter":
-                return Color.green;
-            default:
-                return Color.cyan;
+    private Color getColor(String make, boolean isEnemy) {
+        if (!isEnemy) {
+            switch(make) {
+                case "venom":
+                    return Color.red;
+                case "fighter":
+                    return Color.green;
+                default:
+                    return Color.cyan;
+            }
+        }
+        else {
+            switch(make) {
+                case "venom":
+                    return new Color(150, 0, 0);
+                case "fighter":
+                    return new Color(0, 150, 0);
+                default:
+                    return new Color(0, 0, 150);
+            }
         }
     }
 
@@ -93,9 +108,6 @@ public class Player {
     }
 
     public void fire(int steps) {
-        // player's bullets
-        bullet = new Turtle();
-        bullet.hide();
         bullet.shape("circle");
         bullet.shapeSize(4, 4);
         bullet.outlineColor("yellow");
@@ -106,7 +118,7 @@ public class Player {
         bullet.setDirection(player.getDirection());
         bullet.show();
 
-        // move bullet smoothly while it is still inside world
+        // move bullet smoothly while it is still inside world & not exceeded bullet distance.
         int stepsToGo = steps;
         int bulletSpeed = 5;
         while (stepsToGo > 0 && Math.abs(bullet.getX()) <= constraint && Math.abs(bullet.getY()) <= constraint) {
@@ -114,6 +126,5 @@ public class Player {
             stepsToGo-= 5;
         }
         bullet.hide();
-        bullet = null;
     }
 }

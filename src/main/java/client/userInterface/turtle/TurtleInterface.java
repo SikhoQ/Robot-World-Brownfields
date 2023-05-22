@@ -146,7 +146,7 @@ public class TurtleInterface extends TextInterface implements Runnable {
         createPen();
         showObstacles();
 
-        player = new Player(client.getRobot());
+        player = new Player(client.getRobot(), false);
         player.show();
         robot = client.getRobot();
 

@@ -1,15 +1,16 @@
 {
   "server": {
     "port": 8147,
-    "host": "20.20.10.154"
+    "host": "localhost"
   },
   "world": {
     "x_constraint": 200,
     "y_constraint": 200,
-    "visibility": 80,
-    "reload": 8,
-    "repair": 8,
+    "visibility": 70,
+    "reload": 6,
+    "repair": 6,
     "max_sheilds": 10,
-    "tileSize": 16
+    "tileSize": 16,
+    "maxRobots": 4
   }
 }

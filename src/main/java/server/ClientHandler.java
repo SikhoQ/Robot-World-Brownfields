@@ -115,7 +115,7 @@ public class ClientHandler implements Runnable {
             sendToClient(responseJsonString);
 
             // if command is 'launch', send a list of all robots currently in world
-            if (newCommand instanceof LaunchCommand) {                
+            if (robot != null && newCommand instanceof LaunchCommand) {                
                 List<HashMap<String, Object>> robotsList = new ArrayList<>();
 
                 for (ClientHandler cH: ClientHandler.clientHanders) {

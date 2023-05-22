@@ -8,7 +8,6 @@ import java.io.IOException;
 
 public class ConfigurationManager {
 
-//    public ConfigurationManager() {}
     private JsonNode configurationFile;
 
     public ConfigurationManager() {
@@ -53,6 +52,10 @@ public class ConfigurationManager {
 
     public int getTileSize() {
         return configurationFile.get("world").get("tileSize").asInt();
+    }
+
+    public int getMaxRobots() {
+        return configurationFile.get("world").get("maxRobots").asInt();
     }
     
 }

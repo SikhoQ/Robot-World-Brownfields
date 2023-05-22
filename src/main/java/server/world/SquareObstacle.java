@@ -39,26 +39,6 @@ public class SquareObstacle implements Obstacle {
                 return new Object[]{true};
             }
         }
-    
-        // Check for other robots
-        // for (Robot otherRobot: World.robots) {
-        //     // Ignore the current robot
-        //     if (otherRobot == robot) {
-        //         continue;
-        //     }
-    
-        //     // Calculate the other robot's boundary
-        //     int otherX1 = otherRobot.getPosition().getX();
-        //     int otherY1 = otherRobot.getPosition().getY();
-        //     int otherX2 = otherX1 + size;
-        //     int otherY2 = otherY1 + size;
-    
-        //     // Check if the current position is inside the other robot's boundary
-        //     if ((otherX1 <= position.getX() && position.getX() < otherX2) &&
-        //             (otherY1 <= position.getY() && position.getY() < otherY2)) {
-        //         return new Object[]{true, otherRobot};
-        //     }
-        // }
 
         // Check for other robots
         for (Robot otherRobot : World.robots) {
@@ -78,13 +58,11 @@ public class SquareObstacle implements Obstacle {
             int distanceY = Math.abs(otherRobotY - robotPositionY);
         
             // Check if the current position is inside the other robot's boundary
-            if (distanceX < size && distanceY < size) {
+            if (distanceX < size*2 && distanceY < size*2) {
                 return new Object[]{true, otherRobot};
             }
         }
-        
 
-        
         return new Object[]{false};
     }
     

@@ -9,6 +9,7 @@ import server.json.JsonHandler;
 import server.response.ErrorResponse;
 import server.response.StandardResponse;
 import server.world.Robot;
+import server.world.World;
 import server.response.Response;
 
 public class LaunchCommand extends Command {
@@ -33,7 +34,8 @@ public class LaunchCommand extends Command {
     @Override
     public Response execute(ClientHandler clientHandler) {
 
-        if (clientHandler.getWorld().getRobots().size() >= 4) { //add this 4 to configuration file
+        int maxRobots = World.getWorldConfiguration().getMaxRobots();
+        if (clientHandler.getWorld().getRobots().size() >= maxRobots) {
             return new ErrorResponse("No more space in this world");
         }
 
