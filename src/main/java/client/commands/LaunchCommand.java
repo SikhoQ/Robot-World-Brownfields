@@ -12,8 +12,8 @@ public class LaunchCommand extends Command{
     /**
      * Constructs a LaunchCommand object with the specified make and robot name.
      *
-     * @param make The make of the robot.
-     * @param name The name of the robot.
+     * @param make      The make of the robot.
+     * @param robotName The name of the robot.
      */
     public LaunchCommand(String make, String name) {
         super("launch");
@@ -23,9 +23,9 @@ public class LaunchCommand extends Command{
 
     @Override
     public Request execute(Robot target) {
-        String shields = String.valueOf(target.getShields());
+        String sheilds = String.valueOf(target.getShields());
         String shots = String.valueOf( target.getShots());
-        return new Request(robotName, "launch", new String[]{make, shields, shots});
+        return new Request(robotName, "launch", new String[]{make, sheilds, shots});
     }
 
     public String getKind(){
