@@ -126,13 +126,13 @@ public class TurtleInterface extends TextInterface implements Runnable {
         this.pen.setPosition(-x_constraint - obstacleSize, y_constraint + obstacleSize);
         this.pen.setDirection(0.0);
         this.pen.down();
-        this.pen.forward(x_constraint * 2 + obstacleSize);
+        this.pen.forward(x_constraint * 2 + obstacleSize*2);
         this.pen.setDirection(270.0);
-        this.pen.forward(y_constraint * 2 + obstacleSize);
+        this.pen.forward(y_constraint * 2 + obstacleSize*2);
         this.pen.setDirection(180.0);
-        this.pen.forward(x_constraint * 2 + obstacleSize);
+        this.pen.forward(x_constraint * 2 + obstacleSize*2);
         this.pen.setDirection(90.0);
-        this.pen.forward(y_constraint* 2 + obstacleSize);
+        this.pen.forward(y_constraint* 2 + obstacleSize*2);
         this.pen.up();
     }
 

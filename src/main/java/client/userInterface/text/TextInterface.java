@@ -103,8 +103,22 @@ public class TextInterface {
                         + shots + " shots, status is " + status + ".");
                     break;
 
-                case "forward":
+                case "look":
                     JsonNode data = JsonHandler.deserializeJsonTString(outputString).get("data");
+                    JsonNode objectsNode = data.get("objects");
+
+                    if (objectsNode != null) {
+                        System.out.println("Objects around you:");
+                        for (int i=0; i<objectsNode.size(); i++) {
+                            System.out.println("- " + objectsNode.get(i).get("direction") + ", " +
+                                objectsNode.get(i).get("distance") + " steps away from you. " + 
+                                "Type: " + objectsNode.get(i).get("type") + ".");
+                        }
+                    }
+                    break;     
+
+                case "forward":
+                    data = JsonHandler.deserializeJsonTString(outputString).get("data");
                     String message = data.get("message").asText();
                     if(message.equals( "Done")){
                         System.out.println("moved forward!");
@@ -122,6 +136,7 @@ public class TextInterface {
                         System.out.println("You've been obstructed.");
                     }
                     break;
+
                 case "turn":
                     data = JsonHandler.deserializeJsonTString(outputString).get("data");
                     message = data.get("message").asText();
@@ -129,6 +144,7 @@ public class TextInterface {
                         System.out.println("turned!");
                     }
                     break;
+
                 case "repair":
                     data = JsonHandler.deserializeJsonTString(outputString).get("data");
                     state = JsonHandler.deserializeJsonTString(outputString).get("state");
@@ -138,6 +154,7 @@ public class TextInterface {
                         System.out.println("shields have been repaired.");
                     }
                     break;
+
                 case "reload":
                     data = JsonHandler.deserializeJsonTString(outputString).get("data");
                     state = JsonHandler.deserializeJsonTString(outputString).get("state");
@@ -147,6 +164,7 @@ public class TextInterface {
                         System.out.println("shots have been reloaded.");
                     }
                     break;
+                    
                 case "fire":
                     data = jsonStr.get("data");
                     message = data.get("message").asText();

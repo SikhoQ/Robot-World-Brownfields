@@ -136,6 +136,7 @@ public class Client {
                     break;
                 case "fighter":
                     robot = new Fighter(args[2]);
+                    break;
                 default:
                     robot = new Sniper(args[2]);
             }

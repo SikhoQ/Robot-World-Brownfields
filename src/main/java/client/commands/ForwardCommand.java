@@ -4,7 +4,7 @@ import client.request.Request;
 import client.robots.Robot;
 
 public class ForwardCommand extends Command {
-    private final String argument;
+    private String argument;
 
     public ForwardCommand(String argument) {
         super("forward");

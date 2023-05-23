@@ -4,7 +4,7 @@ import client.request.Request;
 import client.robots.Robot;
 
 public class TurnCommand extends Command{
-    private final String argument;
+    private String argument;
 
     public TurnCommand(String argument) {
         super("turn");

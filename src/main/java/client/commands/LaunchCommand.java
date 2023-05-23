@@ -6,8 +6,8 @@ import client.request.Request;
 
 
 public class LaunchCommand extends Command{
-    private final String make;
-    private final String robotName;
+    private String make;
+    private String robotName;
 
     public LaunchCommand(String make, String name) {
         super("launch");
@@ -17,8 +17,8 @@ public class LaunchCommand extends Command{
 
     @Override
     public Request execute(Robot target) {
-        String shields = String.valueOf(target.getShields());
+        String sheilds = String.valueOf(target.getShields());
         String shots = String.valueOf( target.getShots());
-        return new Request(robotName, "launch", new String[]{make, shields, shots});
+        return new Request(robotName, "launch", new String[]{make, sheilds, shots});
     }
 }

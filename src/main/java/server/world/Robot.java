@@ -173,9 +173,13 @@ public class Robot {
     }
 
     @JsonIgnore
-    public int getDistance(Position position){
-        return (int) Math.sqrt(Math.pow(position.getX() - this.getPosition().getX(), 2) +
-                Math.pow(position.getY() - this.getPosition().getY(), 2));
+    public int getDistanceX(Position position){
+        return (int) Math.abs(this.getPosition().getX() - position.getX());
+    }
+
+    @JsonIgnore
+    public int getDistanceY(Position position){
+        return (int) Math.abs(this.getPosition().getY() - position.getY());
     }
 
     @JsonIgnore

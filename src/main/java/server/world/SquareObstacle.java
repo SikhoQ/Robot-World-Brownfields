@@ -32,7 +32,6 @@ public class SquareObstacle implements Obstacle {
 
 
     public static Object[] blocksPosition(Position position, Robot robot) {
-        // Check for obstacles
         for (Position obstacle: obstacles) {
             if ((obstacle.getX() <= position.getX() && position.getX() < obstacle.getX() + size) &&
                     (obstacle.getY() <= position.getY() && position.getY() < obstacle.getY() + size)) {

@@ -5,7 +5,7 @@ import client.robots.Robot;
 
 public class LookCommand extends Command {
     public LookCommand() {
-        super("quit");
+        super("look");
     }
 
     @Override
