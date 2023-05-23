@@ -60,12 +60,25 @@ public class SquareObstacle implements Obstacle {
      *         [true, otherRobot] if the position is blocked by another robot, or [false] if the position is not blocked
      */
     public static Object[] blocksPosition(Position position, Robot robot) {
-        for (Position obstacle: obstacles) {
-            if ((obstacle.getX() <= position.getX() && position.getX() < obstacle.getX() + size) &&
-                    (obstacle.getY() <= position.getY() && position.getY() < obstacle.getY() + size)) {
+        int positionX = position.getX();
+        int positionY = position.getY();
+
+        // Check for obstacles
+        for (Position obstacle : obstacles) {
+            int obstacleRight = obstacle.getX() + size;
+            int obstacleTop = obstacle.getY() + size*2;
+
+            boolean isOverlapX = (obstacle.getX() <= positionX && positionX < obstacleRight + size) ||
+                                (positionX <= obstacle.getX() && obstacle.getX() < positionX + size);
+            
+            boolean isOverlapY = (obstacle.getY() <= positionY && positionY < obstacleTop) ||
+                                (positionY <= obstacle.getY() && obstacle.getY() < positionY + size);
+
+            if (isOverlapX && isOverlapY) {
                 return new Object[]{true};
             }
         }
+
 
         // Check for other robots
         for (Robot otherRobot : World.robots) {
