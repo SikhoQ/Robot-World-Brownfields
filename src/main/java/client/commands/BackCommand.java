@@ -4,7 +4,7 @@ import client.request.Request;
 import client.robots.Robot;
 
 public class BackCommand extends Command {
-    private String argument;
+    private final String argument;
 
     public BackCommand(String argument) {
         super("back");

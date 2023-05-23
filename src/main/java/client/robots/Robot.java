@@ -7,19 +7,18 @@ import client.robots.util.State;
 
 public class Robot {
 
-    private String name;
+    private final String name;
     private int shields;
-    private int shots;;
+    private int shots;
     private State state;
     private String kind;
-    private List<Robot> enemies = new ArrayList<>();
-    private List<String> enemyNames = new ArrayList<>();
+    private final List<Robot> enemies = new ArrayList<>();
+    private final List<String> enemyNames = new ArrayList<>();
     public static int bulletDistance = 100;
 
     // class variables, the same for all robots.
     private static int reload;
     private static int repair;
-    private static int visibility;
 
     public Robot(String name) {
         this.name = name;
@@ -70,12 +69,7 @@ public class Robot {
         return name;
     }
 
-    public static int getVisibility() {
-        return visibility;
-    }
-
-    public static void setVisibility(int visibility) {
-        Robot.visibility = visibility;
+    public static void setVisibility(int ignoredVisibility) {
     }
 
     public static int getReload() {
@@ -92,10 +86,6 @@ public class Robot {
 
     public static void setRepair(int repair) {
         Robot.repair = repair;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getKind() {

@@ -7,7 +7,6 @@ import client.userInterface.util.Position;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import java.util.List;
 
 public class JsonHandler {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static String serializeRequest(Request request) {
         String jsonString = null;
@@ -55,25 +54,10 @@ public class JsonHandler {
 
     }
 
-    public static int[] convertToIntArray(String intArray) {
-        int[] result = null;
-
-        try {
-            result = objectMapper.readValue(intArray, int[].class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
     public static State updateState(JsonNode responseJson) {
         State state = null;
         try {
             state = objectMapper.readValue(responseJson.get("state").toString(), State.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -84,8 +68,6 @@ public class JsonHandler {
         State state = null;
         try {
             state = objectMapper.readValue(stateNode.toString(), State.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
