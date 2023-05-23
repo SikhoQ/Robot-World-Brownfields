@@ -21,4 +21,9 @@ public class LaunchCommand extends Command{
         String shots = String.valueOf( target.getShots());
         return new Request(robotName, "launch", new String[]{make, sheilds, shots});
     }
+
+    public String getKind(){
+        return this.make;
+    }
 }
+
