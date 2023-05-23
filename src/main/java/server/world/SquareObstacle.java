@@ -13,24 +13,52 @@ public class SquareObstacle implements Obstacle {
 
     private static int size = World.getWorldConfiguration().getTileSize();
 
+    /**
+     * Creates a new SquareObstacle at the specified position.
+     *
+     * @param x the x-coordinate of the obstacle
+     * @param y the y-coordinate of the obstacle
+     */
     public SquareObstacle(int x, int y) {
         this.position = new Position(x, y);
         obstacles.add(position);
     }
 
+    /**
+     * Returns the x-coordinate of the bottom-left corner of the obstacle.
+     *
+     * @return the x-coordinate of the bottom-left corner
+     */
     public int getBottomLeftX() {
         return this.position.getX();
     }
 
+    /**
+     * Returns the y-coordinate of the bottom-left corner of the obstacle.
+     *
+     * @return the y-coordinate of the bottom-left corner
+     */
     public int getBottomLeftY() {
         return this.position.getY();
     }
 
+    /**
+     * Returns the size of the obstacle.
+     *
+     * @return the size of the obstacle
+     */
     public int getSize() {
         return size;
     }
 
-
+    /**
+     * Checks if the obstacle blocks the specified position.
+     *
+     * @param position the position to check
+     * @param robot    the robot to ignore during the check
+     * @return an array with the result of the check: [true] if the position is blocked by the obstacle,
+     *         [true, otherRobot] if the position is blocked by another robot, or [false] if the position is not blocked
+     */
     public static Object[] blocksPosition(Position position, Robot robot) {
         for (Position obstacle: obstacles) {
             if ((obstacle.getX() <= position.getX() && position.getX() < obstacle.getX() + size) &&
@@ -82,7 +110,15 @@ public class SquareObstacle implements Obstacle {
         }
     }
 
-
+    /**
+     * Checks if the obstacle blocks the path from position a to position b.
+     *
+     * @param a     the starting position
+     * @param b     the ending position
+     * @param robot the robot to ignore during the check
+     * @return an array with the result of the check: [true] if the path is blocked by the obstacle,
+     *         [true, otherRobot] if the path is blocked by another robot, or [false] if the path is not blocked
+     */
     public static Object[] blocksYPath(Position a, Position b, Robot robot) {
         if ( b.getY() > a.getY()) { // moving up
             for (int i=a.getY(); i <= b.getY(); i++) {
@@ -124,7 +160,11 @@ public class SquareObstacle implements Obstacle {
         return new Object[]{false};
     }
 
-
+    /**
+     * Returns a string representation of the SquareObstacle.
+     *
+     * @return a string representation of the SquareObstacle
+     */
     @Override
     public String toString() {
         int endposX = getBottomLeftX() + size;

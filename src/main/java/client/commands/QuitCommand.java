@@ -3,7 +3,16 @@ package client.commands;
 import client.robots.Robot;
 import client.request.Request;
 
+/**
+ * Represents a command to quit or exit.
+ * Extends the Command class.
+ */
 public class QuitCommand extends Command {
+
+    /**
+     * Constructs a QuitCommand object.
+     * Sets the command name to "quit".
+     */
     public QuitCommand() {
         super("quit");
     }

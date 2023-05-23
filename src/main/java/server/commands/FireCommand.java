@@ -10,13 +10,28 @@ import server.response.StandardResponse;
 import server.world.Robot;
 import server.world.World;
 
+/**
+ * Represents a command to fire a bullet from the robot.
+ * Extends the Command class.
+ */
 public class FireCommand extends Command{
     private ClientHandler clientHandler;
 
+    /**
+     * Constructs a FireCommand object.
+     * Calls the superclass constructor to set the command name.
+     */
     public FireCommand() {
         super("fire");
     }
 
+    /**
+     * Fires a bullet from the robot and handles the outcome.
+     *
+     * @param robot The robot object that performs the fire command.
+     * @param world The world object representing the game world.
+     * @return The response object indicating the outcome of the fire command.
+     */
     private Response fire(Robot robot, World world) {
         robot.decreaseShots();
 
@@ -87,6 +102,7 @@ public class FireCommand extends Command{
             return new StandardResponse(new HashMap<>() {{ put("message", "Miss"); }}, robot.getState());
         }
     }
+    
     
     @Override
     public Response execute(ClientHandler clientHandler) {

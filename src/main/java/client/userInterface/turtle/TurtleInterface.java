@@ -12,6 +12,10 @@ import client.userInterface.text.TextInterface;
 import client.userInterface.turtle.util.Turtle;
 import client.userInterface.util.Position;
 
+/**
+ * The TurtleInterface class represents the turtle-based user interface for the client.
+ * It manages the display of the game world, including obstacles, player, and enemy players.
+ */
 public class TurtleInterface extends TextInterface implements Runnable {
 
     private Player player;
@@ -30,14 +34,27 @@ public class TurtleInterface extends TextInterface implements Runnable {
 
     private final int angle = 90;
 
+    /**
+     * Constructs a new TurtleInterface with the specified client.
+     *
+     * @param client The client associated with the interface.
+     */
     public TurtleInterface(Client client) {
         super(client);
     }
 
+    /**
+     * Returns the player associated with the interface.
+     *
+     * @return The player associated with the interface.
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Creates a new turtle object to serve as the pen.
+     */
     public void createPen() {
         this.pen = new Turtle();
         this.pen.hide();
@@ -45,6 +62,9 @@ public class TurtleInterface extends TextInterface implements Runnable {
         this.pen.shapeSize(1, 1);
     }
 
+    /**
+     * Displays the obstacles in the game world.
+     */
     public void showObstacles() {
         displayBox();
         for (int i=0; i < obstacles.size(); i++) {
@@ -52,15 +72,29 @@ public class TurtleInterface extends TextInterface implements Runnable {
         }
     }
     
-
+    /**
+     * Sets the obstacles in the game world.
+     *
+     * @param obstacles The list of obstacles.
+     */
     public void setObstacles(List<Position> obstacles) {
         this.obstacles = obstacles;
     }
 
+    /**
+     * Sets the visibility level of the interface.
+     *
+     * @param visibility The visibility level.
+     */
     public void setVisibility(int visibility) {
         this.visibility = visibility;
     }
 
+    /**
+     * Draws an obstacle at the specified position.
+     *
+     * @param obstacle The position of the obstacle.
+     */
     public void drawObstacle(Position obstacle) {
         this.pen.up();
         this.pen.setPosition(obstacle.getX(), obstacle.getY());
@@ -80,6 +114,9 @@ public class TurtleInterface extends TextInterface implements Runnable {
         }
     }
 
+    /**
+     * Adds new enemy players to the interface based on the client's robot.
+     */
     public void removeEnemyPlayers() {
         Iterator<Player> iterator = enemyPlayers.iterator();
         while (iterator.hasNext()) {
@@ -106,11 +143,20 @@ public class TurtleInterface extends TextInterface implements Runnable {
         }
     }
 
+    /**
+     * Returns the enemy player with the specified name.
+     *
+     * @param enemyName The name of the enemy player.
+     * @return The enemy player with the specified name, or null if not found.
+     */
     public Player getEnemyPlayer(String enemyName) {
         int enemyIndex  = enemyPlayersNames.indexOf(enemyName);
         return enemyPlayers.get(enemyIndex);
     }
 
+    /**
+     * Draws a rectangle using the pen turtle.
+     */
     public void drawRectangle() {
         this.pen.forward(this.obstacleSize);
         this.pen.left(this.angle);
@@ -121,6 +167,9 @@ public class TurtleInterface extends TextInterface implements Runnable {
         this.pen.forward(this.obstacleSize);
     }
 
+    /**
+     * Displays the box around the game world.
+     */
     public void displayBox() {
         this.pen.up();
         this.pen.setPosition(-x_constraint - obstacleSize, y_constraint + obstacleSize);

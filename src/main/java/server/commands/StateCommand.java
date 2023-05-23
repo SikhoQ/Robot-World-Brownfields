@@ -8,6 +8,11 @@ import server.response.StandardResponse;
 import server.world.Robot;
 
 public class StateCommand extends Command {
+
+    /**
+     * Constructs a StateCommand object.
+     * Calls the superclass constructor to set the command name.
+     */
     public StateCommand() {
         super("state");
     }

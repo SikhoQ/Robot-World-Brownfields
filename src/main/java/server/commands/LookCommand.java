@@ -8,8 +8,15 @@ import server.world.util.Position;
 import server.ClientHandler;
 import server.response.Response;
 
+/**
+ * Represents a command to look for obstacles and other robots in different directions from the current robot's position.
+ * The command provides information about the objects in the robot's line of sight within the visibility range.
+ */
 public class LookCommand extends Command {
 
+    /**
+     * Constructs a LookCommand object.
+     */
     public LookCommand() {
         super("look");
     }
@@ -191,7 +198,14 @@ public class LookCommand extends Command {
         return  new StandardResponse(data, robot.getState());
     }
 
-
+    /**
+     * Checks if an object is within the boundary of the robot's line of sight based on the direction.
+     *
+     * @param robotPos    The position of the robot.
+     * @param objectPos   The position of the object to check.
+     * @param direction   The direction of the line of sight.
+     * @return True if the object is within the boundary, false otherwise.
+     */
     public boolean inBoundary(Position robotPos, Position objectPos, String direction) {
         int size = World.getWorldConfiguration().getTileSize();
         int robotX = robotPos.getX() - size;

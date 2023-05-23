@@ -9,6 +9,12 @@ public class LaunchCommand extends Command{
     private String make;
     private String robotName;
 
+    /**
+     * Constructs a LaunchCommand object with the specified make and robot name.
+     *
+     * @param make      The make of the robot.
+     * @param robotName The name of the robot.
+     */
     public LaunchCommand(String make, String name) {
         super("launch");
         this.make =  make;

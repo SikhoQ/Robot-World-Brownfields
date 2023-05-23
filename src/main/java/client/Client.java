@@ -30,6 +30,11 @@ public class Client {
 
     private TextInterface textInterface;
 
+    /**
+    * Constructs a new Client object with the specified socket.
+    *
+    * @param socket The socket used for communication with the server.
+    */
     public Client(Socket socket) {
         try {
             this.socket = socket;
@@ -42,14 +47,29 @@ public class Client {
         }
     }
 
+    /**
+     * Returns the socket used for communication with the server.
+     *
+     * @return The socket object.
+     */
     public Socket getSocket() {
         return socket;
     }
 
+    /**
+     * Returns the input stream associated with the socket.
+     *
+     * @return The input stream.
+     */
     public InputStream getInputStream() {
         return inputStream;
     }
 
+    /**
+     * Returns the output stream associated with the socket.
+     *
+     * @return The output stream.
+     */
     public OutputStream getOutputStream() {
         return outputStream;
     }
@@ -62,6 +82,9 @@ public class Client {
         this.robot = robot;
     }
 
+    /**
+     * Sends a message to the server.
+     */
     public void sendMessage() {
         try {
             connectClientToServer();
@@ -75,6 +98,14 @@ public class Client {
         }
     }
 
+    /**
+     * Handles the user input received from the client by creating a command that when executed will return a request.
+     * The Request object is converted a JSON string and sent to server.
+     * Ignores user input if reloading or repairing...
+     * 
+     * @param userInput The user input string.
+     * @throws IOException If an I/O error occurs.
+     */
     public void handleUserInput(String userInput) throws IOException {
         // create a command that when executed will return a request.
         if (!paused) {
@@ -127,6 +158,13 @@ public class Client {
         }
     }
 
+    /**
+     * Instantiates a robot based on the user input.
+     * If user enters invalid type, Sniper is instantiated.
+     * Will not instatiate if a robot has already been launched.
+     *
+     * @param userInput The user input string.
+     */
     public String instantiateRobot(String userInput) {
         if (robot == null) { // user hasn't launched robot yet.
             String[] args = userInput.toLowerCase().trim().split(" ");
@@ -148,10 +186,21 @@ public class Client {
         }
     }
 
+    /**
+     * Sends a request JSON string to the server.
+     *
+     * @param requestJsonString The JSON string representing the request.
+     * @throws IOException If an I/O error occurs.
+     */
     public void sendToServer(String requestJsonString) throws IOException {
         this.outputStream.write(requestJsonString.getBytes());
     }
 
+    /**
+     * Establishes the initial connection between the client and the server.
+     *
+     * @throws IOException If an I/O error occurs.
+     */
     public void connectClientToServer() throws IOException {
         Request connectionRequest = new Request(String.valueOf(socket.getInetAddress()), "connect", new String[] {});
         String connectionRequestString = JsonHandler.serializeRequest(connectionRequest);
@@ -159,6 +208,9 @@ public class Client {
         Command.currentCommand = "connect";
     }
 
+    /**
+     * Listens for messages sent from the server in a separate thread.
+     */
     public void listenFormessage() {
         new Thread(new Runnable() {
             @Override
@@ -178,6 +230,12 @@ public class Client {
         }).start();
     }
 
+    /**
+     * Retrieves the response from the server.
+     *
+     * @return The response string from the server.
+     * @throws IOException If an I/O error occurs.
+     */
     public String getResponseFromServer() throws IOException {
         byte[] buffer = new byte[1024];
         int bytesRead = inputStream.read(buffer);
@@ -185,6 +243,11 @@ public class Client {
         return response;
     }
 
+    /**
+     * Handles the response received from the server.
+     *
+     * @param response The response string from the server.
+     */
     public void handleResponse(String response) {
         JsonNode responseJson = JsonHandler.deserializeJsonTString(response);
         JsonNode msgNode = responseJson.get("data").get("message");
@@ -330,6 +393,14 @@ public class Client {
         }
     }
 
+
+    /**
+     * Closes the socket, input stream, and output stream.
+     *
+     * @param socket        The socket to close.
+     * @param inputStream   The input stream to close.
+     * @param outputStream  The output stream to close.
+     */
     public void closeEverything(Socket socket, InputStream inputStream, OutputStream outputStream) {
         try (socket; inputStream; outputStream) {
             // resources are automatically closed when the try block completes.
@@ -338,6 +409,12 @@ public class Client {
         }
     }
 
+    /**
+     * The entry point of the client application.
+     *
+     * @param args The command-line arguments.
+     * @throws IOException If an I/O error occurs.
+     */
     public static void main(String[] args) throws IOException {
         Socket socket = args.length == 2?  
             new Socket(args[0], Integer.parseInt(args[1])) : new Socket("localhost", 8147);

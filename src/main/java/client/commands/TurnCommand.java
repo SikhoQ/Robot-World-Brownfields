@@ -6,6 +6,11 @@ import client.robots.Robot;
 public class TurnCommand extends Command{
     private String argument;
 
+    /**
+     * Constructs a TurnCommand object with the specified argument.
+     *
+     * @param argument The argument for the turn command.
+     */
     public TurnCommand(String argument) {
         super("turn");
         this.argument = argument;

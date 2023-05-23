@@ -16,7 +16,9 @@ enum Direction {
     NORTH, EAST, SOUTH, WEST
 }
 
-
+/**
+ * The World class represents the game world, including its configuration, obstacles, and robots.
+ */
 public class World {
     public static  ConfigurationManager worldConfiguration = new ConfigurationManager();
     protected final Position TOP_LEFT = new Position(-worldConfiguration.getXConstraint(), worldConfiguration.getYConstraint());
@@ -26,12 +28,20 @@ public class World {
     private List<Obstacle> obstacles;
     public static ArrayList<Robot> robots;
     
-
+    /**
+     * Constructs a new World object.
+     * Initializes the list of robots and creates obstacles in the world.
+     */
     public World(){
         robots = new ArrayList<>();
         this.obstacles = createObstacles();
     }
 
+    /**
+     * Returns the world configuration.
+     *
+     * @return the ConfigurationManager object representing the world configuration
+     */
     public static ConfigurationManager getWorldConfiguration() {
         return worldConfiguration;
     }
@@ -41,6 +51,11 @@ public class World {
         return start + random.nextInt(stop - start + 1);
     }
 
+    /**
+     * Creates a list of obstacles in the world.
+     *
+     * @return a list of obstacles
+     */
     public List<Obstacle> createObstacles() {
         List<Obstacle> obstacles = new ArrayList<>();
         int numberOfObstacles= randomInt(5,15);
@@ -56,10 +71,19 @@ public class World {
         return obstacles;
     }
 
+    /**
+     * Returns the list of obstacles in the world.
+     *
+     * @return the list of obstacles
+     */
     public List<Obstacle> getObstacles() {
         return this.obstacles;
     }
 
+    /**
+     * Displays the obstacles in the world.
+     * Prints the position of each obstacle to the console.
+     */
     public void showObstacles() {
         List<Obstacle> obstacles = getObstacles();
         if (!obstacles.isEmpty()) {
@@ -70,19 +94,39 @@ public class World {
         }
     }
 
-    
+    /**
+     * Returns the list of robots in the world.
+     *
+     * @return the list of robots
+     */
     public ArrayList<Robot> getRobots() {
         return robots;
     }
-    
+
+    /**
+     * Adds a robot to the world.
+     *
+     * @param robot the robot to add
+     */
     public void addRobotToWorld(Robot robot) {
         robots.add(robot);
     }
 
+    /**
+     * Removes a robot from the world.
+     *
+     * @param robot the robot to remove
+     */
     public void removeRobot(Robot robot) {
         robots.remove(robot);
     }
 
+    /**
+     * Checks if a robot is in the world.
+     *
+     * @param robot the robot to check
+     * @return true if the robot is in the world, false otherwise
+     */
     public boolean robotInWorld(Robot robot) {
         for (Robot robotInWorld : robots) {
             if (robot.getName().equalsIgnoreCase(robotInWorld.getName())) {
@@ -92,6 +136,15 @@ public class World {
         return false;
     }
 
+    /**
+     * Updates the position of a robot in the world.
+     *
+     * @param robot    the robot to update
+     * @param nrSteps  the number of steps to move the robot
+     * @param isBullet indicates if the update is for a bullet (true) or robot movement (false)
+     * @return an array containing the update response, which can be UpdateResponse.SUCCESS, UpdateResponse.FAILED_OBSTRUCTED,
+     * or UpdateResponse.FAILED_OUTSIDE_WORLD, and additional information if applicable
+     */
     public Object[] updatePosition(Robot robot, int nrSteps) { // remove isBullet from this method
 
         int increment = (nrSteps > 0)? 1 : -1;
@@ -112,6 +165,15 @@ public class World {
         return updatePosition_helper(robot, nrSteps, true); 
     }
 
+    /**
+     * Helper method to update the position of a robot in the world.
+     *
+     * @param robot    the robot to update
+     * @param nrSteps  the number of steps to move the robot
+     * @param isBullet indicates if the update is for a bullet (true) or robot movement (false)
+     * @return an array containing the update response, which can be UpdateResponse.SUCCESS or UpdateResponse.FAILED_OBSTRUCTED,
+     * and additional information if another robot obstructs the path
+     */
     Object[] updatePosition_helper(Robot robot, int nrSteps, Boolean isBullet) {
         int newX = robot.getPosition().getX();
         int newY = robot.getPosition().getY();
@@ -152,7 +214,12 @@ public class World {
         return new Object[]{UpdateResponse.FAILED_OUTSIDE_WORLD};
     };
 
-
+    /**
+     * Updates the direction of a robot in the world.
+     *
+     * @param robot     the robot to update
+     * @param turnRight indicates whether to turn the robot right (true) or left (false)
+     */
     public void updateDirection(Robot robot, boolean turnRight){
         if (turnRight) {
             switch (String.valueOf(robot.getDirection())) {

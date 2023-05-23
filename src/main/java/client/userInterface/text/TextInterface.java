@@ -12,6 +12,9 @@ import client.userInterface.util.Position;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * The TextInterface class represents a text-based user interface for interacting with the client and robots.
+ */
 public class TextInterface {
     protected final Client client;
     private List<Position> obstacles;
@@ -19,23 +22,48 @@ public class TextInterface {
     private TurtleInterface gui;
     private Scanner scanner;
 
+    /**
+     * Constructs a new TextInterface with the specified client.
+     *
+     * @param client The client associated with the interface.
+     */
     public TextInterface(Client client) {
         this.client = client;
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Retrieves the list of obstacles.
+     *
+     * @return The list of obstacles.
+     */
     public List<Position> getObstacles() {
         return obstacles;
     }
 
+    /**
+     * Retrieves the TurtleInterface used by the TextInterface.
+     *
+     * @return The TurtleInterface used by the TextInterface.
+     */
     public TurtleInterface getGui() {
         return gui;
     }
 
+    /**
+     * Retrieves user input from the scanner.
+     *
+     * @return The user input as a string.
+     */
     public String getUserInput() {
         return scanner.nextLine();
     }
 
+    /**
+     * Outputs the specified string.
+     *
+     * @param outputString The string to be output.
+     */
     public void output(String outputString) {
 
         Robot robot = client.getRobot();

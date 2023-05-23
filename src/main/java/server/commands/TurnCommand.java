@@ -12,6 +12,12 @@ import server.world.World;
 public class TurnCommand extends Command{
 
     public TurnCommand(String argument) {
+        
+        /**
+     * Constructs a TurnCommand object with the specified argument.
+     *
+     * @param argument The argument representing the direction to turn the robot ("right" or "left").
+     */
         super("turn", argument);
     }
 

@@ -10,9 +10,19 @@ import server.world.Robot;
 import server.world.World;
 import server.world.util.UpdateResponse;
 
+/**
+ * Represents a command to move the robot forward a specified number of steps.
+ * Extends the Command class.
+ */
 public class ForwardCommand extends Command {
 
     public ForwardCommand(String argument) {
+        
+        /**
+     * Constructs a ForwardCommand object with the specified argument.
+     *
+     * @param argument The argument representing the number of steps to move the robot forward.
+     */
         super("forward", argument);
     }
 

@@ -1,14 +1,29 @@
 package server.world.util;
 
+/**
+ * The Position class represents a position in a two-dimensional space.
+ * It contains the x and y coordinates of the position.
+ */
 public class Position {
     private final int x;
     private final int y;
 
+    /**
+     * Constructs a new Position object with the specified x and y coordinates.
+     *
+     * @param x The x coordinate of the position.
+     * @param y The y coordinate of the position.
+     */
     public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Returns the x coordinate of the position.
+     *
+     * @return The x coordinate of the position.
+     */
     public int getX() {
         return x;
     }
@@ -21,6 +36,11 @@ public class Position {
         return new int[] {x, y};
     }
 
+    /**
+     * Returns a string representation of the position in the format [x, y].
+     *
+     * @return A string representation of the position.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

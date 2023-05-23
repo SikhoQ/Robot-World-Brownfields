@@ -7,6 +7,10 @@ import client.userInterface.turtle.util.Turtle;
 
 public class Player {
     
+    /**
+    * The Player class represents a player in the turtle-based user interface.
+    * It is responsible for managing the player's turtle, including movement, appearance, and firing bullets.
+    */
     private Turtle player;
     private Robot robot;
     private final int angle = 90;
@@ -14,7 +18,12 @@ public class Player {
     private final int constraint = 200;
     Turtle bullet;
 
-
+    /**
+     * Constructs a new Player with the specified robot and enemy status.
+     *
+     * @param robot    The robot associated with the player.
+     * @param isEnemy  A boolean indicating whether the player is an enemy.
+     */
     public Player(Robot robot, boolean isEnemy) {
         this.robot = robot;
         player = new Turtle();
@@ -54,42 +63,85 @@ public class Player {
         }
     }
 
+    /**
+     * Returns the player's turtle object.
+     *
+     * @return The player's turtle.
+     */
     public Turtle getPlayer() {
         return player;
     }
 
+    /**
+     * Returns the robot associated with the player.
+     *
+     * @return The robot associated with the player.
+     */
     public Robot getRobot() {
         return robot;
     }
 
+    /**
+     * Hides the player's turtle.
+     */
     public void hide() {
         player.hide();
     }
 
+    /**
+     * Shows the player's turtle.
+     */
     public void show() {
         player.show();
     }
 
+    /**
+     * Moves the player's turtle forward by the specified number of steps.
+     *
+     * @param steps The number of steps to move forward.
+     */
     public void moveForward(double steps) {
         player.forward(steps);
     }
 
+    /**
+     * Moves the player's turtle backward by the specified number of steps.
+     *
+     * @param steps The number of steps to move backward.
+     */
     public void moveBack(double steps) {
         player.backward(steps);
     }
 
+    /**
+     * Turns the player's turtle to the right.
+     */
     public void turnRight() {
         player.right(angle);
     }
 
+    /**
+     * Turns the player's turtle to the left.
+     */
     public void turnLeft() {
         player.left(angle);
     }
 
+    /**
+     * Sets the position of the player's turtle to the specified coordinates.
+     *
+     * @param x The x-coordinate of the position.
+     * @param y The y-coordinate of the position.
+     */
     public void setPlayerPosition(int x, int y) {
         player.setPosition(x, y);
     }
 
+     /**
+     * Sets the direction of the player's turtle based on the specified direction string.
+     *
+     * @param direction The direction string ("north", "east", "south", or "west").
+     */
     public void setDirection(String direction) {
         switch(direction.toLowerCase()) {
             case "north" :
@@ -107,6 +159,11 @@ public class Player {
         }
     }
 
+    /**
+     * Fires a bullet from the player's turtle with the specified number of steps.
+     *
+     * @param steps The number of steps the bullet should travel.
+     */
     public void fire(int steps) {
         bullet.shape("circle");
         bullet.shapeSize(4, 4);

@@ -20,6 +20,12 @@ public class LaunchCommand extends Command {
     private int shields;
     private int shots;
 
+    /**
+     * Constructs a LaunchCommand object with the specified robot name and arguments.
+     *
+     * @param robotName The name of the robot to launch.
+     * @param args      The arguments containing the robot kind, shields, and shots.
+     */
     public LaunchCommand(String robotName, JsonNode args) {
         super("launch");
         // Extract each element in the args array:

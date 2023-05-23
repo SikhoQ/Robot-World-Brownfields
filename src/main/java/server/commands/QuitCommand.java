@@ -8,7 +8,12 @@ import server.response.*;
 import server.response.Response;
 import server.world.Robot;
 
-
+/**
+     * Constructs a LaunchCommand object with the specified robot name and arguments.
+     *
+     * @param robotName The name of the robot to launch.
+     * @param args      The arguments containing the robot kind, shields, and shots.
+     */
 public class QuitCommand extends Command{
 
     public QuitCommand() {

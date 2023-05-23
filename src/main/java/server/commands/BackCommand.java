@@ -10,8 +10,14 @@ import server.world.Robot;
 import server.world.World;
 import server.world.util.UpdateResponse;
 
+/**
+ * Represents a command to move the robot backwards in the world.
+ * Extends the Command class and overrides the execute method to execute the back command.
+ */
 public class BackCommand extends Command {
 
+    /** Constructs a BackCommand object with the specified argument.
+     */
     public BackCommand(String argument) {
         super("back", argument);
     }

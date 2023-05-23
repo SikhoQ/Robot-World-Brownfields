@@ -11,12 +11,21 @@ import server.world.World;
 import server.world.Obstacle;
 import server.world.Robot;
 
-/* A class to handle all commands that come from the server. */
+/**
+ * The ServerHandler class handles commands that come from the server.
+ * It implements the Runnable interface to run as a separate thread and wait for
+ * server commands from the console.
+ */
 public class ServerHandler implements Runnable {
     private Scanner scanner;
     private String command;
     private World world;
 
+    /**
+     * Constructs a new ServerHandler object.
+     *
+     * @param world the world instance
+     */
     public ServerHandler(World world) {
         this.world = world;
     }
@@ -45,7 +54,11 @@ public class ServerHandler implements Runnable {
         }
     }
 
-    // tell clients that server is diconnecting, then disconnect it.
+    /**
+     * Handles the quit command.
+     * Sends a server disconnect response to all client handlers and shuts down the
+     * server.
+     */
     public void quit() {
         ErrorResponse response = new ErrorResponse("Server has been disconnected.");
         String responseJsonString = JsonHandler.serializeResponse(response);
@@ -58,6 +71,10 @@ public class ServerHandler implements Runnable {
         System.exit(0);
     }
 
+    /**
+     * Handles the robots command.
+     * Prints the list of robots currently in the world.
+     */
     public void robots() {
         if (world.getRobots().size() < 1) {
             output("There are currently no robots in this world.");
@@ -66,6 +83,11 @@ public class ServerHandler implements Runnable {
         }
     }
 
+    /**
+     * Returns a string representation of the robots in the world.
+     *
+     * @return a string representation of the robots
+     */
     public String getRobotsString() {
         StringBuilder string = new StringBuilder();
         string.append("\nHere are the robots in this world:\n");
@@ -75,6 +97,10 @@ public class ServerHandler implements Runnable {
         return string.toString();
     }
 
+    /**
+     * Handles the dump command.
+     * Prints information about the robots and obstacles in the world.
+     */
     public void dump() {
         StringBuilder string = new StringBuilder();
         String robotsStr = world.getRobots().size() > 0? 
@@ -97,6 +123,11 @@ public class ServerHandler implements Runnable {
         System.out.flush();
     }
 
+    /**
+     * Outputs a string to the console with the server's IP address.
+     *
+     * @param string the string to output
+     */
     private void output(String string) {
         try {
             System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress()  + "> : " + string);

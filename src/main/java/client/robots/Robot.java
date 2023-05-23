@@ -21,12 +21,18 @@ public class Robot {
     private static int repair;
     private static int visibility;
 
+    /**
+     * Constructs a new Robot object with the specified name.
+     *
+     * @param name The name of the robot.
+     */
     public Robot(String name) {
         this.name = name;
         this.shields = 0;
         this.shots = 10;
     }
 
+    
     public Robot(String name, String kind, State state) {
         this.name = name;
         this.kind = kind;
@@ -58,62 +64,144 @@ public class Robot {
         enemyRobot.setState(enemyState);
     }
 
+    /**
+     * Returns the number of shields the robot has, i.e. Health.
+     *
+     * @return The shields value.
+     */
     public int getShields() {
         return shields;
     }
+
+    /**
+     * Returns the shots of the robot.
+     *
+     * @return The shots value.
+     */
+
 
     public int getShots() {
         return shots;
     }
 
+    /**
+     * Returns the name of the robot.
+     *
+     * @return The name value.
+     */
+
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the visibility value shared by all robots.
+     *
+     * @return The visibility value.
+     */
     public static int getVisibility() {
         return visibility;
     }
+
+    /**
+     * Sets the visibility value shared by all robots.
+     *
+     * @param visibility The visibility value to set.
+     */
 
     public static void setVisibility(int visibility) {
         Robot.visibility = visibility;
     }
 
+    /**
+     * Returns the number of seconds it takes reload a robot.
+     * Value shared by all robots.
+     *
+     * @return The reload value.
+     */
     public static int getReload() {
         return reload;
     }
 
+    /**
+     * Sets the number of seconds it takes reload a robot.
+     *
+     * @param reload The reload value to set.
+     */
     public static void setReload(int reload) {
         Robot.reload = reload;
     }
 
+    /**
+     * Returns the number of seconds it takes repair a robot.
+     * Value shared by all robots.
+     *
+     * @return The repair value.
+     */
     public static int getRepair() {
         return repair;
     }
 
+    /**
+     * Sets the number of seconds it takes repair a robot.
+     *
+     * @param reload The repair value to set.
+     */
     public static void setRepair(int repair) {
         Robot.repair = repair;
     }
 
+    /**
+     * Sets the name of the robot.
+     *
+     * @param name The name to set.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the kind(make) of the robot.
+     *
+     * @return The kind value.
+     */
     public String getKind() {
         return kind;
     }
 
+    /**
+     * Sets the kind(make) of the robot.
+     *
+     * @param kind The kind to set.
+     */
     public void setKind(String kind) {
         this.kind = kind;
     }
 
+    /**
+     * Sets the number of shields the robot has, i.e. Health
+     *
+     * @param shields The shields value to set.
+     */
     public void setShields(int shields) {
         this.shields = shields;
     }
 
+    /**
+     * Sets the number of shots the robot has.
+     *
+     * @param shots The shots value to set.
+     */
     public void setShots(int shots) {
         this.shots = shots;
     }
 
+    /**
+     * Sets the state of the robot.
+     * Automatically update shots and shields as well.
+     *
+     * @param state The state to set.
+     */
     public void setState(State state) {
         this.state = state;
         // automatically update shots and shields as well.
@@ -121,6 +209,11 @@ public class Robot {
         setShields(state.getShields());
     }
 
+    /**
+     * Gets the state of the robot.
+     *
+     * @return state of robot.
+     */
     public State getState() {
         return state;
     }
