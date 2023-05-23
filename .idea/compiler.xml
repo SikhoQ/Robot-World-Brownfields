@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="JHB45_ROBOT_WORLD" />
         <module name="RobotWorld" />
+        <module name="jhb45_robot_worlds" />
       </profile>
     </annotationProcessing>
   </component>
