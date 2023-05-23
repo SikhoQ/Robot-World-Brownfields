@@ -8,54 +8,42 @@ import java.io.IOException;
 
 public class ConfigurationManager {
 
-    private JsonNode configurationFile;
+    public ConfigurationManager() {}
 
-    public ConfigurationManager() {
-        try {
-            this.configurationFile = JsonHandler.deserializeJsonFile(new File("src/main/java/server/configuration/Configuration.json"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static  int getPort() {
+        return Config.PORT;
     }
 
-    public int getPort() {
-        return configurationFile.get("server").get("port").asInt();
+    public static String getVisibility() {
+        return String.valueOf(Config.VISIBILITY);
     }
 
-    public String getHost() {
-        return configurationFile.get("server").get("host").asText();
+    public static  String getReload() {
+        return String.valueOf(Config.RELOAD);
     }
 
-    public String getVisibility() {
-        return configurationFile.get("world").get("visibility").asText();
+    public static  String getRepair() {
+        return String.valueOf(Config.RELOAD);
     }
 
-    public String getReload() {
-        return configurationFile.get("world").get("reload").asText();
+    public static  int getXConstraint() {
+        return Config.XCONSTRAINT;
     }
 
-    public String getRepair() {
-        return configurationFile.get("world").get("repair").asText();
+    public static  int getYConstraint() {
+        return Config.YCONSTRAINT;
     }
 
-    public int getXConstraint() {
-        return configurationFile.get("world").get("x_constraint").asInt();
+    public static int getMaxSheilds() {
+        return Config.MAX_SHIELDS;
     }
 
-    public int getYConstraint() {
-        return configurationFile.get("world").get("y_constraint").asInt();
+    public static int getTileSize() {
+        return Config.TILE_SIZE;
     }
 
-    public int getMaxSheilds() {
-        return configurationFile.get("world").get("max_sheilds").asInt();
-    }
-
-    public int getTileSize() {
-        return configurationFile.get("world").get("tileSize").asInt();
-    }
-
-    public int getMaxRobots() {
-        return configurationFile.get("world").get("maxRobots").asInt();
+    public static int getMaxRobots() {
+        return Config.MAX_ROBOTS;
     }
     
 }
