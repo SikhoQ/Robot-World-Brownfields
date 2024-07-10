@@ -116,4 +116,39 @@ class LaunchRobotTests {
         // And the message "No more space in this world"
         assertEquals("No more space in this world", response2.get("data").get("message").asText());
     }
+
+    @Test
+    void nameAlreadyExists(){
+        //        Given that I am connected to a Robot Worlds server
+        //        And the world is of size 1x1
+        assertTrue(serverClient.isConnected());
+
+        //        And there is already a robot with the same name I chose\there is already a robot named "Hal" in the world
+        String request1 = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"launch\"," +
+                "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                "}";
+        JsonNode response1 = serverClient.sendRequest(request1);
+
+        assertNotNull(response1.get("result"));
+        assertEquals("OK", response1.get("result").asText());
+
+        //        When I send a valid launch request to the server with the same robot name "Hal"
+        String request2 = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"launch\"," +
+                "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                "}";
+
+        JsonNode response2 = serverClient.sendRequest(request2);
+
+        //        Then I should get an "ERROR" response
+        assertNotNull(response2.get("result"));
+        assertEquals("ERROR", response2.get("result").asText());
+
+        //        And the message "Too many of you in this world"
+        assertNotNull(response2.get("data"));
+        assertEquals("Too many of you in this world", response2.get("data").get("message").asText());
+    }
 }

@@ -4,16 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-<<<<<<< Updated upstream
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-=======
 import java.net.Socket;
 import java.io.*;
->>>>>>> Stashed changes
 
 public class RobotWorldJsonClient implements RobotWorldClient {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -75,8 +72,4 @@ public class RobotWorldJsonClient implements RobotWorldClient {
             throw new RuntimeException("Error reading server response.", e);
         }
     }
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

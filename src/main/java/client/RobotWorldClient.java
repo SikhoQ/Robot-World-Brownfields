@@ -32,8 +32,4 @@ public interface RobotWorldClient {
     JsonNode sendRequest(String requestJsonString);
 
     String sendRequestAsString(String requestString);
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
