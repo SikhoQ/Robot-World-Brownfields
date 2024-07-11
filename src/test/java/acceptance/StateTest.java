@@ -5,6 +5,7 @@ import client.RobotWorldJsonClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,4 +71,27 @@ public class StateTest {
         assertNotNull(stateResponse.get("state").get("status"));
         assertEquals("TODO", stateResponse.get("state").get("status").asText());
     }
+    @Test
+    @DisplayName("The robot is not in the world.")
+    void errorForInvalidRobot() {
+
+        // Given that I just have successfully connected to the Robot Worlds server,
+        // but I have not yet launched my robot into the world.
+        assertTrue(serverClient.isConnected());
+
+        // When I try to get the state of the robot by sending a request to the server using the state command.
+
+        String stateRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"state\"," +
+                "  \"arguments\": []" +
+                "}";
+        JsonNode stateResponse = serverClient.sendRequest(stateRequest);
+
+        // Then I should get an "error" response from the server,
+        // telling me that my robot hasn't been launched yet.
+        assertNotNull(stateResponse.get("result"));
+        assertEquals("ERROR", stateResponse.get("result").asText());
+    }
+
 }
