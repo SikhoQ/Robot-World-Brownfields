@@ -2,7 +2,7 @@ package server.configuration;
 
 public class Config {
 
-    public static final int PORT = 5000;
+    public static final int PORT = 8147;
     public static final int XCONSTRAINT = 200;
     public static final int YCONSTRAINT = 200;
     public static final int RELOAD = 6;

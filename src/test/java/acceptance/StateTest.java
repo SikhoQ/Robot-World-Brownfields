@@ -72,7 +72,6 @@ public class StateTest {
         assertEquals("TODO", stateResponse.get("state").get("status").asText());
     }
     @Test
-    @DisplayName("The robot is not in the world.")
     void errorForInvalidRobot() {
 
         // Given that I just have successfully connected to the Robot Worlds server,
@@ -92,6 +91,11 @@ public class StateTest {
         // telling me that my robot hasn't been launched yet.
         assertNotNull(stateResponse.get("result"));
         assertEquals("ERROR", stateResponse.get("result").asText());
-    }
 
+        // And the message "Robot does not exist"
+        assertNotNull(stateResponse.get("data"));
+        assertNotNull(stateResponse.get("data").get("message"));
+        assertTrue(stateResponse.get("data").get("message").asText().contains("Robot does not exist"));
+
+    }
 }
