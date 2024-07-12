@@ -58,6 +58,20 @@ public class Client {
     }
 
     /**
+     * The entry point of the client application.
+     *
+     * @param args The command-line arguments.
+     * @throws IOException If an I/O error occurs.
+     */
+    public static void main(String[] args) throws IOException {
+        Socket socket = args.length == 2?
+                new Socket(args[0], Integer.parseInt(args[1])) : new Socket("localhost", 5000);
+        Client client = new Client(socket);
+        client.listenFormessage();
+        client.sendMessage();
+    }
+
+    /**
      * Returns the input stream associated with the socket.
      *
      * @return The input stream.
@@ -82,7 +96,6 @@ public class Client {
     public void setRobot(Robot robot) {
         this.robot = robot;
     }
-
     /**
      * Sends a message to the server.
      */
@@ -126,6 +139,7 @@ public class Client {
 //        if (result.equals("already launched")){
 //            return;
 //        }
+
 //    }
 
     /**
@@ -140,14 +154,14 @@ public class Client {
         if (paused) {
             return;
         }
-    
+
         try {
             processCommand(userInput);
         } catch (IllegalArgumentException e) {
             handleError(e);
         }
     }
-    
+
     private void processCommand(String userInput) throws IOException {
         switch (userInput.toLowerCase()) {
             case "help":
@@ -160,23 +174,23 @@ public class Client {
                 currentCommand = Command.create(userInput);
                 break;
         }
-    
+
         if (currentCommand instanceof LaunchCommand) {
             if (instantiateRobot(userInput).equals("already launched")) {
                 return;
             }
         }
-    
+
         if (currentCommand instanceof RepairCommand || currentCommand instanceof ReloadCommand) {
             paused = true;
         }
-    
+
         if (robot != null || currentCommand instanceof QuitCommand) {
             handleExecution();
         } else {
             textInterface.output("Please launch a robot into the world first.");
         }
-    }    
+    }
 
     /**
      * Instantiates a robot based on the user input.
@@ -329,21 +343,21 @@ public class Client {
         }
         return false;
     }
-    
+
     private boolean isRobotAndMessageValid(String msgStr) {
         return robot != null && msgStr != null && msgStr.contains("new robot");
     }
-    
+
     private void processNewRobot(JsonNode responseJson) {
         String enemyName = responseJson.get("data").get("robotName").asText();
         String enemyKind = responseJson.get("data").get("robotKind").asText();
         State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
-    
+
         Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
         robot.addEnemy(enemyRobot);
         robot.addEnemyName(enemyName);
     }
-    
+
 
     private boolean handleRobotsInWorldResponse(JsonNode responseJson, String msgStr) {
     if (isRobotsInWorldResponseValid(msgStr)) {
@@ -408,11 +422,11 @@ private void processRobotsInWorld(JsonNode responseJson) {
             handleErrorResponse(msgStr);
         }
     }
-    
+
     private boolean isValidResponse(JsonNode responseJson) {
         return responseJson.get("result").asText().equals("OK") && currentCommand != null;
     }
-    
+
     private void handleValidResponse(JsonNode responseJson, String response) {
         switch (currentCommand.getName()) {
             case "launch":
@@ -435,7 +449,7 @@ private void processRobotsInWorld(JsonNode responseJson) {
                 break;
         }
     }
-    
+
     private void handleLaunchResponse(JsonNode responseJson, String response) {
         robot.setState(JsonHandler.updateState(responseJson));
         Robot.setReload(responseJson.get("data").get("reload").asInt());
@@ -443,12 +457,12 @@ private void processRobotsInWorld(JsonNode responseJson) {
         Robot.setVisibility(responseJson.get("data").get("visibility").asInt());
         textInterface.output(response);
     }
-    
+
     private void handleMovementResponse(JsonNode responseJson, String response) {
         robot.setState(JsonHandler.updateState(responseJson));
         textInterface.output(response);
     }
-    
+
     private void handleRepairResponse(JsonNode responseJson, String response) {
         System.out.println("Repairing...");
         try {
@@ -460,7 +474,7 @@ private void processRobotsInWorld(JsonNode responseJson) {
         textInterface.output(response);
         paused = false;
     }
-    
+
     private void handleReloadResponse(JsonNode responseJson, String response) {
         System.out.println("Reloading...");
         try {
@@ -472,7 +486,7 @@ private void processRobotsInWorld(JsonNode responseJson) {
         textInterface.output(response);
         paused = false;
     }
-    
+
     private void handleErrorResponse(String msgStr) {
         if (currentCommand instanceof LaunchCommand) {
             this.robot = null;
@@ -480,7 +494,7 @@ private void processRobotsInWorld(JsonNode responseJson) {
         Command.currentCommand = "error";
         textInterface.output(msgStr);
     }
-    
+
 
 
 
@@ -497,19 +511,5 @@ private void processRobotsInWorld(JsonNode responseJson) {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * The entry point of the client application.
-     *
-     * @param args The command-line arguments.
-     * @throws IOException If an I/O error occurs.
-     */
-    public static void main(String[] args) throws IOException {
-        Socket socket = args.length == 2?
-                new Socket(args[0], Integer.parseInt(args[1])) : new Socket("localhost", 5000);
-        Client client = new Client(socket);
-        client.listenFormessage();
-        client.sendMessage();
     }
 }
