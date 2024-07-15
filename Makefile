@@ -45,8 +45,9 @@ release:
 # Tag Git target
 tag-git:
 	@echo "Tagging version $(VERSION) in Git..."
-	git tag release-$(VERSION)
+	git tag -a release-$(VERSION) -m "Release version $(VERSION)"
 	git push origin release-$(VERSION)
+
 
 # Help target
 help:
