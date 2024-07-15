@@ -34,7 +34,7 @@ public class Server {
      */
     public void startServer() {
         try {
-            System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress()  + "> " + ": Listening on port 8147..." );
+            System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress()  + "> " + ": Listening on port 5000..." );
             ServerHandler serverCommands = new ServerHandler(world); // listens for input on server and handles executing server command on a seperate thread.
             Thread serverThread = new Thread(serverCommands);
             serverThread.start();
@@ -50,6 +50,7 @@ public class Server {
                 System.out.println("A new client" + " <" + socket.getInetAddress().getHostName() + "> " + "has connected!");
                 ClientHandler clientHandler = new ClientHandler(socket, world); // create a clientHandler & sprouts a sperate thread for communicating with client.
                 Thread thread = new Thread(clientHandler);
+                System.out.println("Dodo");
                 thread.start();
             }
         } 

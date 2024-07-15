@@ -1,6 +1,6 @@
 {
   "server": {
-    "port": 8147,
+    "port": 5000,
     "host": "localhost"
   },
   "world": {

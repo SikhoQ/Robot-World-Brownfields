@@ -109,13 +109,13 @@ public class ServerHandler implements Runnable {
         string.append(robotsStr);
         string.append(("\nObstacles:\n"));
 
-        List<Obstacle> obstacles = world.getObstacles();
+//        List<Obstacle> obstacles = world.getObstacles();
 
-        for (Obstacle obstacle: obstacles){
-            string.append(obstacle.toString()).append("\n");
-        }
-
-        output(string.toString());
+//        for (Obstacle obstacle: obstacles){
+//            string.append(obstacle.toString()).append("\n");
+//        }
+//
+//        output(string.toString());
     } 
 
     public void clear() {

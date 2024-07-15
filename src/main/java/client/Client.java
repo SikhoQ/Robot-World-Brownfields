@@ -417,7 +417,7 @@ public class Client {
      */
     public static void main(String[] args) throws IOException {
         Socket socket = args.length == 2?  
-            new Socket(args[0], Integer.parseInt(args[1])) : new Socket("localhost", 8147);
+            new Socket(args[0], Integer.parseInt(args[1])) : new Socket("localhost", 5000);
         Client client = new Client(socket);
         client.listenFormessage();
         client.sendMessage();
