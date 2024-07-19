@@ -1,11 +1,10 @@
-package acceptance;
+package acceptance.world_1x1;
 
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

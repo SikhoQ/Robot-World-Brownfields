@@ -1,4 +1,4 @@
-package acceptance;
+package acceptance.world_1x1;
 
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;

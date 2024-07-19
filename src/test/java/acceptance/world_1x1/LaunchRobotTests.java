@@ -1,4 +1,4 @@
-package acceptance;
+package acceptance.world_1x1;
 
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;
@@ -151,4 +151,5 @@ class LaunchRobotTests {
         assertNotNull(response2.get("data"));
         assertEquals("Too many of you in this world", response2.get("data").get("message").asText());
     }
+
 }
