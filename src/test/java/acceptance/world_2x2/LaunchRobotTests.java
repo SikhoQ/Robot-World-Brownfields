@@ -47,7 +47,7 @@ class LaunchRobotTests {
         }
 //        When I launch one more robot
         String request2 = "{" +
-                "  \"robot\": \"HAL\"," +
+                "  \"robot\": \"HAL 10\"," +
                 "  \"command\": \"launch\"," +
                 "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
                 "}";
