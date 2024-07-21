@@ -62,6 +62,36 @@ class LaunchRobotTests {
         assertNotNull(response.get("data").get("message"));
         assertTrue(response.get("data").get("message").asText().contains("No more space in this world"));
     }
+
+    @Test
+    void robotsAvoidObstacle() {
+        assertTrue(serverClient.isConnected());
+
+        // Launch 8 robots into the world
+        for (int x = 1; x <= 8; x++) {
+            String request = "{" +
+                    "\"robot\": \"HAL " + x + "\"," +
+                    "\"command\": \"launch\"," +
+                    "\"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                    "}";
+            JsonNode response = serverClient.sendRequest(request);
+            assertNotNull(response, "Launch response for robot HAL " + x + " is null");
+            assertEquals("OK", response.get("result").asText(), "Robot launch failed for HAL " + x);
+
+            // Log the response for debugging
+            System.out.println("Response for robot HAL " + x + ": " + response.toString());
+
+            // Each robot cannot be in position [1,1]
+            JsonNode state = response.get("state");
+            assertNotNull(state, "State is null for robot HAL " + x);
+            JsonNode position = state.get("position");
+            assertNotNull(position, "Position is null for robot HAL " + x);
+            int posX = position.get(0).asInt();
+            int posY = position.get(1).asInt();
+            assertFalse(posX == 1 && posY == 1, "Robot HAL " + x + " is in the obstacle position [1,1]");
+        }
+
+    }
 }
 
 
