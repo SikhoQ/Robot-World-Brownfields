@@ -78,8 +78,7 @@ class LaunchRobotTests {
             assertNotNull(response, "Launch response for robot HAL " + x + " is null");
             assertEquals("OK", response.get("result").asText(), "Robot launch failed for HAL " + x);
 
-            // Log the response for debugging
-            System.out.println("Response for robot HAL " + x + ": " + response.toString());
+
 
             // Each robot cannot be in position [1,1]
             JsonNode state = response.get("state");
