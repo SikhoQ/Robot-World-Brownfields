@@ -98,6 +98,35 @@ public class Client {
             closeEverything(socket, inputStream, outputStream);
         }
     }
+    /**
+     * Handles the clear command
+     */
+    public void handleClear() {
+        Command.currentCommand = "clear";
+        Command.clear();
+        textInterface.output("terminal has been cleared.");
+    }
+    /**
+     * Handles errors
+     */
+    public void handleError(IllegalArgumentException e){
+        Command.currentCommand = "error";
+        textInterface.output(e.getMessage());
+    }
+    /**
+     * Handles the execution
+     */
+    public void handleExecution() throws IOException{
+        Request request = currentCommand.execute(robot);
+        String requestJsonString = JsonHandler.serializeRequest(request);
+        sendToServer(requestJsonString);
+    }
+//    public void launchCommand(String userInput){
+//        String result = instantiateRobot(userInput);
+//        if (result.equals("already launched")){
+//            return;
+//        }
+//    }
 
     /**
      * Handles the user input received from the client by creating a command that when executed will return a request.
@@ -116,17 +145,14 @@ public class Client {
                     return;
                 }
                 else if (userInput.equalsIgnoreCase("clear")) {
-                    Command.currentCommand = "clear";
-                    Command.clear();
-                    textInterface.output("terminal has been cleared.");
+                    handleClear();
                     return;
                 }
                 else{
                     currentCommand = Command.create(userInput);
                 }
             } catch (IllegalArgumentException e) {
-                Command.currentCommand = "error";
-                textInterface.output(e.getMessage());
+               handleError(e);
                 return;
             }
         }
@@ -137,7 +163,7 @@ public class Client {
         // if the command is launch
         if (currentCommand instanceof LaunchCommand) {
             String result = instantiateRobot(userInput);
-            if (result.equals("already launched")) {
+            if (result.equals("already launched")){
                 return;
             }
         }
@@ -149,9 +175,7 @@ public class Client {
 
         // user should not be able to do anything but 'quit' if robot is not launched.
         if (robot != null || currentCommand instanceof QuitCommand) {
-            Request request = currentCommand.execute(robot);
-            String requestJsonString = JsonHandler.serializeRequest(request);
-            sendToServer(requestJsonString);
+           handleExecution();
         }
         // robot has not been launched, and command is not launch or quit.
         else if (!(currentCommand instanceof QuitCommand)) {
