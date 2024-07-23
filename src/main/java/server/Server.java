@@ -81,7 +81,7 @@ public class Server {
      */
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(World.getWorldConfiguration().getPort());
-        Server server =  new Server(serverSocket);
+        Server server = new Server(serverSocket);
         server.startServer();
     }
 }

@@ -1,4 +1,4 @@
-package acceptance.world_1x1;
+package acceptance;
 
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;
@@ -79,6 +79,37 @@ class LookTest {
         assertEquals(1, lookResponse.get("data").get("objects").get(1).get("distance").asInt());
         assertEquals(1, lookResponse.get("data").get("objects").get(2).get("distance").asInt());
         assertEquals(1, lookResponse.get("data").get("objects").get(3).get("distance").asInt());
+
+    }
+
+    @Test
+    void seeObstacle() {
+//        Given a world of size 2x2
+//        and the world has an obstacle at coordinate [0,1]
+//        and I have successfully launched a robot into the world
+
+        assertTrue(serverClient.isConnected());
+
+        String launchRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"launch\"," +
+                "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                "}";
+        JsonNode launchResponse = serverClient.sendRequest(launchRequest);
+
+        assertNotNull(launchResponse.get("result"));
+        assertEquals("OK", launchResponse.get("result").asText());
+
+//        When I ask the robot to look
+
+        String lookRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"look\"," +
+                "  \"arguments\": []" +
+                "}";
+        JsonNode lookResponse = serverClient.sendRequest(lookRequest);
+
+//        Then I should get a response back with an object of type OBSTACLE at a distance of 1 step.
 
     }
 }
