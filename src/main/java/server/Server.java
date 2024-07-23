@@ -1,3 +1,4 @@
+
 package server;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class Server {
      *
      * @param serverSocket the server socket
      */
-    private ServerSocket serverSocket; 
+    private ServerSocket serverSocket;
     private World world;
 
     public Server(ServerSocket serverSocket) {
@@ -45,15 +46,14 @@ public class Server {
 
         try{
             while (!serverSocket.isClosed()) {
-        
+
                 Socket socket = serverSocket.accept(); // accept a client
                 System.out.println("A new client" + " <" + socket.getInetAddress().getHostName() + "> " + "has connected!");
                 ClientHandler clientHandler = new ClientHandler(socket, world); // create a clientHandler & sprouts a sperate thread for communicating with client.
                 Thread thread = new Thread(clientHandler);
-                System.out.println("Dodo");
                 thread.start();
             }
-        } 
+        }
         catch (IOException e) {
             e.printStackTrace();
         }

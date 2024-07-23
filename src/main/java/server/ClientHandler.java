@@ -1,10 +1,10 @@
+
 package server;
 
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.ArrayList;
@@ -33,8 +33,8 @@ public class ClientHandler implements Runnable {
     private boolean launched = false;
 
     // use OutputStream & InputStream instead of bufferedReader & bufferedWriter
-    private PrintWriter outputStream;
-    private BufferedReader inputStream;
+    private OutputStream outputStream;
+    private InputStream inputStream;
 
     /**
      * Constructs a new ClientHandler object.
@@ -49,22 +49,22 @@ public class ClientHandler implements Runnable {
             this.world = world;
             clientHanders.add(this);
 
-            this.outputStream = new PrintWriter(this.socket.getOutputStream(), true);
-            this.inputStream = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            this.outputStream = socket.getOutputStream();
+            this.inputStream = socket.getInputStream();
 
             handleRequest(getRequestFromClient()); // initial connect request (might remove this, for compatibility reasons, no connect req, just connect).
-        } 
+        }
         catch (IOException e) {
             closeEverything(socket, inputStream, outputStream);
         }
     }
-    
+
     /**
      * Returns the input stream associated with the client socket.
      *
      * @return the input stream
      */
-    public BufferedReader getInputStream() {
+    public InputStream getInputStream() {
         return inputStream;
     }
 
@@ -73,7 +73,7 @@ public class ClientHandler implements Runnable {
      *
      * @return the output stream
      */
-    public PrintWriter getOutputStream() {
+    public OutputStream getOutputStream() {
         return outputStream;
     }
 
@@ -111,7 +111,7 @@ public class ClientHandler implements Runnable {
     public boolean getLaunched() {
         return launched;
     }
-    
+
     /**
      * Runs the client handler thread.
      * Listens for requests from the client, handles the requests, and sends responses back to the client.
@@ -126,7 +126,7 @@ public class ClientHandler implements Runnable {
                 requestFromCleint = getRequestFromClient();
                 // System.out.println("req from client: " + requestFromCleint);
                 if (JsonHandler.isJsonString(requestFromCleint)) {
-                    handleRequest(requestFromCleint); 
+                    handleRequest(requestFromCleint);
                 }
             } catch (IOException e) {
                 closeEverything(socket, inputStream, outputStream);
@@ -146,7 +146,11 @@ public class ClientHandler implements Runnable {
      * @throws IOException if an I/O error occurs while reading the request
      */
     public String getRequestFromClient() throws IOException {
-        return inputStream.readLine();
+        byte[] buffer = new byte[1024];
+        int bytesRead = inputStream.read(buffer);
+        if (bytesRead == -1) { return ""; }
+        String request = new String(buffer, 0, bytesRead); // No data was read, so return an empty string
+        return request;
     }
 
     /**
@@ -164,11 +168,11 @@ public class ClientHandler implements Runnable {
             sendToClient(responseJsonString);
 
             // if command is 'launch', send a list of all robots currently in world
-            if (robot != null && newCommand instanceof LaunchCommand) {                
+            if (robot != null && newCommand instanceof LaunchCommand) {
                 List<HashMap<String, Object>> robotsList = new ArrayList<>();
 
                 for (ClientHandler cH: ClientHandler.clientHanders) {
-                    if (cH.getRobot() != null && cH!= this) { 
+                    if (cH.getRobot() != null && cH!= this) {
                         HashMap<String, Object> robotInfo = new HashMap<>();
                         robotInfo.put("robotName", cH.getRobot().getName());
                         robotInfo.put("robotKind", cH.getRobot().getKind());
@@ -176,7 +180,7 @@ public class ClientHandler implements Runnable {
                         robotsList.add(robotInfo);
                     }
                 }
-                
+
                 Response message = new StandardResponse(new HashMap<>(){{
                     put("message", "robots currently in world");
                     put("robots", robotsList);
@@ -189,7 +193,7 @@ public class ClientHandler implements Runnable {
                 closeEverything(getSocket(), inputStream, outputStream);
             }
 
-        } 
+        }
         catch (IllegalArgumentException e) {
             ErrorResponse errorResponse = new ErrorResponse("Unsupported command");
             String responseJsonString = JsonHandler.serializeResponse(errorResponse);
@@ -231,7 +235,12 @@ public class ClientHandler implements Runnable {
      * @param message the message to send
      */
     public void sendToClient(String message) {
-        this.outputStream.println(message);
+        try {
+            this.outputStream.write(message.getBytes());
+        }
+        catch (IOException e) {
+            closeEverything(socket, inputStream, outputStream);
+        }
     }
 
     /**
@@ -248,7 +257,7 @@ public class ClientHandler implements Runnable {
      * @param inputStream   the input stream
      * @param outputStream  the output stream
      */
-    public void closeEverything(Socket socket, BufferedReader inputStream, PrintWriter outputStream) {
+    public void closeEverything(Socket socket, InputStream inputStream, OutputStream outputStream) {
         removeClientHandler();
         try {
             if (inputStream != null) {

@@ -1,3 +1,4 @@
+
 package client;
 
 import client.commands.Command;
@@ -31,10 +32,10 @@ public class Client {
     private TextInterface textInterface;
 
     /**
-    * Constructs a new Client object with the specified socket.
-    *
-    * @param socket The socket used for communication with the server.
-    */
+     * Constructs a new Client object with the specified socket.
+     *
+     * @param socket The socket used for communication with the server.
+     */
     public Client(Socket socket) {
         try {
             this.socket = socket;
@@ -102,7 +103,7 @@ public class Client {
      * Handles the user input received from the client by creating a command that when executed will return a request.
      * The Request object is converted a JSON string and sent to server.
      * Ignores user input if reloading or repairing...
-     * 
+     *
      * @param userInput The user input string.
      * @throws IOException If an I/O error occurs.
      */
@@ -250,16 +251,22 @@ public class Client {
      */
     public void handleResponse(String response) {
         JsonNode responseJson = JsonHandler.deserializeJsonTString(response);
-        JsonNode msgNode = responseJson.get("data").get("message");
+        JsonNode dataNode = responseJson.get("data");
+
+        // Check if dataNode is null
+        if (dataNode == null) {
+            textInterface.output("Invalid response from server: 'data' field is missing.");
+            return;
+        }
+
+        JsonNode msgNode = dataNode.get("message");
         String msgStr = msgNode == null ? "" : msgNode.asText();
 
-        // handle response server sends after initial 'connect' request.
-        if (Command.currentCommand.equals("connect")) {
+        if (Command.currentCommand != null && Command.currentCommand.equals("connect")) {
             textInterface.output(response);
             return;
         }
 
-        // handle response sender sends when you quit or server shuts down.
         if (currentCommand instanceof QuitCommand || msgStr.contains("disconnected.")) {
             String outputStr = currentCommand instanceof QuitCommand ? "Shutting down..." : msgStr;
             textInterface.output(outputStr);
@@ -267,30 +274,26 @@ public class Client {
             System.exit(0);
         }
 
-        // handle response server sends when you've been shot.
-        if (responseJson.get("result").asText().equals("OK") && 
-            msgStr.equals("You've been shot.")) {
-                
+        if (responseJson.get("result").asText().equals("OK") && msgStr.equals("You've been shot.")) {
             robot.setState(JsonHandler.updateState(responseJson));
-            if (robot.getShields() < 0) { 
-                System.out.println("You are dead!!! GoodBye.");
+            if (robot.getShields() < 0) {
+                System.out.println("You are dead!!! Goodbye.");
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.exit(0); 
-            }else{
+                System.exit(0);
+            } else {
                 textInterface.output(response);
             }
             return;
         }
 
-        // A new robot has been launched into the worlds
         if (robot != null && msgStr != null && msgStr.contains("new robot")) {
-            String enemyName = responseJson.get("data").get("robotName").asText();
-            String enemyKind = responseJson.get("data").get("robotKind").asText();
-            State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
+            String enemyName = dataNode.get("robotName").asText();
+            String enemyKind = dataNode.get("robotKind").asText();
+            State enemyState = JsonHandler.getState(dataNode.get("robotState"));
 
             Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
             robot.addEnemy(enemyRobot);
@@ -298,17 +301,15 @@ public class Client {
             return;
         }
 
-        // All the robots currently in world. Server sends this after you launch.
         if (robot != null && msgStr != null && msgStr.equals("robots currently in world")) {
-            JsonNode robotsNode = responseJson.get("data").get("robots");
+            JsonNode robotsNode = dataNode.get("robots");
 
-            if (robot != null &&  robotsNode != null) {
-                for (int i=0; i < robotsNode.size(); i++) {
-
+            if (robotsNode != null) {
+                for (int i = 0; i < robotsNode.size(); i++) {
                     String enemyName = robotsNode.get(i).get("robotName").asText();
                     String enemyKind = robotsNode.get(i).get("robotKind").asText();
                     State enemyState = JsonHandler.getState(robotsNode.get(i).get("robotState"));
-        
+
                     Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
                     robot.addEnemy(enemyRobot);
                     robot.addEnemyName(enemyName);
@@ -317,36 +318,32 @@ public class Client {
             return;
         }
 
-        // handle response server sends when another player quits. (should also do this if that player dies)
         if (robot != null && msgStr != null && msgStr.equals("remove enemy")) {
-            robot.removeEnemy(responseJson.get("data").get("robotName").asText());
+            robot.removeEnemy(dataNode.get("robotName").asText());
             return;
         }
 
-        // handle response server sends when an enemy's state changes.
-        if (robot != null && msgStr != null && msgStr.equals("enemy state changed")){
-            String enemyName =  responseJson.get("data").get("robotName").asText();
-            State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
+        if (robot != null && msgStr != null && msgStr.equals("enemy state changed")) {
+            String enemyName = dataNode.get("robotName").asText();
+            State enemyState = JsonHandler.getState(dataNode.get("robotState"));
             robot.updateEnemyState(enemyName, enemyState);
             return;
         }
-        
-        // handle response server sends when an enemy fires a gun.
+
         if (robot != null && msgStr != null && msgStr.contains("enemy fired gun")) {
-            String enemyName =  responseJson.get("data").get("robotName").asText();
-            int bulletDistance =  responseJson.get("data").get("distance").asInt();
+            String enemyName = dataNode.get("robotName").asText();
+            int bulletDistance = dataNode.get("distance").asInt();
             textInterface.getGui().getEnemyPlayer(enemyName).fire(bulletDistance);
             return;
         }
 
-        // handle the rest of the responses.
         if (responseJson.get("result").asText().equals("OK") && currentCommand != null) {
             switch (currentCommand.getName()) {
                 case "launch":
                     robot.setState(JsonHandler.updateState(responseJson));
-                    Robot.setReload(responseJson.get("data").get("reload").asInt());
-                    Robot.setRepair(responseJson.get("data").get("repair").asInt());
-                    Robot.setVisibility(responseJson.get("data").get("visibility").asInt());
+                    Robot.setReload(dataNode.get("reload").asInt());
+                    Robot.setRepair(dataNode.get("repair").asInt());
+                    Robot.setVisibility(dataNode.get("visibility").asInt());
                     textInterface.output(response);
                     break;
                 case "forward":
@@ -370,7 +367,7 @@ public class Client {
                 case "reload":
                     System.out.println("Reloading...");
                     try {
-                        Thread.sleep(Robot.getReload()* 1000);
+                        Thread.sleep(Robot.getReload() * 1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -378,20 +375,18 @@ public class Client {
                     textInterface.output(response);
                     paused = false;
                     break;
-
                 default:
                     textInterface.output(response);
             }
         } else {
-            // handle an error response for launch. set robot variable back to null.
             if (currentCommand instanceof LaunchCommand) {
                 this.robot = null;
             }
             Command.currentCommand = "error";
             textInterface.output(msgStr);
-            return;
         }
     }
+
 
 
     /**
