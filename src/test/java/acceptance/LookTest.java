@@ -27,8 +27,7 @@ class LookTest {
 
     @Test
     void emptyWorld() {
-        //    Given that the robot is already in world
-        //    And the world size is 1x1
+
         assertTrue(serverClient.isConnected());
 
         String launchRequest = "{" +
@@ -41,7 +40,6 @@ class LookTest {
         assertNotNull(launchResponse.get("result"));
         assertEquals("OK", launchResponse.get("result").asText());
 
-        //    When I send a valid look command to the server
         String lookRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"look\"," +
@@ -49,17 +47,13 @@ class LookTest {
                 "}";
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
 
-        //    Then it should return only the edges as detected objects
         assertNotNull(lookResponse.get("result"));
         assertEquals("OK", lookResponse.get("result").asText());
 
         assertNotNull(lookResponse.get("data"));
         assertNotNull(lookResponse.get("data").get("objects"));
 
-//        check that there are only 4 objects(edges)
-
         int objectsInWorld = lookResponse.get("data").get("objects").size();
-//        assertEquals(4, lookResponse.get("data").get("objects").size());
 
         if (objectsInWorld == 4) {
             assertEquals("EDGE", lookResponse.get("data").get("objects").get(0).get("type").asText());
@@ -87,10 +81,6 @@ class LookTest {
 
     @Test
     void seeObstacle() {
-//        Given a world of size 2x2
-//        and the world has an obstacle at coordinate [0,1]
-//        and I have successfully launched a robot into the world
-
         assertTrue(serverClient.isConnected());
 
         String launchRequest = "{" +
@@ -103,8 +93,6 @@ class LookTest {
         assertNotNull(launchResponse.get("result"));
         assertEquals("OK", launchResponse.get("result").asText());
 
-//        When I ask the robot to look
-
         String lookRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"look\"," +
@@ -112,11 +100,49 @@ class LookTest {
                 "}";
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
 
-//        Then I should get a response back with an object of type OBSTACLE at a distance of 1 step.
         String direction = lookResponse.get("data").get("objects").get(3).get("direction").asText();
 
         if (direction == "North") {
             assertEquals("OBSTACLE", lookResponse.get("data").get("objects").get(0).get("type").asText());
+            assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
+        }
+    }
+
+    @Test
+    public void seeObstacleAndRobots() {
+
+        assertTrue(serverClient.isConnected());
+
+        String launchRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"launch\"," +
+                "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                "}";
+        JsonNode launchResponse = serverClient.sendRequest(launchRequest);
+
+        for(int i = 1; i <= 8; i++) {
+            assertTrue(serverClient.isConnected());
+
+            String launchMoreRobots = "{" +
+                    "  \"robot\": \"HAL\"," +
+                    "  \"command\": \"launch\"," +
+                    "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                    "}";
+            JsonNode response = serverClient.sendRequest(launchMoreRobots);
+        }
+        String lookRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"look\"," +
+                "  \"arguments\": []" +
+                "}";
+        JsonNode lookResponse = serverClient.sendRequest(lookRequest);
+        String direction = lookResponse.get("data").get("objects").get(3).get("direction").asText();
+
+        if (direction == "North") {
+            assertEquals("OBSTACLE", lookResponse.get("data").get("objects").get(0).get("type").asText());
+            assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
+        } else if (direction == "West" || direction == "East" || direction == "South") {
+            assertEquals("ROBOT", lookResponse.get("data").get("objects").get(0).get("type").asText());
             assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
         }
     }
