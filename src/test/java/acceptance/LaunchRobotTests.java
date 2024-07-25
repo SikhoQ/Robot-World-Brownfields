@@ -177,7 +177,6 @@ class LaunchRobotTests {
                 "\"arguments\": [\"shooter\"]" +
                 "}";
         JsonNode Response2 = serverClient.sendRequest(Request2);
-        System.out.println(Response2);
         assertNotNull(Response2.get("result"));
         assertEquals("OK", Response2.get("result").asText());
 
@@ -214,7 +213,6 @@ class LaunchRobotTests {
 
 
 //        Then I should get an error response back with the message "No more space in this world"
-        System.out.println(response);
         assertNotNull(response.get("result"));
         assertEquals("ERROR", response.get("result").asText());
 

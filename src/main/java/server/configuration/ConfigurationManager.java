@@ -10,8 +10,12 @@ public class ConfigurationManager {
 
     public ConfigurationManager() {}
 
-    public static  int getPort() {
+    public static int getPort() {
         return Config.PORT;
+    }
+
+    public static void setPort(int port) {
+        Config.PORT = port;
     }
 
     public static String getVisibility() {
@@ -30,11 +34,19 @@ public class ConfigurationManager {
         return Config.XCONSTRAINT;
     }
 
+    public static void setXConstraint(int x) {
+        Config.XCONSTRAINT = x;
+    }
+
     public static  int getYConstraint() {
         return Config.YCONSTRAINT;
     }
 
-    public static int getMaxSheilds() {
+    public static void setYConstraint(int y) {
+        Config.YCONSTRAINT = y;
+    }
+
+    public static int getMaxShields() {
         return Config.MAX_SHIELDS;
     }
 
@@ -46,4 +58,19 @@ public class ConfigurationManager {
         return Config.MAX_ROBOTS;
     }
     
+    public static void setObstacles(String obstacle) {
+        Config.OBSTACLE = obstacle;
+    }
+    
+    public static int getWorldSize() {
+        return Config.WORLD_SIZE;
+    }
+
+    public static String getObstacles() {
+        return Config.OBSTACLE;
+    }
+
+    public static void setWorldSize(int worldSize) {
+        Config.WORLD_SIZE = worldSize;
+    }
 }

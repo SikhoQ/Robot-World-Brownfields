@@ -1,4 +1,3 @@
-
 package server;
 
 import java.io.IOException;
@@ -7,61 +6,66 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import server.configuration.Config;
 import server.world.World;
+import server.configuration.ConfigurationManager;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
-/**
- * The Server class represents a server that listens for client connections and manages client handlers.
- * It starts the server, accepts client connections, and creates a separate client handler thread for each client.
- */
 public class Server {
 
-    /**
-     * Constructs a new Server object.
-     *
-     * @param serverSocket the server socket
-     */
+    @Option(names = {"-p", "--port"}, description = "Port number to listen on (0 - 9999). 5000 by default.")
+    private int port = ConfigurationManager.getPort();
+
+    @Option(names = {"-s", "--size"}, description = "Size of world, i.e. one side (0 - 9999). 1 by default.")
+    private int worldSize = ConfigurationManager.getWorldSize();
+
+    @Option(names = {"-o", "--obstacles"}, description = "Obstacle position x,y (top-right corner). none by default.")
+    private String obstacles = ConfigurationManager.getObstacles();
+
     private ServerSocket serverSocket;
     private World world;
 
-    public Server(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-        this.world = new World();
+    public Server() {
     }
 
-    /**
-     * Starts the server.
-     * Prints the server IP address and port, and starts a separate thread for server commands.
-     * Accepts client connections, creates a client handler for each client, and starts a separate thread for each client handler.
-     */
+    public void configureServer(String[] args) {
+        CommandLine.populateCommand(this, args);
+        // You can parse and apply the configuration here
+        // Example:
+        int width = worldSize;
+        int height = worldSize;
+
+        ConfigurationManager.setWorldSize(worldSize);
+        ConfigurationManager.setXConstraint(width);
+        ConfigurationManager.setYConstraint(height);
+        ConfigurationManager.setPort(port);
+        ConfigurationManager.setObstacles(obstacles);
+    }
+
     public void startServer() {
         try {
-            System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress()  + "> " + ": Listening on port 5000..." );
-            ServerHandler serverCommands = new ServerHandler(world); // listens for input on server and handles executing server command on a seperate thread.
+            System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress() + "> " + ": Listening on port " + port + "...");
+            ServerHandler serverCommands = new ServerHandler(this.world);
             Thread serverThread = new Thread(serverCommands);
             serverThread.start();
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        try{
+        try {
             while (!serverSocket.isClosed()) {
-
-                Socket socket = serverSocket.accept(); // accept a client
-                System.out.println("A new client" + " <" + socket.getInetAddress().getHostName() + "> " + "has connected!");
-                ClientHandler clientHandler = new ClientHandler(socket, world); // create a clientHandler & sprouts a sperate thread for communicating with client.
+                Socket socket = serverSocket.accept();
+                System.out.println("A new client <" + socket.getInetAddress().getHostName() + "> has connected!");
+                ClientHandler clientHandler = new ClientHandler(socket, this.world);
                 Thread thread = new Thread(clientHandler);
                 thread.start();
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Closes the server socket.
-     */
     public void closeServerSocket() {
         try {
             if (serverSocket != null) {
@@ -72,16 +76,26 @@ public class Server {
         }
     }
 
-    /**
-     * The main method to run the server.
-     * Creates a server socket, creates a Server instance, and starts the server.
-     *
-     * @param args command line arguments (not used)
-     * @throws IOException if an I/O error occurs while creating the server socket
-     */
+    public ServerSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public World getWorld() {
+        return this.world;
+    }
+
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(World.getWorldConfiguration().getPort());
-        Server server = new Server(serverSocket);
+        Server server = new Server();
+        server.configureServer(args);
+        ServerSocket serverSocket = new ServerSocket(ConfigurationManager.getPort());
+        server.serverSocket = serverSocket;
+
+        System.out.println("* Creating World.. [size: " + ConfigurationManager.getWorldSize() + " x " + ConfigurationManager.getWorldSize() + ", obstacles: (" + ConfigurationManager.getObstacles() + "), visibility: " + ConfigurationManager.getVisibility() + "]");
+        server.world = new World(); // Initialize world with configurations
         server.startServer();
     }
 }

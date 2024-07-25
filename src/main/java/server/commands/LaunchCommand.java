@@ -31,7 +31,7 @@ public class LaunchCommand extends Command {
         // Extract each element in the args array:
         this.robotName = robotName;
         this.kind = args.get(0).asText();
-        int maxSheilds = new ConfigurationManager().getMaxSheilds();
+        int maxSheilds = new ConfigurationManager().getMaxShields();
         int robotSheilds = args.get(1).asInt();
         this.shields = robotSheilds > maxSheilds? maxSheilds : robotSheilds;
         this.shots = args.get(2).asInt();

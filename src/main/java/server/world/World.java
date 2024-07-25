@@ -1,5 +1,6 @@
 package server.world;
 
+import server.configuration.Config;
 import server.configuration.ConfigurationManager;
 import server.world.util.Position;
 import server.world.util.UpdateResponse;
@@ -21,8 +22,8 @@ enum Direction {
  */
 public class World {
     public static  ConfigurationManager worldConfiguration = new ConfigurationManager();
-    protected final Position TOP_LEFT = new Position(-worldConfiguration.getXConstraint(), worldConfiguration.getYConstraint());
-    protected final Position BOTTOM_RIGHT = new Position(worldConfiguration.getXConstraint(), -worldConfiguration.getYConstraint());
+    protected final Position WORLD_TOP_LEFT = new Position(-worldConfiguration.getXConstraint(), worldConfiguration.getYConstraint());
+    protected final Position WORLD_BOTTOM_RIGHT = new Position(worldConfiguration.getXConstraint(), -worldConfiguration.getYConstraint());
     private final Position CENTRE =  new Position(0, 0);
 
     private List<Obstacle> obstacles;
@@ -35,6 +36,8 @@ public class World {
     public World(){
         robots = new ArrayList<>();
         this.obstacles = createObstacles();
+
+        System.out.println();
     }
 
     /**
@@ -58,14 +61,21 @@ public class World {
      */
     public List<Obstacle> createObstacles() {
         List<Obstacle> obstacles = new ArrayList<>();
-        int numberOfObstacles= randomInt(5,15);
-        for (int i = 0; i < numberOfObstacles ; i++) {
-            int x = randomInt(TOP_LEFT.getX(), BOTTOM_RIGHT.getX());
-            int y = randomInt(BOTTOM_RIGHT.getY(), TOP_LEFT.getY());
-            // rather check if the position is blocked.
-            if (!SquareObstacle.obstacles.contains(new Position(x, y))) {
-                SquareObstacle obstacle = new SquareObstacle(x, y);
-                obstacles.add(obstacle);
+
+        String obstacle = Config.OBSTACLE;
+
+        if (!obstacle.equalsIgnoreCase("none") && obstacle.contains(",")) {
+            try {
+                // need to add logic to get bottom-left since these are top-right. Obstacle size = Config.TILE_SIZE
+                int x = Integer.parseInt(obstacle.split(",")[0]);
+                int y = Integer.parseInt(obstacle.split(",")[1]);
+
+                if (!SquareObstacle.obstacles.contains(new Position(x, y))) {
+                    SquareObstacle squareObstacle = new SquareObstacle(x, y);
+                    obstacles.add(squareObstacle);
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Expected integer values for x and y.");
             }
         }
         return obstacles;
@@ -103,6 +113,9 @@ public class World {
         return robots;
     }
 
+    public int getWorldSize() {
+        return ConfigurationManager.getWorldSize();
+    }
     /**
      * Adds a robot to the world.
      *
@@ -202,7 +215,7 @@ public class World {
                 return new Object[]{UpdateResponse.FAILED_OBSTRUCTED, result[1]}; // also return the otherRobot
             }
         }
-        else if (newPosition.isIn(this.TOP_LEFT,this.BOTTOM_RIGHT)){ 
+        else if (newPosition.isIn(this.WORLD_TOP_LEFT,this.WORLD_BOTTOM_RIGHT)){
             // if path not blocked and in constraint box, check result length. 
             // Only update position if robot is moving not bullet. How? isBullet - true/false.
             if (!isBullet) {
