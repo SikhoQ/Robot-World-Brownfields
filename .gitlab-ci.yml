@@ -1,6 +1,8 @@
+image: debian stabe
+
 before_script:
-- apt-get update && apt-get install make
-- cd robot_worlds
+- apt-get update && apt-get install -y make maven
+# - cd robot_worlds
 
 stages:          
   - compiling
