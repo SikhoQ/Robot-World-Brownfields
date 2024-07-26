@@ -1,4 +1,4 @@
-image: debian stabe
+ 
 
 before_script:
 - apt-get update && apt-get install -y make maven
@@ -13,6 +13,7 @@ stages:
 
 compiling-job:       
   stage: compiling
+  image: ubuntu:20.04 
   script:
     - echo "Compiling the code..."
     - make clean
@@ -22,7 +23,8 @@ compiling-job:
 
 
 test-job:   
-  stage: test    
+  stage: test   
+  image: ubuntu:20.04  
   script:
     - echo "Running all unit tests... "
     # - make unit-test
@@ -31,6 +33,7 @@ test-job:
 
 package-job:
   stage: package
+  image: ubuntu:20.04 
   script:
     - echo "Packaging Robot Worlds server..."
     - make package
@@ -39,6 +42,7 @@ package-job:
 
 acceptance-test-job:
   stage: acceptance
+  image: ubuntu:20.04 
   script:
     - echo "Running acceptance tests against the server..."
     # - make test-own
