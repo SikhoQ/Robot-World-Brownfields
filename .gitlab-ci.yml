@@ -1,21 +1,28 @@
+before_script:
+- apt-get update && apt-get install make
+
 stages:          
-  - build
+  - compiling
   - test
   - package
   - acceptance
   - deploy
 
-build-job:       
-  stage: build
+compiling-job:       
+  stage: compiling
   script:
     - echo "Compiling the code..."
+    - make clean
+    - make verify
+    - make compile
     - echo "Compile complete."
 
 
-unit-test-job:   
+test-job:   
   stage: test    
   script:
     - echo "Running all unit tests... "
+    - make unit-test
     - echo "Code coverage is 90%"
 
 
@@ -23,6 +30,7 @@ package-job:
   stage: package
   script:
     - echo "Packaging Robot Worlds server..."
+    - make package
     - echo "Packaging complete."
 
 
@@ -30,6 +38,7 @@ acceptance-test-job:
   stage: acceptance
   script:
     - echo "Running acceptance tests against the server..."
+    - make test-own
     - echo "Acceptance tests complete."
 
 deploy-job:      
@@ -39,6 +48,6 @@ deploy-job:
     - echo "Application successfully deployed."
 
 
-workflow:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+# workflow:
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "main"'
