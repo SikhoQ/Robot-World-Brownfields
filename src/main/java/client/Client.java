@@ -137,51 +137,46 @@ public class Client {
      * @throws IOException If an I/O error occurs.
      */
     public void handleUserInput(String userInput) throws IOException {
-        // create a command that when executed will return a request.
-        if (!paused) {
-            try {
-                if (userInput.equalsIgnoreCase("help")) {
-                    Command.help();
-                    return;
-                }
-                else if (userInput.equalsIgnoreCase("clear")) {
-                    handleClear();
-                    return;
-                }
-                else{
-                    currentCommand = Command.create(userInput);
-                }
-            } catch (IllegalArgumentException e) {
-               handleError(e);
-                return;
-            }
-        }
-        else { // repairing or reloading
+        if (paused) {
             return;
         }
-
-        // if the command is launch
+    
+        try {
+            processCommand(userInput);
+        } catch (IllegalArgumentException e) {
+            handleError(e);
+        }
+    }
+    
+    private void processCommand(String userInput) throws IOException {
+        switch (userInput.toLowerCase()) {
+            case "help":
+                Command.help();
+                return;
+            case "clear":
+                handleClear();
+                return;
+            default:
+                currentCommand = Command.create(userInput);
+                break;
+        }
+    
         if (currentCommand instanceof LaunchCommand) {
-            String result = instantiateRobot(userInput);
-            if (result.equals("already launched")){
+            if (instantiateRobot(userInput).equals("already launched")) {
                 return;
             }
         }
-
-        // if the command is repair or reload
+    
         if (currentCommand instanceof RepairCommand || currentCommand instanceof ReloadCommand) {
             paused = true;
         }
-
-        // user should not be able to do anything but 'quit' if robot is not launched.
+    
         if (robot != null || currentCommand instanceof QuitCommand) {
-           handleExecution();
-        }
-        // robot has not been launched, and command is not launch or quit.
-        else if (!(currentCommand instanceof QuitCommand)) {
+            handleExecution();
+        } else {
             textInterface.output("Please launch a robot into the world first.");
         }
-    }
+    }    
 
     /**
      * Instantiates a robot based on the user input.
