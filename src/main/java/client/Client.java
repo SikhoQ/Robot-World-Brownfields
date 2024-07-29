@@ -323,38 +323,55 @@ public class Client {
     }
 
     private boolean handleNewRobotResponse(JsonNode responseJson, String msgStr) {
-        if (robot != null && msgStr != null && msgStr.contains("new robot")) {
-            String enemyName = responseJson.get("data").get("robotName").asText();
-            String enemyKind = responseJson.get("data").get("robotKind").asText();
-            State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
+        if (isRobotAndMessageValid(msgStr)) {
+            processNewRobot(responseJson);
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean isRobotAndMessageValid(String msgStr) {
+        return robot != null && msgStr != null && msgStr.contains("new robot");
+    }
+    
+    private void processNewRobot(JsonNode responseJson) {
+        String enemyName = responseJson.get("data").get("robotName").asText();
+        String enemyKind = responseJson.get("data").get("robotKind").asText();
+        State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
+    
+        Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
+        robot.addEnemy(enemyRobot);
+        robot.addEnemyName(enemyName);
+    }
+    
+
+    private boolean handleRobotsInWorldResponse(JsonNode responseJson, String msgStr) {
+    if (isRobotsInWorldResponseValid(msgStr)) {
+        processRobotsInWorld(responseJson);
+        return true;
+    }
+    return false;
+}
+
+private boolean isRobotsInWorldResponseValid(String msgStr) {
+    return robot != null && msgStr != null && msgStr.equals("robots currently in world");
+}
+
+private void processRobotsInWorld(JsonNode responseJson) {
+    JsonNode robotsNode = responseJson.get("data").get("robots");
+    if (robotsNode != null) {
+        for (int i = 0; i < robotsNode.size(); i++) {
+            String enemyName = robotsNode.get(i).get("robotName").asText();
+            String enemyKind = robotsNode.get(i).get("robotKind").asText();
+            State enemyState = JsonHandler.getState(robotsNode.get(i).get("robotState"));
 
             Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
             robot.addEnemy(enemyRobot);
             robot.addEnemyName(enemyName);
-            return true;
         }
-        return false;
     }
+}
 
-    private boolean handleRobotsInWorldResponse(JsonNode responseJson, String msgStr) {
-        if (robot != null && msgStr != null && msgStr.equals("robots currently in world")) {
-            JsonNode robotsNode = responseJson.get("data").get("robots");
-
-            if (robotsNode != null) {
-                for (int i = 0; i < robotsNode.size(); i++) {
-                    String enemyName = robotsNode.get(i).get("robotName").asText();
-                    String enemyKind = robotsNode.get(i).get("robotKind").asText();
-                    State enemyState = JsonHandler.getState(robotsNode.get(i).get("robotState"));
-
-                    Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
-                    robot.addEnemy(enemyRobot);
-                    robot.addEnemyName(enemyName);
-                }
-            }
-            return true;
-        }
-        return false;
-    }
 
     private boolean handleRemoveEnemyResponse(JsonNode responseJson, String msgStr) {
         if (robot != null && msgStr != null && msgStr.equals("remove enemy")) {
@@ -385,55 +402,85 @@ public class Client {
     }
 
     private void handleDefaultResponse(JsonNode responseJson, String response, String msgStr) {
-        if (responseJson.get("result").asText().equals("OK") && currentCommand != null) {
-            switch (currentCommand.getName()) {
-                case "launch":
-                    robot.setState(JsonHandler.updateState(responseJson));
-                    Robot.setReload(responseJson.get("data").get("reload").asInt());
-                    Robot.setRepair(responseJson.get("data").get("repair").asInt());
-                    Robot.setVisibility(responseJson.get("data").get("visibility").asInt());
-                    textInterface.output(response);
-                    break;
-                case "forward":
-                case "back":
-                case "turn":
-                case "fire":
-                    robot.setState(JsonHandler.updateState(responseJson));
-                    textInterface.output(response);
-                    break;
-                case "repair":
-                    System.out.println("Repairing...");
-                    try {
-                        Thread.sleep(Robot.getRepair() * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    robot.setState(JsonHandler.updateState(responseJson));
-                    textInterface.output(response);
-                    paused = false;
-                    break;
-                case "reload":
-                    System.out.println("Reloading...");
-                    try {
-                        Thread.sleep(Robot.getReload() * 1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    robot.setState(JsonHandler.updateState(responseJson));
-                    textInterface.output(response);
-                    paused = false;
-                    break;
-                default:
-                    textInterface.output(response);
-            }
+        if (isValidResponse(responseJson)) {
+            handleValidResponse(responseJson, response);
         } else {
-            if (currentCommand instanceof LaunchCommand) {
-                this.robot = null;
-            }
-            Command.currentCommand = "error";
-            textInterface.output(msgStr);
+            handleErrorResponse(msgStr);
         }
     }
+    
+    private boolean isValidResponse(JsonNode responseJson) {
+        return responseJson.get("result").asText().equals("OK") && currentCommand != null;
+    }
+    
+    private void handleValidResponse(JsonNode responseJson, String response) {
+        switch (currentCommand.getName()) {
+            case "launch":
+                handleLaunchResponse(responseJson, response);
+                break;
+            case "forward":
+            case "back":
+            case "turn":
+            case "fire":
+                handleMovementResponse(responseJson, response);
+                break;
+            case "repair":
+                handleRepairResponse(responseJson, response);
+                break;
+            case "reload":
+                handleReloadResponse(responseJson, response);
+                break;
+            default:
+                textInterface.output(response);
+                break;
+        }
+    }
+    
+    private void handleLaunchResponse(JsonNode responseJson, String response) {
+        robot.setState(JsonHandler.updateState(responseJson));
+        Robot.setReload(responseJson.get("data").get("reload").asInt());
+        Robot.setRepair(responseJson.get("data").get("repair").asInt());
+        Robot.setVisibility(responseJson.get("data").get("visibility").asInt());
+        textInterface.output(response);
+    }
+    
+    private void handleMovementResponse(JsonNode responseJson, String response) {
+        robot.setState(JsonHandler.updateState(responseJson));
+        textInterface.output(response);
+    }
+    
+    private void handleRepairResponse(JsonNode responseJson, String response) {
+        System.out.println("Repairing...");
+        try {
+            Thread.sleep(Robot.getRepair() * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.setState(JsonHandler.updateState(responseJson));
+        textInterface.output(response);
+        paused = false;
+    }
+    
+    private void handleReloadResponse(JsonNode responseJson, String response) {
+        System.out.println("Reloading...");
+        try {
+            Thread.sleep(Robot.getReload() * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.setState(JsonHandler.updateState(responseJson));
+        textInterface.output(response);
+        paused = false;
+    }
+    
+    private void handleErrorResponse(String msgStr) {
+        if (currentCommand instanceof LaunchCommand) {
+            this.robot = null;
+        }
+        Command.currentCommand = "error";
+        textInterface.output(msgStr);
+    }
+    
 
 
 
