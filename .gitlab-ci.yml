@@ -7,8 +7,8 @@ before_script:
 stages:          
   - compiling
   - test
-  - package
   - acceptance
+  - package
   - deploy
 
 compiling-job:       
