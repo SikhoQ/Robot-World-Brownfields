@@ -2,7 +2,7 @@
 FROM node:14
 
 # Create and set the working directory
-WORKDIR /usr/src/app
+WORKDIR /usr/src/server
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port that the app will run on
-EXPOSE 5000
+EXPOSE 5050
 
 # Start the application
 CMD ["node", "server.js"]
