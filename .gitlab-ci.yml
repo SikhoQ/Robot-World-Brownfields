@@ -41,14 +41,19 @@
 
 deploy-job:      
   stage: deploy 
-  image: 27.1.0
+  image: docker:27.1.0
+  services:
+    - docker:dind
   before_script:
+    - echo "Logging into Docker repository..."
     - docker login -u $docker -p $wethinkcode_dbn_04
   script:
     - echo "Building the docker image..."
-    - docker build -t nnyawo023/dbn_04brownfields:latest
+    - docker build -t nnyawo023/dbn_04brownfields:latest .
+    - echo "Pushing the docker image..."
     - docker push nnyawo023/dbn_04brownfields:latest 
-    - echo "Image  successfully built."
+    - echo "Image successfully built and pushed."
+
 
 
 # workflow:
