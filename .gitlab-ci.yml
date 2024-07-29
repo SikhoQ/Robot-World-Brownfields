@@ -44,7 +44,7 @@ package-job:
   image: ubuntu:20.04 
   script:
     - echo "Packaging Robot Worlds server..."
-    - make package
+    - mvn package -DskipTests
     - echo "Packaging complete."
 
 deploy-job:      
