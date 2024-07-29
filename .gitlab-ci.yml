@@ -22,7 +22,6 @@ compiling-job:
     - echo "Compile complete."
 
 test-job:   
-  stage: test   docker build -t nnyawo023/dbn_04brownfields:latest
   stage: acceptance
   image: ubuntu:20.04 
   script:
