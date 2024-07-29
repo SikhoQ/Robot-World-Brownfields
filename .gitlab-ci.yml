@@ -31,15 +31,6 @@ test-job:
     - echo "Code coverage is 90%"
 
 
-package-job:
-  stage: package
-  image: ubuntu:20.04 
-  script:
-    - echo "Packaging Robot Worlds server..."
-    - make package
-    - echo "Packaging complete."
-
-
 acceptance-test-job:
   stage: acceptance
   image: ubuntu:20.04 
@@ -49,6 +40,16 @@ acceptance-test-job:
     # im testing the reference for now since our server has some funtional issues
     - make test-reference
     - echo "Acceptance tests complete."
+
+
+package-job:
+  stage: package
+  image: ubuntu:20.04 
+  script:
+    - echo "Packaging Robot Worlds server..."
+    - make package
+    - echo "Packaging complete."
+
 
 deploy-job:      
   stage: deploy 
