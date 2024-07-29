@@ -1,4 +1,4 @@
- 
+
 
 before_script:
 - apt-get update && apt-get install -y make maven
@@ -22,14 +22,7 @@ compiling-job:
     - echo "Compile complete."
 
 test-job:   
-  stage: test   
-  image: ubuntu:20.04  
-  script:
-    - echo "Running all unit tests... "
-    # - make unit-test
-    - echo "Code coverage is 90%"
-
-acceptance-test-job:
+  stage: test   docker build -t nnyawo023/dbn_04brownfields:latest
   stage: acceptance
   image: ubuntu:20.04 
   script:
@@ -49,9 +42,14 @@ package-job:
 
 deploy-job:      
   stage: deploy 
+  image: 27.1.0
+  before_script:
+    - docker login -u $docker -p $wethinkcode_dbn_04
   script:
-    - echo "Deploying application..."
-    - echo "Application successfully deployed."
+    - echo "Building the docker image..."
+    - docker build -t nnyawo023/dbn_04brownfields:latest
+    - docker push nnyawo023/dbn_04brownfields:latest 
+    - echo "Image  successfully built."
 
 
 # workflow:
