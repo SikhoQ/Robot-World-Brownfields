@@ -270,33 +270,44 @@ public class Client {
      */
     public void handleResponse(String response) {
         JsonNode responseJson = JsonHandler.deserializeJsonTString(response);
-        JsonNode dataNode = responseJson.get("data");
-
-        // Check if dataNode is null
-        if (dataNode == null) {
-            textInterface.output("Invalid response from server: 'data' field is missing.");
-            return;
-        }
-
-        JsonNode msgNode = dataNode.get("message");
+        JsonNode msgNode = responseJson.get("data").get("message");
         String msgStr = msgNode == null ? "" : msgNode.asText();
 
-        if (Command.currentCommand != null && Command.currentCommand.equals("connect")) {
-            textInterface.output(response);
-            return;
-        }
+        if (handleConnectResponse(response, msgStr)) return;
+        if (handleQuitResponse(response, msgStr)) return;
+        if (handleShotResponse(responseJson, msgStr)) return;
+        if (handleNewRobotResponse(responseJson, msgStr)) return;
+        if (handleRobotsInWorldResponse(responseJson, msgStr)) return;
+        if (handleRemoveEnemyResponse(responseJson, msgStr)) return;
+        if (handleEnemyStateChangedResponse(responseJson, msgStr)) return;
+        if (handleEnemyFiredGunResponse(responseJson, msgStr)) return;
+        handleDefaultResponse(responseJson, response, msgStr);
+    }
 
+    private boolean handleConnectResponse(String response, String msgStr) {
+        if (Command.currentCommand.equals("connect")) {
+            textInterface.output(response);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean handleQuitResponse(String response, String msgStr) {
         if (currentCommand instanceof QuitCommand || msgStr.contains("disconnected.")) {
             String outputStr = currentCommand instanceof QuitCommand ? "Shutting down..." : msgStr;
             textInterface.output(outputStr);
             closeEverything(getSocket(), inputStream, outputStream);
             System.exit(0);
+            return true;
         }
+        return false;
+    }
 
+    private boolean handleShotResponse(JsonNode responseJson, String msgStr) {
         if (responseJson.get("result").asText().equals("OK") && msgStr.equals("You've been shot.")) {
             robot.setState(JsonHandler.updateState(responseJson));
             if (robot.getShields() < 0) {
-                System.out.println("You are dead!!! Goodbye.");
+                System.out.println("You are dead!!! GoodBye.");
                 try {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
@@ -304,24 +315,30 @@ public class Client {
                 }
                 System.exit(0);
             } else {
-                textInterface.output(response);
+                textInterface.output(responseJson.toString());
             }
-            return;
+            return true;
         }
+        return false;
+    }
 
+    private boolean handleNewRobotResponse(JsonNode responseJson, String msgStr) {
         if (robot != null && msgStr != null && msgStr.contains("new robot")) {
-            String enemyName = dataNode.get("robotName").asText();
-            String enemyKind = dataNode.get("robotKind").asText();
-            State enemyState = JsonHandler.getState(dataNode.get("robotState"));
+            String enemyName = responseJson.get("data").get("robotName").asText();
+            String enemyKind = responseJson.get("data").get("robotKind").asText();
+            State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
 
             Robot enemyRobot = new Robot(enemyName, enemyKind, enemyState);
             robot.addEnemy(enemyRobot);
             robot.addEnemyName(enemyName);
-            return;
+            return true;
         }
+        return false;
+    }
 
+    private boolean handleRobotsInWorldResponse(JsonNode responseJson, String msgStr) {
         if (robot != null && msgStr != null && msgStr.equals("robots currently in world")) {
-            JsonNode robotsNode = dataNode.get("robots");
+            JsonNode robotsNode = responseJson.get("data").get("robots");
 
             if (robotsNode != null) {
                 for (int i = 0; i < robotsNode.size(); i++) {
@@ -334,35 +351,47 @@ public class Client {
                     robot.addEnemyName(enemyName);
                 }
             }
-            return;
+            return true;
         }
+        return false;
+    }
 
+    private boolean handleRemoveEnemyResponse(JsonNode responseJson, String msgStr) {
         if (robot != null && msgStr != null && msgStr.equals("remove enemy")) {
-            robot.removeEnemy(dataNode.get("robotName").asText());
-            return;
+            robot.removeEnemy(responseJson.get("data").get("robotName").asText());
+            return true;
         }
+        return false;
+    }
 
+    private boolean handleEnemyStateChangedResponse(JsonNode responseJson, String msgStr) {
         if (robot != null && msgStr != null && msgStr.equals("enemy state changed")) {
-            String enemyName = dataNode.get("robotName").asText();
-            State enemyState = JsonHandler.getState(dataNode.get("robotState"));
+            String enemyName = responseJson.get("data").get("robotName").asText();
+            State enemyState = JsonHandler.getState(responseJson.get("data").get("robotState"));
             robot.updateEnemyState(enemyName, enemyState);
-            return;
+            return true;
         }
+        return false;
+    }
 
+    private boolean handleEnemyFiredGunResponse(JsonNode responseJson, String msgStr) {
         if (robot != null && msgStr != null && msgStr.contains("enemy fired gun")) {
-            String enemyName = dataNode.get("robotName").asText();
-            int bulletDistance = dataNode.get("distance").asInt();
+            String enemyName = responseJson.get("data").get("robotName").asText();
+            int bulletDistance = responseJson.get("data").get("distance").asInt();
             textInterface.getGui().getEnemyPlayer(enemyName).fire(bulletDistance);
-            return;
+            return true;
         }
+        return false;
+    }
 
+    private void handleDefaultResponse(JsonNode responseJson, String response, String msgStr) {
         if (responseJson.get("result").asText().equals("OK") && currentCommand != null) {
             switch (currentCommand.getName()) {
                 case "launch":
                     robot.setState(JsonHandler.updateState(responseJson));
-                    Robot.setReload(dataNode.get("reload").asInt());
-                    Robot.setRepair(dataNode.get("repair").asInt());
-                    Robot.setVisibility(dataNode.get("visibility").asInt());
+                    Robot.setReload(responseJson.get("data").get("reload").asInt());
+                    Robot.setRepair(responseJson.get("data").get("repair").asInt());
+                    Robot.setVisibility(responseJson.get("data").get("visibility").asInt());
                     textInterface.output(response);
                     break;
                 case "forward":
