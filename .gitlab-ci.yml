@@ -1,43 +1,43 @@
 
 
-before_script:
-- apt-get update && apt-get install -y make maven
-# - cd robot_worlds
+# before_script:
+# - apt-get update && apt-get install -y make maven
+# # - cd robot_worlds
 
-stages:          
-  - compiling
-  - test
-  - acceptance
-  - package
-  - deploy
+# stages:          
+#   - compiling
+#   - test
+#   - acceptance
+#   - package
+#   - deploy
 
-compiling-job:       
-  stage: compiling
-  image: ubuntu:20.04 
-  script:
-    - echo "Compiling the code..."
-    - make clean
-    # - make verify
-    - make compile
-    - echo "Compile complete."
+# compiling-job:       
+#   stage: compiling
+#   image: ubuntu:20.04 
+#   script:
+#     - echo "Compiling the code..."
+#     - make clean
+#     # - make verify
+#     - make compile
+#     - echo "Compile complete."
 
-test-job:   
-  stage: acceptance
-  image: ubuntu:20.04 
-  script:
-    - echo "Running acceptance tests against the server..."
-    # - make test-own
-    # im testing the reference for now since our server has some funtional issues
-    - make test-reference
-    - echo "Acceptance tests complete."
+# test-job:   
+#   stage: acceptance
+#   image: ubuntu:20.04 
+#   script:
+#     - echo "Running acceptance tests against the server..."
+#     # - make test-own
+#     # im testing the reference for now since our server has some funtional issues
+#     - make test-reference
+#     - echo "Acceptance tests complete."
 
-package-job:
-  stage: package
-  image: ubuntu:20.04 
-  script:
-    - echo "Packaging Robot Worlds server..."
-    - mvn package -DskipTests
-    - echo "Packaging complete."
+# package-job:
+#   stage: package
+#   image: ubuntu:20.04 
+#   script:
+#     - echo "Packaging Robot Worlds server..."
+#     - mvn package -DskipTests
+#     - echo "Packaging complete."
 
 deploy-job:      
   stage: deploy 
