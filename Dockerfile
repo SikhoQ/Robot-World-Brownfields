@@ -1,20 +1,8 @@
-# Use the official Node.js image as the base image
-FROM node:14
 
-# Create and set the working directory
-WORKDIR /usr/src/server
+FROM openjdk:11-jre-slim
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+WORKDIR /app
 
-# Install dependencies
-RUN npm install
+COPY target/RobotWorld-1.0-SNAPSHOT-jar-with-dependencies.jar /app/RobotWorld.jar
 
-# Copy the rest of the application files
-COPY . .
-
-# Expose the port that the app will run on
-EXPOSE 5050
-
-# Start the application
-CMD ["node", "server.js"]
+ENTRYPOINT ["java", "-jar", "RobotWorld.jar"]
