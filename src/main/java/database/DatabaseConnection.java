@@ -2,41 +2,49 @@ package database;
 
 import java.sql.*;
 
+/**
+ * The DatabaseConnection class provides methods to connect to an SQLite database,
+ * create a table if it does not exist, and retrieve data from the table.
+ */
 public class DatabaseConnection {
 
     public static final String DB_NAME = "RobotWorlds.db";
     private static final String URL = "jdbc:sqlite:RobotWorlds.db";
-    public static final String TABLE_CONTACTS = "world";
+    public static final String TABLE_WORLD = "world";
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_SIZE_X = "size_x";
-    public static final String COLUMN_SIZE_Y= "size_y";
+    public static final String COLUMN_SIZE_Y = "size_y";
 
-
+      /**
+       * The main method establishes a connection to the SQLite database, creates the
+      'world' table if it does not exist, and retrieves and prints data from the table.
+       */
     public static void main(String[] args) {
 
         try (Connection conn = DriverManager.getConnection(URL)) {
-            // Load the SQLite JDBC driver (make sure the driver is in your classpath)
+
+            // Load the SQLite JDBC driver
             DriverManager.registerDriver(new org.sqlite.JDBC());
 
             // Establish the connection
             Statement statement = conn.createStatement();
-            statement.execute("CREATE TABLE IF NOT EXISTS " + TABLE_CONTACTS +
+            statement.execute("CREATE TABLE IF NOT EXISTS " + TABLE_WORLD +
                     " (" + COLUMN_ID + " integer, " +
                     COLUMN_SIZE_X + " integer, " +
-                    COLUMN_SIZE_Y+ " integer" +
+                    COLUMN_SIZE_Y + " integer" +
                     ")");
 
-            statement.execute("SELECT * FROM world");
+            //  prints data from the table.
+            statement.execute("SELECT * FROM " + TABLE_WORLD);
             ResultSet results = statement.getResultSet();
-            while(results.next()) {
-                System.out.println(results.getString("id") + " " +
-                        results.getInt("size_x") + " " +
-                        results.getString("size_y"));
+            while (results.next()) {
+                System.out.println(results.getString(COLUMN_ID) + " " +
+                        results.getInt(COLUMN_SIZE_X) + " " +
+                        results.getString(COLUMN_SIZE_Y));
             }
 
             results.close();
-
             statement.close();
 
         } catch (SQLException e) {
@@ -45,24 +53,3 @@ public class DatabaseConnection {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
