@@ -26,7 +26,7 @@ class BackwardMovementTest {
     }
 
     @Test
-    void validForwardMovementShouldSucceed() {
+    void validBackwardMovementShouldSucceed() {
         // Given that I am connected to a running Robot Worlds server
         // And the world is of size 1x1 (The world is configured or hardcoded to this size)
         assertTrue(serverClient.isConnected());
