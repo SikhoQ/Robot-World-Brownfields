@@ -59,6 +59,8 @@ public abstract class Command {
                 return new ReloadCommand();  
             case "repair":
                 return new RepairCommand();
+            case "restore":
+                return new RestoreCommand();
             case "forward":
                 try{
                     return new ForwardCommand(args[1]);
