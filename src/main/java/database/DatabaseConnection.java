@@ -15,6 +15,8 @@ public class DatabaseConnection {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_SIZE_X = "size_x";
     public static final String COLUMN_SIZE_Y = "size_y";
+    public static final String OBSTACLE = "obstacle";
+    public static final String OBSTACLE_TYPE = "obstacle_type";
 
     public static String getUrl(){
         return URL;

@@ -162,23 +162,49 @@ public class World {
             System.out.println("World with the name '" + worldName + "' already exists.");
             return false;
         }
-        return false;
+        String worldData = convertWorldToJson();
+        return DatabaseConnection.saveWorld(worldName, worldData);
+    }
+    public String convertWorldToJson(){
+        return "";
     }
 
     public boolean restoreFromDatabase(String worldName) {
-        // Use DatabaseConnection class to restore the world with the provided name
-        return true; // return true if restore was successful, false otherwise
+        if (worldName == null || worldName.isEmpty()) {
+            return false;
+        }
+
+        // Retrieve world data from database
+        String worldData = String.valueOf(DatabaseConnection.restoreWorld(worldName));
+        if (worldData == null) {
+            // Handle case where the world does not exist
+            System.out.println("World with the name '" + worldName + "' does not exist.");
+            return false;
+        }
+
+        // Convert JSON or other stored format back into world state
+        boolean successful = loadWorldFromJson(worldData); // Implement this method to deserialize world
+
+        return successful;
     }
 
-    /**
-     * Updates the position of a robot in the world.
-     *
-     * @param robot    the robot to update
-     * @param nrSteps  the number of steps to move the robot
-     * @param isBullet indicates if the update is for a bullet (true) or robot movement (false)
-     * @return an array containing the update response, which can be UpdateResponse.SUCCESS, UpdateResponse.FAILED_OBSTRUCTED,
-     * or UpdateResponse.FAILED_OUTSIDE_WORLD, and additional information if applicable
-     */
+    public boolean loadWorldFromJson(String worldData) {
+        // Implement JSON deserialization of world state
+        // This is a placeholder; use a library like Gson or Jackson for actual implementation
+        return true; // Return true if world was successfully loaded
+    }
+
+
+
+        /**
+         * Updates the position of a robot in the world.
+         *
+         * @param robot    the robot to update
+         * @param nrSteps  the number of steps to move the robot
+         * @param isBullet indicates if the update is for a bullet (true) or robot movement (false)
+         * @return an array containing the update response, which can be UpdateResponse.SUCCESS, UpdateResponse.FAILED_OBSTRUCTED,
+         * or UpdateResponse.FAILED_OUTSIDE_WORLD, and additional information if applicable
+         */
     public Object[] updatePosition(Robot robot, int nrSteps) { // remove isBullet from this method
 
         int increment = (nrSteps > 0)? 1 : -1;

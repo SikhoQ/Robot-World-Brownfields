@@ -4,11 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import database.DatabaseConnection;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,14 +17,34 @@ class ManyWorldsTest {
         // Establish connection to the database
         connection = DriverManager.getConnection(DatabaseConnection.getUrl());
 
+        // Clear the database before each test
+        clearDatabase();
     }
 
+    public void clearDatabase() {
+        try (Statement statement = connection.createStatement()) {
+            // Delete all records from the world table
+            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.TABLE_WORLD;
+            statement.executeUpdate(deleteWorldSQL);
+
+            // Optionally, you can add other cleanup operations for additional tables
+            // Example: String deleteRobotsSQL = "DELETE FROM " + DatabaseConnection.TABLE_ROBOTS;
+            // statement.executeUpdate(deleteRobotsSQL);
+
+            System.out.println("Database has been cleared.");
+        } catch (SQLException e) {
+            System.err.println("Failed to clear database: " + e.getMessage());
+        }
+    }
+
+
     @Test
-    void testSaveWorldWithUniqueAndDuplicateNames() {
-        String uniqueWorldName = "World1";
-        String duplicateWorldName = "World2";
+    void testSaveWorldWithUniqueNames() {
+        String uniqueWorldName = "world1";
+        String duplicateWorldName = "world2";
         int sizeX = 100;
         int sizeY = 100;
+        String obstacle = "pit";
 
         // Save a world with a unique name
         boolean isFirstSaveSuccessful = saveWorld(uniqueWorldName, sizeX, sizeY);
@@ -50,12 +66,12 @@ class ManyWorldsTest {
         boolean isDuplicateSaveSuccessful = saveWorld(duplicateWorldName, sizeX, sizeY);
         assertFalse(isDuplicateSaveSuccessful, "The world with a duplicate name should not be saved");
 
-        // Clean up (delete both worlds)
-        deleteWorld(uniqueWorldName);
-        deleteWorld(duplicateWorldName);
+//        // Clean up (delete both worlds)
+//        deleteWorld(uniqueWorldName);
+//        deleteWorld(duplicateWorldName);
     }
 
-    private boolean saveWorld(String name, int sizeX, int sizeY) {
+    public boolean saveWorld(String name, int sizeX, int sizeY) {
         try {
             // Check if the world with the given name already exists
             if (checkWorldExists(name)) {
@@ -82,7 +98,7 @@ class ManyWorldsTest {
         }
     }
 
-    private boolean checkWorldExists(String name) {
+    public boolean checkWorldExists(String name) {
         try {
             String checkWorldSQL = "SELECT COUNT(*) FROM " + DatabaseConnection.TABLE_WORLD +
                     " WHERE " + DatabaseConnection.COLUMN_ID + " = ?";
@@ -100,15 +116,15 @@ class ManyWorldsTest {
         }
     }
 
-    private void deleteWorld(String name) {
-        try {
-            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.TABLE_WORLD +
-                    " WHERE " + DatabaseConnection.COLUMN_ID + " = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(deleteWorldSQL);
-            preparedStatement.setString(1, name);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Failed to delete world: " + e.getMessage());
-        }
-    }
+//    public void deleteWorld(String name) {
+//        try {
+//            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.TABLE_WORLD +
+//                    " WHERE " + DatabaseConnection.COLUMN_ID + " = ?";
+//            PreparedStatement preparedStatement = connection.prepareStatement(deleteWorldSQL);
+//            preparedStatement.setString(1, name);
+//            preparedStatement.executeUpdate();
+//        } catch (SQLException e) {
+//            System.err.println("Failed to delete world: " + e.getMessage());
+//        }
+//    }
 }

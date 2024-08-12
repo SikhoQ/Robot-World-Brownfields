@@ -10,6 +10,7 @@ import server.response.ErrorResponse;
 import server.world.World;
 import server.world.Obstacle;
 import server.world.Robot;
+import database.DatabaseConnection;
 
 /**
  * The ServerHandler class handles commands that come from the server.
@@ -35,8 +36,6 @@ public class ServerHandler implements Runnable {
         this.scanner = new Scanner(System.in);
         while(true) {
             command =  scanner.nextLine().toLowerCase();
-            String[] commandParts = command.split(" ");
-            String mainCommand = commandParts[0];
             switch (command) {
                 case "dump":
                     dump();
@@ -51,53 +50,33 @@ public class ServerHandler implements Runnable {
                     clear();
                     break;
                 case "save":
-                    if (commandParts.length > 1) {
-                        saveWorld(commandParts[1]);
-                    } else {
-                        System.out.println("Please provide a world name to save.");
-                    }
+                    handleSaveCommand();
                     break;
                 case "restore":
-                    if (commandParts.length > 1) {
-                        restoreWorld(commandParts[1]);
-                    } else {
-                        System.out.println("Please provide a world name to restore.");
-                    }
+                    handleRestoreCommand();
                     break;
                 default:
                     System.out.println("Unsupported command: " + command);
             }
         }
     }
-    public void saveWorld(String worldName) {
-        if (worldName == null || worldName.isEmpty()) {
-            output("World name cannot be empty.");
-            return;
-        }
-
-        // Assuming World class has a saveToDatabase method
-        boolean success = world.saveToDatabase(worldName);
-
-        if (success) {
-            output("World '" + worldName + "' saved successfully.");
+    public void handleSaveCommand() {
+        System.out.print("Enter world name to save: ");
+        String worldName = scanner.nextLine();
+        if (world.saveToDatabase(worldName)) {
+            System.out.println("World saved successfully.");
         } else {
-            output("Failed to save world '" + worldName + "'.");
+            System.out.println("Failed to save the world.");
         }
     }
 
-    public void restoreWorld(String worldName) {
-        if (worldName == null || worldName.isEmpty()) {
-            output("World name cannot be empty.");
-            return;
-        }
-
-        // Assuming World class has a restoreFromDatabase method
-        boolean success = world.restoreFromDatabase(worldName);
-
-        if (success) {
-            output("World '" + worldName + "' restored successfully.");
+    public void handleRestoreCommand() {
+        System.out.print("Enter world name to restore: ");
+        String worldName = scanner.nextLine();
+        if (world.restoreFromDatabase(worldName)) {
+            System.out.println("World restored successfully.");
         } else {
-            output("Failed to restore world '" + worldName + "'.");
+            System.out.println("Failed to restore the world.");
         }
     }
 
