@@ -19,6 +19,53 @@ public class DatabaseConnection {
     public static String getUrl(){
         return URL;
     }
+
+    public static boolean worldExists(String worldName) {
+        String query = "SELECT COUNT(*) FROM " + TABLE_WORLD + " WHERE " + COLUMN_ID + " = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, worldName);
+            ResultSet rs = stmt.executeQuery();
+            return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean saveWorld(String worldName, String worldData) {
+        if (worldExists(worldName)) {
+            System.out.println("World with the name '" + worldName + "' already exists.");
+            return false;
+        }
+
+        String query = "INSERT INTO " + TABLE_WORLD + " (" + COLUMN_ID + ", data) VALUES (?, ?)";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, worldName);
+            stmt.setString(2, worldData);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static String restoreWorld(String worldName) {
+        String query = "SELECT data FROM " + TABLE_WORLD + " WHERE " + COLUMN_ID + " = ?";
+        try (Connection conn = DriverManager.getConnection(URL);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, worldName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("data");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
       /**
        * The main method establishes a connection to the SQLite database, creates the
       'world' table if it does not exist, and retrieves and prints data from the table.

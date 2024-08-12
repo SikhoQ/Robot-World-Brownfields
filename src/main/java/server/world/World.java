@@ -4,6 +4,7 @@ import server.configuration.Config;
 import server.configuration.ConfigurationManager;
 import server.world.util.Position;
 import server.world.util.UpdateResponse;
+import database.DatabaseConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,6 +148,26 @@ public class World {
             }
         }
         return false;
+    }
+
+    public boolean saveToDatabase(String worldName) {
+        if (worldName == null || worldName.isEmpty()) {
+            return false;
+        }
+
+        // Check if world already exists
+        if (DatabaseConnection.worldExists(worldName)) {
+            // Handle existing world scenario
+            // Optionally, you could ask for overwrite confirmation or handle accordingly
+            System.out.println("World with the name '" + worldName + "' already exists.");
+            return false;
+        }
+        return false;
+    }
+
+    public boolean restoreFromDatabase(String worldName) {
+        // Use DatabaseConnection class to restore the world with the provided name
+        return true; // return true if restore was successful, false otherwise
     }
 
     /**

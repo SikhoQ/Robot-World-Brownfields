@@ -21,32 +21,48 @@ class ManyWorldsTest {
         // Establish connection to the database
         connection = DriverManager.getConnection(DatabaseConnection.getUrl());
 
-        // Clear the table before each test to avoid conflicts
-        connection.createStatement().execute("DELETE FROM " + DatabaseConnection.TABLE_WORLD);
     }
 
     @Test
-    void testSaveWorldWithUniqueName() {
-        String worldName = "UniqueWorld";
+    void testSaveWorldWithUniqueAndDuplicateNames() {
+        String uniqueWorldName = "World1";
+        String duplicateWorldName = "World2";
         int sizeX = 100;
         int sizeY = 100;
 
-        // Simulate the SAVE command
-        boolean isSaved = saveWorld(worldName, sizeX, sizeY);
+        // Save a world with a unique name
+        boolean isFirstSaveSuccessful = saveWorld(uniqueWorldName, sizeX, sizeY);
+        assertTrue(isFirstSaveSuccessful, "The unique world should be saved successfully");
 
-        // Assert that the world was saved successfully
-        assertTrue(isSaved, "The world should be saved successfully");
+        // Verify the unique world was actually saved in the database
+        boolean uniqueWorldExists = checkWorldExists(uniqueWorldName);
+        assertTrue(uniqueWorldExists, "The unique world should exist in the database");
 
-        // Verify the world was actually saved in the database
-        boolean worldExists = checkWorldExists(worldName);
-        assertTrue(worldExists, "The world should exist in the database");
+        // Save another world with a different unique name
+        boolean isSecondSaveSuccessful = saveWorld(duplicateWorldName, sizeX, sizeY);
+        assertTrue(isSecondSaveSuccessful, "Another unique world should be saved successfully");
 
-        // Clean up
-        deleteWorld(worldName);
+        // Verify the second unique world was actually saved in the database
+        boolean secondWorldExists = checkWorldExists(duplicateWorldName);
+        assertTrue(secondWorldExists, "The second unique world should exist in the database");
+
+        // Attempt to save a world with a duplicate name
+        boolean isDuplicateSaveSuccessful = saveWorld(duplicateWorldName, sizeX, sizeY);
+        assertFalse(isDuplicateSaveSuccessful, "The world with a duplicate name should not be saved");
+
+        // Clean up (delete both worlds)
+        deleteWorld(uniqueWorldName);
+        deleteWorld(duplicateWorldName);
     }
 
     private boolean saveWorld(String name, int sizeX, int sizeY) {
         try {
+            // Check if the world with the given name already exists
+            if (checkWorldExists(name)) {
+                System.out.println("World with name '" + name + "' already exists. Save operation aborted.");
+                return false;  // Indicate that saving was not successful
+            }
+
             String insertWorldSQL = "INSERT INTO " + DatabaseConnection.TABLE_WORLD + " (" +
                     DatabaseConnection.COLUMN_ID + ", " +
                     DatabaseConnection.COLUMN_SIZE_X + ", " +

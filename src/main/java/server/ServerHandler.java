@@ -35,6 +35,8 @@ public class ServerHandler implements Runnable {
         this.scanner = new Scanner(System.in);
         while(true) {
             command =  scanner.nextLine().toLowerCase();
+            String[] commandParts = command.split(" ");
+            String mainCommand = commandParts[0];
             switch (command) {
                 case "dump":
                     dump();
@@ -48,11 +50,57 @@ public class ServerHandler implements Runnable {
                 case "clear":
                     clear();
                     break;
+                case "save":
+                    if (commandParts.length > 1) {
+                        saveWorld(commandParts[1]);
+                    } else {
+                        System.out.println("Please provide a world name to save.");
+                    }
+                    break;
+                case "restore":
+                    if (commandParts.length > 1) {
+                        restoreWorld(commandParts[1]);
+                    } else {
+                        System.out.println("Please provide a world name to restore.");
+                    }
+                    break;
                 default:
                     System.out.println("Unsupported command: " + command);
             }
         }
     }
+    public void saveWorld(String worldName) {
+        if (worldName == null || worldName.isEmpty()) {
+            output("World name cannot be empty.");
+            return;
+        }
+
+        // Assuming World class has a saveToDatabase method
+        boolean success = world.saveToDatabase(worldName);
+
+        if (success) {
+            output("World '" + worldName + "' saved successfully.");
+        } else {
+            output("Failed to save world '" + worldName + "'.");
+        }
+    }
+
+    public void restoreWorld(String worldName) {
+        if (worldName == null || worldName.isEmpty()) {
+            output("World name cannot be empty.");
+            return;
+        }
+
+        // Assuming World class has a restoreFromDatabase method
+        boolean success = world.restoreFromDatabase(worldName);
+
+        if (success) {
+            output("World '" + worldName + "' restored successfully.");
+        } else {
+            output("Failed to restore world '" + worldName + "'.");
+        }
+    }
+
 
     /**
      * Handles the quit command.
