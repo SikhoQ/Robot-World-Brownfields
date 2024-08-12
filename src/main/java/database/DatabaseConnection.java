@@ -16,6 +16,9 @@ public class DatabaseConnection {
     public static final String COLUMN_SIZE_X = "size_x";
     public static final String COLUMN_SIZE_Y = "size_y";
 
+    public static String getUrl(){
+        return URL;
+    }
       /**
        * The main method establishes a connection to the SQLite database, creates the
       'world' table if it does not exist, and retrieves and prints data from the table.
