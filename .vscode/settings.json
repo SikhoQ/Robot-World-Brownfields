@@ -1,0 +1,5 @@
+{
+    "codescene.enableAutoRefactor": true,
+    "codescene.previewCodeHealthGate": true,
+    "java.configuration.updateBuildConfiguration": "automatic"
+}
