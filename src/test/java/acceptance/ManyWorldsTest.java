@@ -24,7 +24,7 @@ class ManyWorldsTest {
     public void clearDatabase() {
         try (Statement statement = connection.createStatement()) {
             // Delete all records from the world table
-            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.TABLE_WORLD;
+            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.WORLD_TABLE;
             statement.executeUpdate(deleteWorldSQL);
 
             // Optionally, you can add other cleanup operations for additional tables
@@ -79,10 +79,9 @@ class ManyWorldsTest {
                 return false;  // Indicate that saving was not successful
             }
 
-            String insertWorldSQL = "INSERT INTO " + DatabaseConnection.TABLE_WORLD + " (" +
-                    DatabaseConnection.COLUMN_ID + ", " +
-                    DatabaseConnection.COLUMN_SIZE_X + ", " +
-                    DatabaseConnection.COLUMN_SIZE_Y + ") VALUES (?, ?, ?)";
+            String insertWorldSQL = "INSERT INTO " + DatabaseConnection.WORLD_TABLE + " (" +
+                    DatabaseConnection.WORLD_COLUMN_ID + ", " +
+                    DatabaseConnection.WORLD_COLUMN_SIZE + ") VALUES (?, ?)";
 
             PreparedStatement preparedStatement = connection.prepareStatement(insertWorldSQL);
             preparedStatement.setString(1, name);
@@ -100,8 +99,8 @@ class ManyWorldsTest {
 
     public boolean checkWorldExists(String name) {
         try {
-            String checkWorldSQL = "SELECT COUNT(*) FROM " + DatabaseConnection.TABLE_WORLD +
-                    " WHERE " + DatabaseConnection.COLUMN_ID + " = ?";
+            String checkWorldSQL = "SELECT COUNT(*) FROM " + DatabaseConnection.WORLD_TABLE +
+                    " WHERE " + DatabaseConnection.WORLD_COLUMN_ID + " = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(checkWorldSQL);
             preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -118,8 +117,8 @@ class ManyWorldsTest {
 
 //    public void deleteWorld(String name) {
 //        try {
-//            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.TABLE_WORLD +
-//                    " WHERE " + DatabaseConnection.COLUMN_ID + " = ?";
+//            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.WORLD_TABLE +
+//                    " WHERE " + DatabaseConnection.WORLD_COLUMN_ID + " = ?";
 //            PreparedStatement preparedStatement = connection.prepareStatement(deleteWorldSQL);
 //            preparedStatement.setString(1, name);
 //            preparedStatement.executeUpdate();
