@@ -1,0 +1,37 @@
+TODO:
+change obstacles cmdLine arg to accept a variable number of obstacles
+
+DOING:
+-create WorldObjects class to store the objects of the world as a single entry/entity.
+-create WorldRepository interface to define operations that can be performed on the domain models,
+ abstracting away the data access logic.
+-create DBWorldRepository class to implement WorldRepository -> contains data access logic for
+ interacting with the database.
+-use repository interface in domain logic to interact with the data, keeps domain logic clean and
+ unaware of the data access implementation.
+-add setters in World for world objects, to use when restoring the world
+
+============================
+server should not allow persistence commands to be executed when there are clients connected
+
+============================
+DB schema
+---------
+world(s) table(s) with cols (id, size)
+
+CREATE TABLE world (
+    id TEXT PRIMARY KEY,
+    size INT NOT NULL
+    -- Add more columns if needed, such as name, description, etc.
+);
+
+CREATE TABLE objects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    world_id TEXT,
+    type TEXT NOT NULL,
+    x INT NOT NULL,
+    y INT NOT NULL,
+    size INT,
+    -- Other attributes specific to each object can be added here
+    FOREIGN KEY(world_id) REFERENCES world(id)
+);

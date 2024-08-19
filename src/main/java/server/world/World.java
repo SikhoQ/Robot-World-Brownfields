@@ -38,7 +38,6 @@ public class World {
         robots = new ArrayList<>();
         this.obstacles = createObstacles();
 
-        System.out.println();
     }
 
     /**

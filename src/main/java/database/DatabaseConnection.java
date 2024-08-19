@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.*;
+import java.util.Scanner;
 
 /**
  * The DatabaseConnection class provides methods to connect to an SQLite database,
@@ -40,22 +41,43 @@ public class DatabaseConnection {
     }
 
     public static boolean saveWorld(String worldName, String worldData) {
+        boolean shouldOverwrite = true;
+
         if (worldExists(worldName)) {
-            System.out.println("World with the name '" + worldName + "' already exists.");
-            return false;
+            shouldOverwrite = promptOverwrite(worldName);
         }
 
-        String query = "INSERT INTO " + WORLD_TABLE + " (" + WORLD_COLUMN_ID + ", data) VALUES (?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, worldName);
-            stmt.setString(2, worldData);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        if (shouldOverwrite) {
+            // insert into world (id, size) values (?, ?)
+            String query = "INSERT INTO " + WORLD_TABLE + " (" + WORLD_COLUMN_ID + ", " + WORLD_COLUMN_SIZE + ") VALUES (?, ?)";
+            try (Connection conn = DriverManager.getConnection(URL);
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, worldName);
+                stmt.setString(2, worldData);
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
         }
+        return false;
+    }
+
+    private static boolean promptOverwrite(String worldName) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("World with the name '" + worldName + "' already exists.");
+        System.out.println("Do you want to overwrite this world? [Y/N]");
+        String input = scanner.nextLine();
+
+        while (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")) {
+            System.out.println("Invalid option");
+            System.out.println("Do you want to overwrite this world? [Y/N]");
+            input = scanner.nextLine();
+        }
+
+        return input.equalsIgnoreCase("Y");
     }
 
     public static String restoreWorld(String worldName) {
@@ -74,14 +96,11 @@ public class DatabaseConnection {
     }
 
     /**
-     * The main method establishes a connection to the SQLite database, creates the
-     * 'world' table if it does not exist, and retrieves and prints data from the table.
+     * Establishes a connection to the SQLite database, creates the
+     * 'world' and 'objects' tables if they do not exist, and retrieves and prints data (if any) from the tables.
      */
-    public static void main(String[] args) {
+    public static void initializeDatabase() throws RuntimeException {
         try (Connection conn = DriverManager.getConnection(URL)) {
-
-            // Load the SQLite JDBC driver
-            DriverManager.registerDriver(new org.sqlite.JDBC());
 
             // Establish the connection
             Statement statement = conn.createStatement();
@@ -133,7 +152,7 @@ public class DatabaseConnection {
 
         } catch (SQLException e) {
             System.out.println("Something went wrong: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

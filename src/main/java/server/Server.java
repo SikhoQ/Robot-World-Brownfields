@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import database.DatabaseConnection;
 import server.configuration.Config;
 import server.world.World;
 import server.configuration.ConfigurationManager;
@@ -89,6 +90,16 @@ public class Server {
     }
 
     public static void main(String[] args) throws IOException {
+        // initialize database connection
+        System.out.println("Connecting to database...");
+        try {
+            DatabaseConnection.initializeDatabase();
+            System.out.println("Connected to database.");
+        } catch (RuntimeException e) {
+            System.out.println("Error while connecting to database");
+            System.exit(1);
+        }
+
         Server server = new Server();
         server.configureServer(args);
         ServerSocket serverSocket = new ServerSocket(ConfigurationManager.getPort());
