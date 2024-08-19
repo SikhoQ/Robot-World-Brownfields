@@ -1,42 +1,77 @@
 package acceptance;
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
-import org.junit.jupiter.api.TestClassOrder;
+/**
+ *
+ * @author sqlitetutorial.net
+ */
+public class RestoreTheWorldTest {
+    /**
+     * Connection to RobotWorlds database
+     */
+    Connection conn = null;
+    String url = "jdbc:sqlite:RobotWorlds.db";
 
-
-class RestoreTheWorldTest {
-
-    // check if database connection exists
     @Test
-    void connectToDatabase() {
-        try( final Connection connection = DriverManager.getConnection(null) ){
-            System.out.println( "Connected to database " );
-            // runTest( connection );
-        }catch( SQLException e ){
-            System.err.println( e.getMessage() );
+    public void connectionTest() {
+//        Connection conn = null;
+        try {
+            // db parameters
+//            String url = "jdbc:sqlite:RobotWorlds.db";
+            // create a connection to the database
+            conn = DriverManager.getConnection(url);
+
+            System.out.println("Connection to SQLite has been established.");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
+    }
+    /**
+     * check if table exists and that it has records
+     */
+
+    @Test
+    public void ExistingTableTest() {
+//        check if world table exists
+        try (final Statement stmt = conn.createStatement()) {
+            conn = DriverManager.getConnection(url);
+            stmt.execute("SELECT name FROM RobotWorlds WHERE type='table' AND name='world'");
+
+        } catch (SQLException e) {
+
+        }
+//        SELECT name FROM RobotWorlds WHERE type='table' AND name='world';
+
+//        check if obstacles table exists
+//        SELECT name FROM RobotWorlds WHERE type='table' AND name='obstacles';
 
     }
 
+    /**
+     * check if table has records
+     */
+    @Test
 
-    // Given that I have a world saved in a database already
-    // Check if there is a world saved
+    public void RecordsExistTest() {
 
+    }
 
+    /**
+     * check if passing the restore command launches a robot with saved world state
+     */
 
+    @Test
+    public void restoreTest() {
 
-    // When I send a restore command to the server
+    }
 
-
-    // Then the world should be restored to the initial state(default)
-    // Update the database with the default world state
 
 }
