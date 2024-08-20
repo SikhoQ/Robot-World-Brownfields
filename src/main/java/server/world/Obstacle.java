@@ -3,7 +3,7 @@ package server.world;
 /**
  * Defines an interface for obstacles you want to place in your world.
  */
-public interface Obstacle {
+public interface Obstacle extends WorldObject {
     /**
      * Get X coordinate of bottom left corner of obstacle.
      * @return x coordinate

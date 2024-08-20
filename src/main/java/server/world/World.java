@@ -22,12 +22,12 @@ enum Direction {
  * The World class represents the game world, including its configuration, obstacles, and robots.
  */
 public class World {
-    public static  ConfigurationManager worldConfiguration = new ConfigurationManager();
-    protected final Position WORLD_TOP_LEFT = new Position(-worldConfiguration.getXConstraint(), worldConfiguration.getYConstraint());
-    protected final Position WORLD_BOTTOM_RIGHT = new Position(worldConfiguration.getXConstraint(), -worldConfiguration.getYConstraint());
-    private final Position CENTRE =  new Position(0, 0);
+    public static  ConfigurationManager worldConfiguration;
+    protected Position WORLD_TOP_LEFT;
+    protected Position WORLD_BOTTOM_RIGHT;
+    protected Position CENTRE;
 
-    private List<Obstacle> obstacles;
+    private final List<Obstacle> obstacles;
     public static ArrayList<Robot> robots;
     
     /**
@@ -37,7 +37,9 @@ public class World {
     public World(){
         robots = new ArrayList<>();
         this.obstacles = createObstacles();
-
+        WORLD_TOP_LEFT = new Position(-ConfigurationManager.getXConstraint(), ConfigurationManager.getYConstraint());
+        WORLD_BOTTOM_RIGHT = new Position(ConfigurationManager.getXConstraint(), -ConfigurationManager.getYConstraint());
+        CENTRE =  new Position(0, 0);
     }
 
     /**
@@ -314,4 +316,6 @@ public class World {
         }
     }
 
+    public void addObject(WorldObject object) {
+    }
 }

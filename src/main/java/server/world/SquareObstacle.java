@@ -29,6 +29,7 @@ public class SquareObstacle implements Obstacle {
      *
      * @return the x-coordinate of the bottom-left corner
      */
+    @Override
     public int getBottomLeftX() {
         return this.position.getX();
     }
@@ -38,6 +39,7 @@ public class SquareObstacle implements Obstacle {
      *
      * @return the y-coordinate of the bottom-left corner
      */
+    @Override
     public int getBottomLeftY() {
         return this.position.getY();
     }
@@ -47,10 +49,20 @@ public class SquareObstacle implements Obstacle {
      *
      * @return the size of the obstacle
      */
+    @Override
     public int getSize() {
         return size;
     }
 
+    @Override
+    public int getX() {
+        return this.getBottomLeftX();
+    }
+
+    @Override
+    public int getY() {
+        return this.getBottomLeftY();
+    }
     /**
      * Checks if the obstacle blocks the specified position.
      *

@@ -2,14 +2,14 @@ package server;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import database.SQLiteWorldRepository;
 import server.json.JsonHandler;
 import server.response.ErrorResponse;
-import server.world.World;
-import server.world.Obstacle;
-import server.world.Robot;
+import server.world.*;
 import database.DatabaseConnection;
 
 /**
@@ -21,6 +21,7 @@ public class ServerHandler implements Runnable {
     private Scanner scanner;
     private String command;
     private World world;
+    private final SQLiteWorldRepository worldRepository;
 
     /**
      * Constructs a new ServerHandler object.
@@ -29,6 +30,7 @@ public class ServerHandler implements Runnable {
      */
     public ServerHandler(World world) {
         this.world = world;
+        this.worldRepository = new SQLiteWorldRepository();
     }
 
     @Override
@@ -60,23 +62,39 @@ public class ServerHandler implements Runnable {
             }
         }
     }
+
     public void handleSaveCommand() {
-        System.out.print("Enter world name to save: ");
+        System.out.print("Enter name to save this world in: ");
         String worldName = scanner.nextLine();
-        if (world.saveToDatabase(worldName)) {
-            System.out.println("World saved successfully.");
-        } else {
-            System.out.println("Failed to save the world.");
+        boolean shouldOverwrite = true;
+        if (DatabaseConnection.worldExists(worldName)) {
+            shouldOverwrite = DatabaseConnection.promptOverwrite(worldName);
+        }
+
+        if (shouldOverwrite) {
+            // after getting the name, use this.world to get the size and objects
+            final int worldSize = this.world.getWorldSize();
+            WorldObjects worldObjects = new WorldObjects(this.world);
+            final ArrayList<WorldObject> objects = worldObjects.getObjects();
+            // call worldRepo save method with these 3 args
+            boolean successfullySaved = this.worldRepository.save(worldName, worldSize, objects);
+            if (successfullySaved) {
+                System.out.println("World saved successfully.");
+            } else {
+                System.out.println("Failed to save the world.");
+            }
         }
     }
 
     public void handleRestoreCommand() {
         System.out.print("Enter world name to restore: ");
         String worldName = scanner.nextLine();
-        if (world.restoreFromDatabase(worldName)) {
+        World world = this.worldRepository.loadWorld(worldName);
+
+        if (world != null) {
             System.out.println("World restored successfully.");
         } else {
-            System.out.println("Failed to restore the world.");
+            System.out.println("Failed to restore the world '" + worldName + "'");
         }
     }
 

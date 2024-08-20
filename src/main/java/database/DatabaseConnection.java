@@ -64,7 +64,7 @@ public class DatabaseConnection {
         return false;
     }
 
-    private static boolean promptOverwrite(String worldName) {
+    public static boolean promptOverwrite(String worldName) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("World with the name '" + worldName + "' already exists.");
