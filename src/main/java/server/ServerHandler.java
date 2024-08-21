@@ -57,10 +57,19 @@ public class ServerHandler implements Runnable {
                 case "restore":
                     handleRestoreCommand();
                     break;
+                case "delete":
+                    handleDeleteCommand();
+                    break;
                 default:
                     System.out.println("Unsupported command: " + command);
             }
         }
+    }
+
+    private void handleDeleteCommand() {
+        System.out.println("Enter name of world to delete from database: ");
+        String worldName = scanner.nextLine();
+
     }
 
     public void handleSaveCommand() {
@@ -77,11 +86,22 @@ public class ServerHandler implements Runnable {
             WorldObjects worldObjects = new WorldObjects(this.world);
             final ArrayList<WorldObject> objects = worldObjects.getObjects();
             // call worldRepo save method with these 3 args
-            boolean successfullySaved = this.worldRepository.save(worldName, worldSize, objects);
-            if (successfullySaved) {
-                System.out.println("World saved successfully.");
-            } else {
-                System.out.println("Failed to save the world.");
+            final String worldRemoved = this.worldRepository.removeWorld(worldName);
+            switch (worldRemoved) {
+                case "removed":
+                case "no objects":
+                case "no world":
+                    boolean successfullySaved = this.worldRepository.save(worldName, worldSize, objects);
+                    if (successfullySaved) {
+                        System.out.println("World saved successfully.");
+                    } else {
+                        System.out.println("Failed to save the world.");
+                    }
+                    break;
+                case "not removed":
+                    System.out.print("Failed to remove world '" + worldName + "' from database. ");
+                    System.out.println("Run 'save' command with a different world name.");
+                    break;
             }
         }
     }
@@ -121,7 +141,7 @@ public class ServerHandler implements Runnable {
      * Prints the list of robots currently in the world.
      */
     public void robots() {
-        if (world.getRobots().size() < 1) {
+        if (world.getRobots().isEmpty()) {
             output("There are currently no robots in this world.");
         }else{
             output(getRobotsString());
@@ -148,19 +168,20 @@ public class ServerHandler implements Runnable {
      */
     public void dump() {
         StringBuilder string = new StringBuilder();
-        String robotsStr = world.getRobots().size() > 0? 
+        String robotsStr = !world.getRobots().isEmpty() ?
         getRobotsString() : "There are currently no robots in world.";
 
         string.append(robotsStr);
         string.append(("\nObstacles:\n"));
 
-//        List<Obstacle> obstacles = world.getObstacles();
+        List<Obstacle> obstacles = world.getObstacles();
+        if (obstacles != null) {
+            for (Obstacle obstacle : obstacles) {
+                string.append(obstacle.toString()).append("\n");
+            }
+        }
 
-//        for (Obstacle obstacle: obstacles){
-//            string.append(obstacle.toString()).append("\n");
-//        }
-//
-//        output(string.toString());
+        output(string.toString());
     } 
 
     public void clear() {

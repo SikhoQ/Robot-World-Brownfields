@@ -96,6 +96,7 @@ public class Server {
             DatabaseConnection.initializeDatabase();
             System.out.println("Connected to database.");
         } catch (RuntimeException e) {
+            e.printStackTrace();
             System.out.println("Error while connecting to database");
             System.exit(1);
         }

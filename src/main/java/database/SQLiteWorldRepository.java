@@ -88,7 +88,7 @@ public class SQLiteWorldRepository implements WorldRepository {
     }
 
     @Override
-    public boolean removeWorld(String worldName) {
+    public String removeWorld(String worldName) {
         String deleteObjectsQuery = "DELETE FROM objects WHERE world_id = ?";
         String deleteWorldQuery = "DELETE FROM world WHERE id = ?";
 
@@ -100,21 +100,31 @@ public class SQLiteWorldRepository implements WorldRepository {
             try (PreparedStatement stmt = conn.prepareStatement(deleteObjectsQuery)) {
                 stmt.setString(1, worldName);
                 stmt.executeUpdate();
+                int updateCount = stmt.getUpdateCount();
+            } catch (SQLException ignored) {
+                return "no objects";
             }
 
             // Delete the world itself
             try (PreparedStatement stmt = conn.prepareStatement(deleteWorldQuery)) {
                 stmt.setString(1, worldName);
-                stmt.executeUpdate();
+                int rowsAffected = stmt.executeUpdate();
+
+                // If no rows were affected, the world didn't exist
+                if (rowsAffected == 0) {
+                    conn.rollback();
+                    return "no world";
+                }
+            } catch (SQLException ignored) {
+                return "no world";
             }
 
             // Commit the transaction
             conn.commit();
-            return true;
+            return "removed";
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        } catch (SQLException ignored) {
+            return "not removed";
         }
     }
 }

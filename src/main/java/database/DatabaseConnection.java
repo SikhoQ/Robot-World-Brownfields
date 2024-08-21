@@ -18,6 +18,7 @@ public class DatabaseConnection {
     public static final String WORLD_COLUMN_SIZE = "size";
 
     public static final String OBJECTS_COLUMN_ID = "id";
+    public static final String OBJECTS_COLUMN_WORLD_ID = "world_id";
     public static final String OBJECTS_COLUMN_TYPE = "type";
     public static final String OBJECTS_COLUMN_X = "x";
     public static final String OBJECTS_COLUMN_Y = "y";
@@ -114,10 +115,12 @@ public class DatabaseConnection {
             // Create the 'objects' table if it does not exist.
             statement.execute("CREATE TABLE IF NOT EXISTS " + OBJECTS_TABLE +
                     " (" + OBJECTS_COLUMN_ID + " INT PRIMARY KEY, " +
+                    OBJECTS_COLUMN_WORLD_ID + " TEXT NOT NULL, " +
                     OBJECTS_COLUMN_TYPE + " TEXT NOT NULL, " +
                     OBJECTS_COLUMN_X + " INT NOT NULL, " +
                     OBJECTS_COLUMN_Y + " INT NOT NULL, " +
-                    OBJECTS_COLUMN_SIZE + " INT NOT NULL" +
+                    OBJECTS_COLUMN_SIZE + " INT NOT NULL, " +
+                    "FOREIGN KEY(" + OBJECTS_COLUMN_WORLD_ID + ") REFERENCES " + WORLD_TABLE + "(" + WORLD_COLUMN_ID + ")" +
                     ")");
 
             // Retrieve and check data from the 'world' table.
