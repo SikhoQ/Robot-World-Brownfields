@@ -71,7 +71,7 @@ public class SQLiteWorldRepository implements WorldRepository {
             try (PreparedStatement stmt = conn.prepareStatement(objectInsertQuery)) {
                 for (WorldObject obj : worldObjects) {
                     stmt.setString(1, worldName);
-                    stmt.setString(2, obj.getClass().getSimpleName());
+                    stmt.setString(2, obj.getType());
                     stmt.setInt(3, obj.getX());
                     stmt.setInt(4, obj.getY());
                     stmt.setInt(5, obj.getSize());

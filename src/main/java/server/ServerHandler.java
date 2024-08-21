@@ -114,7 +114,7 @@ public class ServerHandler implements Runnable {
         if (world != null) {
             System.out.println("World restored successfully.");
         } else {
-            System.out.println("Failed to restore the world '" + worldName + "'");
+            System.out.println("Failed to restore the world '" + worldName + "'. World not found");
         }
     }
 
