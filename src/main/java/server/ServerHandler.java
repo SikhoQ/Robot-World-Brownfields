@@ -4,13 +4,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import database.SQLiteWorldRepository;
+import server.configuration.ConfigurationManager;
 import server.json.JsonHandler;
 import server.response.ErrorResponse;
 import server.world.*;
 import database.DatabaseConnection;
+import server.world.WorldObject;
+
 
 /**
  * The ServerHandler class handles commands that come from the server.
@@ -109,11 +113,34 @@ public class ServerHandler implements Runnable {
     public void handleRestoreCommand() {
         System.out.print("Enter world name to restore: ");
         String worldName = scanner.nextLine();
-        World world = this.worldRepository.loadWorld(worldName);
+        final Map<Integer, List<Map<String, List<Integer>>>> worldInfo = this.worldRepository.loadWorld(worldName);
+        if (!worldInfo.isEmpty()) {
+            // get world size and use to config
+            final Integer worldSize = worldInfo.keySet().iterator().next();
+            ConfigurationManager.setWorldSize(worldSize);
+            ConfigurationManager.setXConstraint(worldSize);
+            ConfigurationManager.setYConstraint(worldSize);
 
-        if (world != null) {
-            System.out.println("World restored successfully.");
-        } else {
+            final List<Map<String, List<Integer>>> worldObjects = worldInfo.get(worldSize);
+
+            List<Robot> robotsToAdd = new ArrayList<>();
+            List<Obstacle> obstaclesToAdd = new ArrayList<>();
+
+            for (Map<String, List<Integer>> oneObject: worldObjects) {
+                String type = oneObject.keySet().iterator().next();
+                int x = oneObject.get(type).get(0);
+                int y = oneObject.get(type).get(1);
+                int size = oneObject.get(type).get(2);
+
+                if (type.equals("SquareObstacle")) {
+                    obstaclesToAdd.add(new SquareObstacle(x, y));
+                }
+
+                this.world.setObstacles(obstaclesToAdd);
+
+            }
+            System.out.println("* Restored World '" + worldName + "'.. [size: " + worldSize + " x " + worldSize + ", obstacles: (" + this.world.getObstacles() + "), visibility: " + ConfigurationManager.getVisibility() + "]");
+        }else {
             System.out.println("Failed to restore the world '" + worldName + "'. World not found");
         }
     }

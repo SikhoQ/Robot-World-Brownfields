@@ -1,21 +1,25 @@
 package database;
 
-import server.configuration.ConfigurationManager;
-import server.world.World;
 import server.world.WorldObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.sql.*;
 
 public class SQLiteWorldRepository implements WorldRepository {
     private static final String URL = "jdbc:sqlite:RobotWorlds.db";
 
     @Override
-    public World loadWorld(String worldName) {
+    public Map<Integer, List<Map<String, List<Integer>>>> loadWorld(String worldName) {
         String worldSelectQuery = "SELECT size FROM world WHERE id = ?";
         String objectsSelectQuery = "SELECT type, x, y, size FROM objects WHERE world_id = ?";
-        World world = null;
+
+        // List of all objects in this world, objects being a map of its 'type' to a list of its size ints
+        List<Map<String, List<Integer>>> worldObjects = new ArrayList<>();
+        // map of single object: its 'type' to a list of its  size ints
+        Map<String, List<Integer>> oneObject = new HashMap<>();
+        // Map of the size of the world to a list of its objects
+        Map<Integer, List<Map<String, List<Integer>>>> worldInfo = new HashMap<>();
+        int worldSize = -1;
 
         try (Connection conn = DriverManager.getConnection(URL)) {
             // Load the world
@@ -23,35 +27,28 @@ public class SQLiteWorldRepository implements WorldRepository {
                 stmt.setString(1, worldName);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
-                    int worldSize = rs.getInt("size");
-                    ConfigurationManager.setWorldSize(worldSize);
-                    ConfigurationManager.setXConstraint(worldSize);
-                    ConfigurationManager.setYConstraint(worldSize);
-                    world = new World();
+                    worldSize = rs.getInt("size");
                 }
-            }
+            } catch (SQLException ignored) {}
 
-            // Load the objects and add them to the world
-            if (world != null) {
-                try (PreparedStatement stmt = conn.prepareStatement(objectsSelectQuery)) {
-                    stmt.setString(1, worldName);
-                    ResultSet rs = stmt.executeQuery();
-                    while (rs.next()) {
-                        String type = rs.getString("type");
-                        int x = rs.getInt("x");
-                        int y = rs.getInt("y");
-                        int size = rs.getInt("size");
-                        WorldObject object = new WorldObject(type, size, x, y);
-                        world.addObject(object);
-                    }
+            try (PreparedStatement stmt = conn.prepareStatement(objectsSelectQuery)) {
+                stmt.setString(1, worldName);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String type = rs.getString("type");
+                    int x = rs.getInt("x");
+                    int y = rs.getInt("y");
+                    int size = rs.getInt("size");
+                    oneObject.put(type, new ArrayList<>(Arrays.asList(x, y, size)));
+                    worldObjects.add(oneObject);
                 }
+                worldInfo.put(worldSize, worldObjects);
+                return  worldInfo;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return worldInfo;
         }
-
-        return world;
     }
 
     @Override

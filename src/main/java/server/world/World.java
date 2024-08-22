@@ -27,7 +27,7 @@ public class World {
     protected Position WORLD_BOTTOM_RIGHT;
     protected Position CENTRE;
 
-    private final List<Obstacle> obstacles;
+    private List<Obstacle> obstacles;
     public static ArrayList<Robot> robots;
     
     /**
@@ -83,6 +83,9 @@ public class World {
         return obstacles;
     }
 
+    public void setObstacles (List<Obstacle> newObstacles) {
+        this.obstacles = newObstacles;
+    }
     /**
      * Returns the list of obstacles in the world.
      *
