@@ -18,6 +18,10 @@ Java 17
 
 Maven
 
+Docker
+
+Javalin
+
 ### **Usage**
 
 To run the project, please refer to the Makefile.
