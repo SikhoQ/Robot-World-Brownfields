@@ -8,15 +8,15 @@ import server.world.WorldObject;
 
 
 public class RobotWorldsAPI {
-    private final Javalin server;
+    private final Javalin apiServer;
     private final SQLiteWorldRepository worldRepository;
 
     public RobotWorldsAPI() {
-        this.server = Javalin.create();
+        this.apiServer = Javalin.create();
         this.worldRepository = new SQLiteWorldRepository();
 
         // Endpoint to load a world
-        this.server.get("/loadWorld", context -> {
+        this.apiServer.get("/loadWorld", context -> {
             String worldName = context.queryParam("worldName");
             if (worldName != null && !worldName.isEmpty()) {
                 Map<Integer, List<Map<String, List<Integer>>>> worldData = worldRepository.loadWorld(worldName);
@@ -31,7 +31,7 @@ public class RobotWorldsAPI {
         });
 
         // Endpoint to save a world
-        this.server.post("/saveWorld", context -> {
+        this.apiServer.post("/saveWorld", context -> {
             String worldName = context.formParam("worldName");
             int worldSize = Integer.parseInt(context.formParam("worldSize"));
             List<WorldObject> worldObjects = context.bodyStreamAsClass(List.class);
@@ -49,7 +49,7 @@ public class RobotWorldsAPI {
         });
 
         // Endpoint to delete a world
-        this.server.delete("/removeWorld", context -> {
+        this.apiServer.delete("/removeWorld", context -> {
             String worldName = context.queryParam("worldName");
             if (worldName != null && !worldName.isEmpty()) {
                 String result = worldRepository.removeWorld(worldName);
@@ -65,11 +65,11 @@ public class RobotWorldsAPI {
     }
 
     public Javalin start() {
-        return this.server.start(7000);
+        return this.apiServer.start(7000);
     }
 
     public Javalin stop() {
-        return this.server.stop();
+        return this.apiServer.stop();
     }
 
     public static void main(String[] args) {

@@ -192,7 +192,7 @@ public class LookCommand extends Command {
             }};
             objects.add(object);
         }
-
+        System.out.println(objects);
         HashMap<String,Object> data = new HashMap<>() {{ put("objects", objects); }};
 
         return  new StandardResponse(data, robot.getState());

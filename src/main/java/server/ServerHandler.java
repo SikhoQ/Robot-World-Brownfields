@@ -70,10 +70,37 @@ public class ServerHandler implements Runnable {
         }
     }
 
-    private void handleDeleteCommand() {
+    public void handleDeleteCommand() {
         System.out.println("Enter name of world to delete from database: ");
         String worldName = scanner.nextLine();
 
+        if (DatabaseConnection.worldExists(worldName)) {
+            String result = deleteWorld(worldName);
+            printFeedback(result, worldName);
+        } else {
+            System.out.println("World '" + worldName + "' does not exist.");
+        }
+    }
+
+    public String deleteWorld(String worldName) {
+        return worldRepository.removeWorld(worldName);
+    }
+
+    public void printFeedback(String result, String worldName) {
+        switch (result) {
+            case "removed":
+                System.out.println("World '" + worldName + "' was removed successfully.");
+                break;
+            case "no world":
+                System.out.println("World '" + worldName + "' does not exist.");
+                break;
+            case "not removed":
+                System.out.println("Failed to remove world '" + worldName + "'.");
+                break;
+            default:
+                System.out.println("An unexpected error occurred.");
+                break;
+        }
     }
 
     public void handleSaveCommand() {
@@ -130,7 +157,6 @@ public class ServerHandler implements Runnable {
                 String type = oneObject.keySet().iterator().next();
                 int x = oneObject.get(type).get(0);
                 int y = oneObject.get(type).get(1);
-                int size = oneObject.get(type).get(2);
 
                 if (type.equals("SquareObstacle")) {
                     obstaclesToAdd.add(new SquareObstacle(x, y));

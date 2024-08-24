@@ -50,7 +50,7 @@ public class Robot {
         this.direction = Direction.NORTH;
         this.bulletDistance = 100;
         this.configurationManager = new ConfigurationManager();
-        this.position = getStartingPosition();
+        this.position = clientHandler.getWorld().getStartingPosition();
         this.clientHandler = clientHandler;
         this.state = new State(position.asArray(), String.valueOf(direction), shields, shots, status).getStateAsHashMap();
     }

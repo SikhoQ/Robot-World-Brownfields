@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>RobotWorld</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.4.1</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.0</version>
+            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
 
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0.3</version>
+            <version>3.41.2.2</version>
         </dependency>
 
         <!-- Javalin dependency -->
@@ -109,6 +109,12 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.13</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
