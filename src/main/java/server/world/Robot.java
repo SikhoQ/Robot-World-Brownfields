@@ -28,7 +28,7 @@ public class Robot {
     private final int maxSheilds;
     private final int bulletDistance;
     private final ConfigurationManager configurationManager;
-    private final ClientHandler clientHandler;
+    private ClientHandler clientHandler = null;
 
     /**
      * Constructs a new Robot object.
@@ -46,13 +46,17 @@ public class Robot {
         this.shields = shields;
         this.maxSheilds = shields;
         this.maxShots = shots;
-        this.status = "NORMAL";
+        this.status = "TODO";
         this.direction = Direction.NORTH;
         this.bulletDistance = 100;
         this.configurationManager = new ConfigurationManager();
+        System.out.println("above");
         this.position = clientHandler.getWorld().getStartingPosition();
-        this.clientHandler = clientHandler;
-        this.state = new State(position.asArray(), String.valueOf(direction), shields, shots, status).getStateAsHashMap();
+        if (this.position != null) {
+            this.clientHandler = clientHandler;
+            this.state = new State(position.asArray(), String.valueOf(direction), shields, shots, status).getStateAsHashMap();
+        }
+        System.out.println("below");
     }
 
     private int randomInt(int start, int stop) {

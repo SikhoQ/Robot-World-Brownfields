@@ -6,7 +6,6 @@ import server.json.JsonHandler;
 import server.response.ErrorResponse;
 import server.world.util.Position;
 import server.world.util.UpdateResponse;
-import database.DatabaseConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +85,20 @@ public class World {
     }
 
     public void setObstacles (List<Obstacle> newObstacles) {
-        this.obstacles = newObstacles;
+        if (newObstacles.isEmpty()) {
+            this.obstacles.clear();
+            ConfigurationManager.setObstacles("(none)");
+        }
+        else {
+            this.obstacles = newObstacles;
+            StringBuilder obstacles = new StringBuilder();
+            for (Obstacle obstacle : newObstacles) {
+                int x = obstacle.getBottomLeftX();
+                int y = obstacle.getBottomLeftY();
+                obstacles.append(String.format("(%d, %d)", x, y)).append(" ");
+            }
+            ConfigurationManager.setObstacles(String.valueOf(obstacles));
+        }
     }
     /**
      * Returns the list of obstacles in the world.
@@ -231,7 +243,6 @@ public class World {
             }
             return new Object[]{UpdateResponse.SUCCESS};
         }
-
         return new Object[]{UpdateResponse.FAILED_OUTSIDE_WORLD};
     };
 
@@ -290,6 +301,7 @@ public class World {
         String positionBlocked = "";
         while (!(positionBlocked = startingPositionBlocked(startingPosition)).equals("free")) {
             if (positionBlocked.equals("no space")) {
+                System.out.println("returning null");
                 return null;
             }
             int randomX = randomInt(-ConfigurationManager.getXConstraint(), ConfigurationManager.getXConstraint());
@@ -325,6 +337,7 @@ public class World {
 
         if (obstaclesInWorld.size() + robotsInWorld.size() == positionsInWorld.size()) {
             JsonHandler.serializeResponse(new ErrorResponse("No more space in this world"));
+            System.out.println("no space");
             return "no space";
         }
 

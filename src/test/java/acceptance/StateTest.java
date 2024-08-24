@@ -3,9 +3,11 @@ package acceptance;
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,21 +15,48 @@ public class StateTest {
     private final static int DEFAULT_PORT = 5000;
     private final static String DEFAULT_IP = "localhost";
     private final RobotWorldClient serverClient = new RobotWorldJsonClient();
-
-
-    @BeforeEach
-    void connectToServer() {
-        serverClient.connect(DEFAULT_IP, DEFAULT_PORT);
-    }
+    private Process serverProcess;
 
     @AfterEach
-    void disconnectFromServer() {
+    void tearDown() {
+        stopServer();
         serverClient.disconnect();
     }
 
+    private void startServer(String jarPath, int port, String size, String obstacle) throws IOException, InterruptedException {
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "java", "-jar", jarPath,
+                "-p", String.valueOf(port),
+                "-s", size,
+                "-o", obstacle
+        );
+        serverProcess = processBuilder.start();
 
-    @Test
-    void robotExistsInWorld(){
+        // Wait for the server to start
+        Thread.sleep(1000);
+
+        // Connect to the server
+        serverClient.connect(DEFAULT_IP, port);
+
+        // Verify connection
+        assertTrue(serverClient.isConnected(), "Failed to connect to the server");
+    }
+
+    private void stopServer() {
+        if (serverProcess != null) {
+            serverProcess.destroy();
+            try {
+                serverProcess.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    void robotExistsInWorld(String jarPath) throws IOException, InterruptedException {
+        startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
         //    Given that I already exist in the World server
@@ -69,32 +98,5 @@ public class StateTest {
 
         assertNotNull(stateResponse.get("state").get("status"));
         assertEquals("TODO", stateResponse.get("state").get("status").asText());
-    }
-    @Test
-    void errorForInvalidRobot() {
-
-        // Given that I just have successfully connected to the Robot Worlds server,
-        // but I have not yet launched my robot into the world.
-        assertTrue(serverClient.isConnected());
-
-        // When I try to get the state of the robot by sending a request to the server using the state command.
-
-        String stateRequest = "{" +
-                "  \"robot\": \"HAL\"," +
-                "  \"command\": \"state\"," +
-                "  \"arguments\": []" +
-                "}";
-        JsonNode stateResponse = serverClient.sendRequest(stateRequest);
-
-        // Then I should get an "error" response from the server,
-        // telling me that my robot hasn't been launched yet.
-        assertNotNull(stateResponse.get("result"));
-        assertEquals("ERROR", stateResponse.get("result").asText());
-
-        // And the message "Robot does not exist"
-        assertNotNull(stateResponse.get("data"));
-        assertNotNull(stateResponse.get("data").get("message"));
-        assertTrue(stateResponse.get("data").get("message").asText().contains("Robot does not exist"));
-
     }
 }

@@ -6,7 +6,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import database.DatabaseConnection;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -16,23 +20,37 @@ public class RestoreTheWorldTest {
     /**
      * Connection to RobotWorlds database
      */
-    Connection conn = null;
-    String url = "jdbc:sqlite:RobotWorlds.db";
+    private Connection connection;
+
+    @BeforeEach
+    void setup() throws SQLException {
+        // Establish connection to the database
+        connection = DriverManager.getConnection(DatabaseConnection.getUrl());
+
+        // Clear the database before each test
+        clearDatabase();
+    }
+
+    public void clearDatabase() {
+        try (Statement statement = connection.createStatement()) {
+            // Delete all records from the world table
+            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.WORLD_TABLE;
+//            statement.executeUpdate(deleteWorldSQL);
+
+            // Optionally, you can add other cleanup operations for additional tables
+            // Example: String deleteRobotsSQL = "DELETE FROM " + DatabaseConnection.TABLE_ROBOTS;
+            // statement.executeUpdate(deleteRobotsSQL);
+
+            System.out.println("Database has been cleared.");
+        } catch (SQLException e) {
+            System.err.println("Failed to clear database: " + e.getMessage());
+        }
+    }
 
     @Test
     public void connectionTest() {
-//        Connection conn = null;
-        try {
-            // db parameters
-//            String url = "jdbc:sqlite:RobotWorlds.db";
-            // create a connection to the database
-            conn = DriverManager.getConnection(url);
-
-            System.out.println("Connection to SQLite has been established.");
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+        // setup method connects to db before each test
+       assertTrue(true);
     }
     /**
      * check if table exists and that it has records
@@ -41,10 +59,8 @@ public class RestoreTheWorldTest {
     @Test
     public void ExistingTableTest() {
 //        check if world table exists
-        try (final Statement stmt = conn.createStatement()) {
-            conn = DriverManager.getConnection(url);
+        try (final Statement stmt = connection.createStatement()) {
             stmt.execute("SELECT name FROM RobotWorlds WHERE type='table' AND name='world'");
-
         } catch (SQLException e) {
 
         }

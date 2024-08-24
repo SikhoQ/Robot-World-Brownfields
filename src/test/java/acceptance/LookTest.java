@@ -3,9 +3,7 @@ package acceptance;
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -35,6 +33,11 @@ class LookTest {
                 "-s", size,
                 "-o", obstacle
         );
+
+        // Redirect server's stdout and stderr to the parent process's output streams
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
@@ -58,9 +61,9 @@ class LookTest {
         }
     }
 
-    @Test
-    void emptyWorld() throws IOException, InterruptedException {
-        String jarPath = "out/artifacts/Server_jar/RobotWorld.jar";
+    @ParameterizedTest
+    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    void emptyWorld(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 

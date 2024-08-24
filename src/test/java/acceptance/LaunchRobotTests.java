@@ -3,36 +3,67 @@ package acceptance;
 import client.RobotWorldClient;
 import client.RobotWorldJsonClient;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * As a player
- * I want to launch my robot in the online robot world
- * So that I can break the record for the most robot kills
- */
 class LaunchRobotTests {
     private final static int DEFAULT_PORT = 5000;
     private final static String DEFAULT_IP = "localhost";
     private final RobotWorldClient serverClient = new RobotWorldJsonClient();
-
-    @BeforeEach
-    void connectToServer() {
-        serverClient.connect(DEFAULT_IP, DEFAULT_PORT);
-    }
+    private Process serverProcess;
 
     @AfterEach
-    void disconnectFromServer() {
+    void tearDown() {
+        stopServer();
         serverClient.disconnect();
     }
 
-    @Test
-    void validLaunchShouldSucceed() {
+    private void startServer(String jarPath, int port, String size, String obstacle) throws IOException, InterruptedException {
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "java", "-jar", jarPath,
+                "-p", String.valueOf(port),
+                "-s", size,
+                "-o", obstacle
+        );
+
+        // Redirect server's stdout and stderr to the parent process's output streams
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+        serverProcess = processBuilder.start();
+
+        // Wait for the server to start
+        Thread.sleep(1000);
+
+        // Connect to the server
+        serverClient.connect(DEFAULT_IP, port);
+
+        // Verify connection
+        assertTrue(serverClient.isConnected(), "Failed to connect to the server");
+    }
+
+    private void stopServer() {
+        if (serverProcess != null) {
+            serverProcess.destroy();
+            try {
+                serverProcess.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void validLaunchShouldSucceed(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a running Robot Worlds server
         // And the world is of size 1x1 (The world is configured or hardcoded to this size)
+        startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
         // When I send a valid launch request to the server
@@ -57,9 +88,12 @@ class LaunchRobotTests {
         assertNotNull(response.get("state"));
     }
 
-    @Test
-    void invalidLaunchShouldFail() {
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void invalidLaunchShouldFail(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a running Robot Worlds server
+        // And the world is of size 1x1
+        startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
         // When I send an invalid launch request with the command "luanch" instead of "launch"
@@ -80,26 +114,27 @@ class LaunchRobotTests {
         assertTrue(response.get("data").get("message").asText().contains("Unsupported command"));
     }
 
-    @Test
-    void noMoreSpaceInWorld(){
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void noMoreSpaceInWorld(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a Robot Worlds server
         // And the world is of size 1x1
+        startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
-        //        And every coordinate has an object
-        String request1 = "{" +
-                "  \"robot\": \"HAL\"," +
+        // And every coordinate has an object
+        String request = "{" +
+                "  \"robot\": \"HAL " + "\"," +
                 "  \"command\": \"launch\"," +
                 "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
                 "}";
-        JsonNode response1 = serverClient.sendRequest(request1);
-
-        assertNotNull(response1.get("result"));
-        assertEquals("OK", response1.get("result").asText());
-        assertNotNull(response1.get("data"));
-        assertNotNull(response1.get("data").get("position"));
-        assertEquals(0, response1.get("data").get("position").get(0).asInt());
-        assertEquals(0, response1.get("data").get("position").get(1).asInt());
+        JsonNode response = serverClient.sendRequest(request);
+        assertNotNull(response.get("result"));
+        assertEquals("OK", response.get("result").asText());
+        assertNotNull(response.get("data"));
+        assertNotNull(response.get("data").get("position"));
+        assertEquals(0, response.get("data").get("position").get(0).asInt());
+        assertEquals(0, response.get("data").get("position").get(1).asInt());
 
         // When I send a valid launch request to the server
         String request2 = "{" +
@@ -117,13 +152,15 @@ class LaunchRobotTests {
         assertEquals("No more space in this world", response2.get("data").get("message").asText());
     }
 
-    @Test
-    void nameAlreadyExists(){
-        //        Given that I am connected to a Robot Worlds server
-        //        And the world is of size 1x1
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void nameAlreadyExists(String jarPath) throws IOException, InterruptedException {
+        // Given that I am connected to a Robot Worlds server
+        // And the world is of size 2x2
+        startServer(jarPath, DEFAULT_PORT, "2", "none");
         assertTrue(serverClient.isConnected());
 
-        //        And there is already a robot with the same name I chose\there is already a robot named "Hal" in the world
+        // And there is already a robot with the same name I chose
         String request1 = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"launch\"," +
@@ -134,28 +171,30 @@ class LaunchRobotTests {
         assertNotNull(response1.get("result"));
         assertEquals("OK", response1.get("result").asText());
 
-        //        When I send a valid launch request to the server with the same robot name "Hal"
+        // When I send a valid launch request to the server with the same robot name "Hal"
         String request2 = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"launch\"," +
                 "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
                 "}";
-
         JsonNode response2 = serverClient.sendRequest(request2);
 
-        //        Then I should get an "ERROR" response
+        // Then I should get an "ERROR" response
         assertNotNull(response2.get("result"));
         assertEquals("ERROR", response2.get("result").asText());
 
-        //        And the message "Too many of you in this world"
+        // And the message "Too many of you in this world"
         assertNotNull(response2.get("data"));
+        assertNotNull(response2.get("data").get("message"));
         assertEquals("Too many of you in this world", response2.get("data").get("message").asText());
     }
 
-    @Test
-    void launchAnotherRobot() {
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void launchAnotherRobotShouldSucceed(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a running Robot Worlds server
         // And the world is of size 2x2
+        startServer(jarPath, DEFAULT_PORT, "2", "none");
         assertTrue(serverClient.isConnected());
 
         // And robot "HAL" has already been launched into the world
@@ -166,7 +205,6 @@ class LaunchRobotTests {
                 "}";
 
         JsonNode Response = serverClient.sendRequest(Request1);
-        System.out.println(Response);
         assertNotNull(Response.get("result"));
         assertEquals("OK", Response.get("result").asText());
 
@@ -183,15 +221,17 @@ class LaunchRobotTests {
         // Then the launch should be successful
         // and a randomly allocated position of R2D2 should be returned.
         assertNotNull(Response2.get("data"));
-        JsonNode Position = Response2.get("data").get("position");
-        assertNotNull(Position);
-        assertFalse(Position.get(0).asInt() >= 0 && Position.get(0).asInt() < 2);
-        assertFalse(Position.get(1).asInt() >= 0 && Position.get(1).asInt() < 2);
+        JsonNode position = Response2.get("data").get("position");
+        assertNotNull(position);
+        assertTrue(position.get(0).asInt() >= -2 && position.get(0).asInt() <= 2);
+        assertTrue(position.get(1).asInt() >= -2 && position.get(1).asInt() <= 2);
     }
 
-    @Test
-    void worldWithoutObstaclesFull() {
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void worldWithoutObstaclesFull(String jarPath) throws IOException, InterruptedException {
 //        Given a world of size 2x2
+        startServer(jarPath, DEFAULT_PORT, "2", "none");
         assertTrue(serverClient.isConnected());
 
 //        and I have successfully launched 9 robots into the world
@@ -221,8 +261,10 @@ class LaunchRobotTests {
         assertTrue(response.get("data").get("message").asText().contains("No more space in this world"));
     }
 
-    @Test
-    void robotsIntoWorldWithObstacle() {
+    @ParameterizedTest
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
+    void robotsIntoWorldWithObstacle(String jarPath) throws IOException, InterruptedException {
+        startServer(jarPath, DEFAULT_PORT, "2", "1,1");
         assertTrue(serverClient.isConnected());
 
         // Launch 8 robots into the world
@@ -247,6 +289,5 @@ class LaunchRobotTests {
             int posY = position.get(1).asInt();
             assertFalse(posX == 1 && posY == 1, "Robot HAL " + x + " is in the obstacle position [1,1]");
         }
-
     }
 }

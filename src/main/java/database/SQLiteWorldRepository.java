@@ -31,6 +31,9 @@ public class SQLiteWorldRepository implements WorldRepository {
                 }
             } catch (SQLException ignored) {}
 
+            if (worldSize == -1)
+                return worldInfo;
+
             try (PreparedStatement stmt = conn.prepareStatement(objectsSelectQuery)) {
                 stmt.setString(1, worldName);
                 ResultSet rs = stmt.executeQuery();

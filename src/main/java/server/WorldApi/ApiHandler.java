@@ -4,6 +4,8 @@ package server.WorldApi;
 import io.javalin.http.Context;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import database.SQLiteWorldRepository;
 import server.world.WorldObject;
 
@@ -32,7 +34,7 @@ public class ApiHandler {
     // Handler for saving a world
     public void saveWorld(Context context) {
         String worldName = context.formParam("worldName");
-        int worldSize = Integer.parseInt(context.formParam("worldSize"));
+        int worldSize = Integer.parseInt(Objects.requireNonNull(context.formParam("worldSize")));
         List<WorldObject> worldObjects = context.bodyStreamAsClass(List.class);
 
         if (worldName != null && !worldName.isEmpty()) {

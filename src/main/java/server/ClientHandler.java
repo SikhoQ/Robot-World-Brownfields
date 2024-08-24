@@ -126,6 +126,7 @@ public class ClientHandler implements Runnable {
                     break;
                 }
                 if (JsonHandler.isJsonString(requestFromClient)) {
+                    System.out.println("a json string");
                     synchronized (this) {
                         handleRequest(requestFromClient);
                     }
@@ -162,8 +163,10 @@ public class ClientHandler implements Runnable {
         try {
             Command newCommand = Command.create(request);
             Response response = newCommand.execute(this);
+            System.out.println("after command execution");
 
             String responseJsonString = JsonHandler.serializeResponse(response);
+            System.out.println("RESPONSE: " + responseJsonString);
             sendToClient(responseJsonString);
 
             // if command is 'launch', send a list of all robots currently in world

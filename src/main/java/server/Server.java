@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import database.DatabaseConnection;
+import server.WorldApi.ApiServer;
 import server.configuration.Config;
 import server.world.World;
 import server.configuration.ConfigurationManager;
@@ -27,7 +28,34 @@ public class Server {
     private ServerSocket serverSocket;
     private World world;
 
-    public Server() {
+    public Server() {}
+
+    public static void main(String[] args) throws IOException {
+        // initialize database connection
+        System.out.println("Connecting to database...");
+        try {
+            DatabaseConnection.initializeDatabase();
+            System.out.println("Connected to database.");
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            System.out.println("Error while connecting to database");
+            System.exit(1);
+        }
+
+        // Initialize world with configurations
+        Server server = new Server();
+        server.configureServer(args);
+        System.out.println("* Creating World.. [size: " + ConfigurationManager.getWorldSize() + " x " + ConfigurationManager.getWorldSize() + ", obstacles: " + ConfigurationManager.getObstacles() + ", visibility: " + ConfigurationManager.getVisibility() + "]");
+        server.world = new World();
+
+        server.serverSocket = new ServerSocket(ConfigurationManager.getPort());
+
+        // Start existing server in a separate thread
+        new Thread(server::startServer).start();
+
+        // Initialize the Web API server
+        ApiServer apiServer = new ApiServer();
+        apiServer.start();
     }
 
     public void configureServer(String[] args) {
@@ -87,27 +115,5 @@ public class Server {
 
     public World getWorld() {
         return this.world;
-    }
-
-    public static void main(String[] args) throws IOException {
-        // initialize database connection
-        System.out.println("Connecting to database...");
-        try {
-            DatabaseConnection.initializeDatabase();
-            System.out.println("Connected to database.");
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            System.out.println("Error while connecting to database");
-            System.exit(1);
-        }
-
-        Server server = new Server();
-        server.configureServer(args);
-        ServerSocket serverSocket = new ServerSocket(ConfigurationManager.getPort());
-        server.serverSocket = serverSocket;
-
-        System.out.println("* Creating World.. [size: " + ConfigurationManager.getWorldSize() + " x " + ConfigurationManager.getWorldSize() + ", obstacles: (" + ConfigurationManager.getObstacles() + "), visibility: " + ConfigurationManager.getVisibility() + "]");
-        server.world = new World(); // Initialize world with configurations
-        server.startServer();
     }
 }

@@ -1,7 +1,5 @@
 package server.WorldApi;
 
-
-import database.DatabaseConnection;
 import io.javalin.Javalin;
 
 public class ApiServer {
@@ -26,12 +24,4 @@ public class ApiServer {
     public Javalin stop() {
         return this.apiServer.stop();
     }
-
-    public static void main(String[] args) {
-        ApiServer apiServer = new ApiServer();
-        apiServer.start();
-        DatabaseConnection.initializeDatabase();
-    }
 }
-
-

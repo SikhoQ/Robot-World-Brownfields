@@ -2,10 +2,7 @@ package server;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import database.SQLiteWorldRepository;
 import server.configuration.ConfigurationManager;
@@ -41,7 +38,11 @@ public class ServerHandler implements Runnable {
     public void run() {
         this.scanner = new Scanner(System.in);
         while(true) {
-            command =  scanner.nextLine().toLowerCase();
+            try {
+                command =  scanner.nextLine().toLowerCase();
+            } catch (NoSuchElementException ignored) {
+                System.exit(1);
+            }
             switch (command) {
                 case "dump":
                     dump();
@@ -162,12 +163,11 @@ public class ServerHandler implements Runnable {
                     obstaclesToAdd.add(new SquareObstacle(x, y));
                 }
 
-                this.world.setObstacles(obstaclesToAdd);
-
             }
-            System.out.println("* Restored World '" + worldName + "'.. [size: " + worldSize + " x " + worldSize + ", obstacles: (" + this.world.getObstacles() + "), visibility: " + ConfigurationManager.getVisibility() + "]");
+            this.world.setObstacles(obstaclesToAdd);
+            System.out.println("* Restored World '" + worldName + "'.. [size: " + worldSize + " x " + worldSize + ", obstacles: " + ConfigurationManager.getObstacles() + ", visibility: " + ConfigurationManager.getVisibility() + "]");
         }else {
-            System.out.println("Failed to restore the world '" + worldName + "'. World not found");
+            System.out.println("Failed to restore the world '" + worldName + "'. World not found.");
         }
     }
 
@@ -222,16 +222,21 @@ public class ServerHandler implements Runnable {
     public void dump() {
         StringBuilder string = new StringBuilder();
         String robotsStr = !world.getRobots().isEmpty() ?
-        getRobotsString() : "There are currently no robots in world.";
+        getRobotsString() : "\nThere are no robots in world.";
 
         string.append(robotsStr);
-        string.append(("\nObstacles:\n"));
 
         List<Obstacle> obstacles = world.getObstacles();
-        if (obstacles != null) {
+
+        if (!obstacles.isEmpty()) {
+            string.append(("\nObstacles:\n"));
+
             for (Obstacle obstacle : obstacles) {
                 string.append(obstacle.toString()).append("\n");
             }
+        }
+        else {
+            string.append("\n").append("There are no obstacles in this world");
         }
 
         output(string.toString());

@@ -42,12 +42,12 @@ class ManyWorldsTest {
     void testSaveWorldWithUniqueNames() {
         String uniqueWorldName = "world1";
         String duplicateWorldName = "world2";
-        int sizeX = 5;
-        int sizeY = 4;
+        int uniqueWorldSize = 5;
+        int duplicateWorldSize = 4;
         String obstacle = "pit";
 
         // Save a world with a unique name
-        boolean isFirstSaveSuccessful = saveWorld(uniqueWorldName, sizeX, sizeY);
+        boolean isFirstSaveSuccessful = saveWorld(uniqueWorldName, uniqueWorldSize);
         assertTrue(isFirstSaveSuccessful, "The unique world should be saved successfully");
 
         // Verify the unique world was actually saved in the database
@@ -55,7 +55,7 @@ class ManyWorldsTest {
         assertTrue(uniqueWorldExists, "The unique world should exist in the database");
 
         // Save another world with a different unique name
-        boolean isSecondSaveSuccessful = saveWorld(duplicateWorldName, sizeX, sizeY);
+        boolean isSecondSaveSuccessful = saveWorld(duplicateWorldName, duplicateWorldSize);
         assertTrue(isSecondSaveSuccessful, "Another unique world should be saved successfully");
 
         // Verify the second unique world was actually saved in the database
@@ -63,7 +63,7 @@ class ManyWorldsTest {
         assertTrue(secondWorldExists, "The second unique world should exist in the database");
 
         // Attempt to save a world with a duplicate name
-        boolean isDuplicateSaveSuccessful = saveWorld(duplicateWorldName, sizeX, sizeY);
+        boolean isDuplicateSaveSuccessful = saveWorld(duplicateWorldName, duplicateWorldSize);
         assertFalse(isDuplicateSaveSuccessful, "The world with a duplicate name should not be saved");
 
 //        // Clean up (delete both worlds)
@@ -71,7 +71,7 @@ class ManyWorldsTest {
 //        deleteWorld(duplicateWorldName);
     }
 
-    public boolean saveWorld(String name, int sizeX, int sizeY) {
+    public boolean saveWorld(String name, int worldSize) {
         try {
             // Check if the world with the given name already exists
             if (checkWorldExists(name)) {
@@ -85,8 +85,7 @@ class ManyWorldsTest {
 
             PreparedStatement preparedStatement = connection.prepareStatement(insertWorldSQL);
             preparedStatement.setString(1, name);
-            preparedStatement.setInt(2, sizeX);
-            preparedStatement.setInt(3, sizeY);
+            preparedStatement.setInt(2, worldSize);
             preparedStatement.executeUpdate();
 
             System.out.println("World saved successfully");
