@@ -25,7 +25,7 @@ class ManyWorldsTest {
         try (Statement statement = connection.createStatement()) {
             // Delete all records from the world table
             String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.WORLD_TABLE;
-            statement.executeUpdate(deleteWorldSQL);
+//            statement.executeUpdate(deleteWorldSQL);
 
             // Optionally, you can add other cleanup operations for additional tables
             // Example: String deleteRobotsSQL = "DELETE FROM " + DatabaseConnection.TABLE_ROBOTS;
@@ -42,8 +42,8 @@ class ManyWorldsTest {
     void testSaveWorldWithUniqueNames() {
         String uniqueWorldName = "world1";
         String duplicateWorldName = "world2";
-        int sizeX = 100;
-        int sizeY = 100;
+        int sizeX = 5;
+        int sizeY = 4;
         String obstacle = "pit";
 
         // Save a world with a unique name

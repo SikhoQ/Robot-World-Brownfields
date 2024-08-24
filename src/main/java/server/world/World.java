@@ -12,8 +12,8 @@ import java.util.Random;
 
 
 /**
-* Enum used to track direction
-*/
+ * Enum used to track direction
+ */
 enum Direction {
     NORTH, EAST, SOUTH, WEST
 }
@@ -29,7 +29,7 @@ public class World {
 
     private List<Obstacle> obstacles;
     public static ArrayList<Robot> robots;
-    
+
     /**
      * Constructs a new World object.
      * Initializes the list of robots and creates obstacles in the world.
@@ -154,61 +154,15 @@ public class World {
         return false;
     }
 
-    public boolean saveToDatabase(String worldName) {
-        if (worldName == null || worldName.isEmpty()) {
-            return false;
-        }
-
-        // Check if world already exists
-        if (DatabaseConnection.worldExists(worldName)) {
-            // Handle existing world scenario
-            // Optionally, you could ask for overwrite confirmation or handle accordingly
-            System.out.println("World with the name '" + worldName + "' already exists.");
-            return false;
-        }
-        String worldData = convertWorldToJson();
-        return DatabaseConnection.saveWorld(worldName, worldData);
-    }
-    public String convertWorldToJson(){
-        return "";
-    }
-
-    public boolean restoreFromDatabase(String worldName) {
-        if (worldName == null || worldName.isEmpty()) {
-            return false;
-        }
-
-        // Retrieve world data from database
-        String worldData = String.valueOf(DatabaseConnection.restoreWorld(worldName));
-        if (worldData == null) {
-            // Handle case where the world does not exist
-            System.out.println("World with the name '" + worldName + "' does not exist.");
-            return false;
-        }
-
-        // Convert JSON or other stored format back into world state
-        boolean successful = loadWorldFromJson(worldData); // Implement this method to deserialize world
-
-        return successful;
-    }
-
-    public boolean loadWorldFromJson(String worldData) {
-        // Implement JSON deserialization of world state
-        // This is a placeholder; use a library like Gson or Jackson for actual implementation
-        return true; // Return true if world was successfully loaded
-    }
-
-
-
-        /**
-         * Updates the position of a robot in the world.
-         *
-         * @param robot    the robot to update
-         * @param nrSteps  the number of steps to move the robot
-         * @param isBullet indicates if the update is for a bullet (true) or robot movement (false)
-         * @return an array containing the update response, which can be UpdateResponse.SUCCESS, UpdateResponse.FAILED_OBSTRUCTED,
-         * or UpdateResponse.FAILED_OUTSIDE_WORLD, and additional information if applicable
-         */
+    /**
+     * Updates the position of a robot in the world.
+     *
+     * @param robot    the robot to update
+     * @param nrSteps  the number of steps to move the robot
+     * @param isBullet indicates if the update is for a bullet (true) or robot movement (false)
+     * @return an array containing the update response, which can be UpdateResponse.SUCCESS, UpdateResponse.FAILED_OBSTRUCTED,
+     * or UpdateResponse.FAILED_OUTSIDE_WORLD, and additional information if applicable
+     */
     public Object[] updatePosition(Robot robot, int nrSteps) { // remove isBullet from this method
 
         int increment = (nrSteps > 0)? 1 : -1;
@@ -216,7 +170,7 @@ public class World {
 
         // move robot by 1 / -1 step until it reaches its destination or it is obstructed / out of safezone
         for (int i=1; i<=Math.abs(nrSteps); i++) {
-            updateResponse = updatePosition_helper(robot, increment, false); 
+            updateResponse = updatePosition_helper(robot, increment, false);
             if (updateResponse[0] != UpdateResponse.SUCCESS) { //obstructed or out of world.
                 return updateResponse;
             }
@@ -226,7 +180,7 @@ public class World {
     };
 
     public Object[] fireGun(Robot robot, int nrSteps) {
-        return updatePosition_helper(robot, nrSteps, true); 
+        return updatePosition_helper(robot, nrSteps, true);
     }
 
     /**
@@ -267,7 +221,7 @@ public class World {
             }
         }
         else if (newPosition.isIn(this.WORLD_TOP_LEFT,this.WORLD_BOTTOM_RIGHT)){
-            // if path not blocked and in constraint box, check result length. 
+            // if path not blocked and in constraint box, check result length.
             // Only update position if robot is moving not bullet. How? isBullet - true/false.
             if (!isBullet) {
                 robot.setPosition(newPosition);

@@ -41,30 +41,6 @@ public class DatabaseConnection {
         }
     }
 
-    public static boolean saveWorld(String worldName, String worldData) {
-        boolean shouldOverwrite = true;
-
-        if (worldExists(worldName)) {
-            shouldOverwrite = promptOverwrite(worldName);
-        }
-
-        if (shouldOverwrite) {
-            // insert into world (id, size) values (?, ?)
-            String query = "INSERT INTO " + WORLD_TABLE + " (" + WORLD_COLUMN_ID + ", " + WORLD_COLUMN_SIZE + ") VALUES (?, ?)";
-            try (Connection conn = DriverManager.getConnection(URL);
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, worldName);
-                stmt.setString(2, worldData);
-                int rowsAffected = stmt.executeUpdate();
-                return rowsAffected > 0;
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return false;
-    }
-
     public static boolean promptOverwrite(String worldName) {
         Scanner scanner = new Scanner(System.in);
 
@@ -79,21 +55,6 @@ public class DatabaseConnection {
         }
 
         return input.equalsIgnoreCase("Y");
-    }
-
-    public static String restoreWorld(String worldName) {
-        String query = "SELECT data FROM " + WORLD_TABLE + " WHERE " + WORLD_COLUMN_ID + " = ?";
-        try (Connection conn = DriverManager.getConnection(URL);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, worldName);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("data");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     /**
