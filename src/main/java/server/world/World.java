@@ -2,6 +2,8 @@ package server.world;
 
 import server.configuration.Config;
 import server.configuration.ConfigurationManager;
+import server.json.JsonHandler;
+import server.response.ErrorResponse;
 import server.world.util.Position;
 import server.world.util.UpdateResponse;
 import database.DatabaseConnection;
@@ -320,5 +322,71 @@ public class World {
     }
 
     public void addObject(WorldObject object) {
+    }
+
+    public Position getStartingPosition() {
+        System.out.println("inside get start position");
+        System.out.println("before getting starting position");
+        Position startingPosition = new Position(0, 0);
+        System.out.println("after getting starting position: ("+startingPosition.getX()+","+startingPosition.getY()+")");
+        System.out.println("after getting robots inside getStartingPosition");
+        System.out.println("after initial getPosition values");
+
+        String positionBlocked = "";
+        while (!(positionBlocked = startingPositionBlocked(startingPosition)).equals("free")) {
+            if (positionBlocked.equals("no space")) {
+                return null;
+            }
+            int randomX = randomInt(-ConfigurationManager.getXConstraint(), ConfigurationManager.getXConstraint());
+            int randomY = randomInt(-ConfigurationManager.getYConstraint(), ConfigurationManager.getYConstraint());
+            startingPosition = new Position(randomX, randomY);
+        }
+        System.out.println("about to return starting position");
+        return startingPosition;
+    }
+
+    /**
+     * Creates and returns an ArrayList of all positions in the world, including edges
+     * @return an ArrayList of world positions
+     * */
+    public ArrayList<Position> getWorldPositions() {
+        ArrayList<Position> worldPositions = new ArrayList<>();
+
+        int positionY = Math.abs(WORLD_TOP_LEFT.getY());
+        int positionX = Math.abs(WORLD_TOP_LEFT.getX());
+
+        for (int y = positionY; y >= -positionY; y--) {
+            for (int x = -positionX; x <= positionX; x++) {
+                worldPositions.add(new Position(x, y));
+            }
+        }
+        return worldPositions;
+    }
+
+    private String startingPositionBlocked(Position startingPosition) {
+        List<Robot> robotsInWorld = this.getRobots();
+        List<Obstacle> obstaclesInWorld = this.getObstacles();
+        List<Position> positionsInWorld = this.getWorldPositions();
+
+        if (obstaclesInWorld.size() + robotsInWorld.size() == positionsInWorld.size()) {
+            JsonHandler.serializeResponse(new ErrorResponse("No more space in this world"));
+            return "no space";
+        }
+
+        for (Robot robot: robotsInWorld) {
+            System.out.println("inside getStartingPosition robotsInWorld for loop");
+            if (robot.getPosition().equals(startingPosition)) {
+                return "blocked";
+            }
+        }
+
+        for (Obstacle obstacle: obstaclesInWorld) {
+            System.out.println("inside getStartingPosition obstaclesInWorld for loop");
+            Position obstaclePosition = new Position(obstacle.getBottomLeftX(), obstacle.getBottomLeftY());
+            if (obstaclePosition.equals(startingPosition)) {
+                return "blocked";
+            }
+        }
+        return "free";
     }
 }

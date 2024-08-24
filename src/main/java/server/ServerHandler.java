@@ -130,7 +130,6 @@ public class ServerHandler implements Runnable {
                 String type = oneObject.keySet().iterator().next();
                 int x = oneObject.get(type).get(0);
                 int y = oneObject.get(type).get(1);
-                int size = oneObject.get(type).get(2);
 
                 if (type.equals("SquareObstacle")) {
                     obstaclesToAdd.add(new SquareObstacle(x, y));

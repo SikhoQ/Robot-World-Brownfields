@@ -6,28 +6,62 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LookTest {
     private final static int DEFAULT_PORT = 5000;
     private final static String DEFAULT_IP = "localhost";
     private final RobotWorldClient serverClient = new RobotWorldJsonClient();
-
-    @BeforeEach
-    void connectToServer(){
-        serverClient.connect(DEFAULT_IP, DEFAULT_PORT);
-    }
+    private Process serverProcess;
 
     @AfterEach
-    void disconnectFromServer(){
+    void tearDown() {
+        stopServer();
         serverClient.disconnect();
     }
 
-    @Test
-    void emptyWorld() {
+    private void startServer(String jarPath, int port, String size, String obstacle) throws IOException, InterruptedException {
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "java", "-jar", jarPath,
+                "-p", String.valueOf(port),
+                "-s", size,
+                "-o", obstacle
+        );
+        serverProcess = processBuilder.start();
 
+        // Wait for the server to start
+        Thread.sleep(1000);
+
+        // Connect to the server
+        serverClient.connect(DEFAULT_IP, port);
+
+        // Verify connection
+        assertTrue(serverClient.isConnected(), "Failed to connect to the server");
+    }
+
+    private void stopServer() {
+        if (serverProcess != null) {
+            serverProcess.destroy();
+            try {
+                serverProcess.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    @Test
+    void emptyWorld() throws IOException, InterruptedException {
+        String jarPath = "out/artifacts/Server_jar/RobotWorld.jar";
+        startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
         String launchRequest = "{" +
@@ -79,8 +113,10 @@ class LookTest {
         }
     }
 
-    @Test
-    void seeObstacle() {
+    @ParameterizedTest
+    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    void seeObstacle(String jarPath) throws IOException, InterruptedException {
+        startServer(jarPath, DEFAULT_PORT, "2", "0,1");
         assertTrue(serverClient.isConnected());
 
         String launchRequest = "{" +
@@ -102,15 +138,16 @@ class LookTest {
 
         String direction = lookResponse.get("data").get("objects").get(3).get("direction").asText();
 
-        if (direction == "North") {
+        if (Objects.equals(direction, "North")) {
             assertEquals("OBSTACLE", lookResponse.get("data").get("objects").get(0).get("type").asText());
             assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
         }
     }
 
-    @Test
-    public void seeObstacleAndRobots() {
-
+    @ParameterizedTest
+    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    public void seeObstacleAndRobots(String jarPath) throws IOException, InterruptedException {
+        startServer(jarPath, DEFAULT_PORT, "2", "0,1");
         assertTrue(serverClient.isConnected());
 
         String launchRequest = "{" +
@@ -138,10 +175,10 @@ class LookTest {
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
         String direction = lookResponse.get("data").get("objects").get(3).get("direction").asText();
 
-        if (direction == "North") {
+        if (Objects.equals(direction, "North")) {
             assertEquals("OBSTACLE", lookResponse.get("data").get("objects").get(0).get("type").asText());
             assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
-        } else if (direction == "West" || direction == "East" || direction == "South") {
+        } else if (Objects.equals(direction, "West") || Objects.equals(direction, "East") || Objects.equals(direction, "South")) {
             assertEquals("ROBOT", lookResponse.get("data").get("objects").get(0).get("type").asText());
             assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
         }

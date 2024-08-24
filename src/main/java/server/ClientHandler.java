@@ -3,8 +3,9 @@ package server;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
 import java.net.Socket;
 import java.util.List;
 import java.util.ArrayList;
@@ -32,9 +33,8 @@ public class ClientHandler implements Runnable {
     private String currentCommand;
     private boolean launched = false;
 
-    // use OutputStream & InputStream instead of bufferedReader & bufferedWriter
-    private OutputStream outputStream;
-    private InputStream inputStream;
+    private PrintWriter outputStream;
+    private BufferedReader inputStream;
 
     /**
      * Constructs a new ClientHandler object.
@@ -49,8 +49,8 @@ public class ClientHandler implements Runnable {
             this.world = world;
             clientHanders.add(this);
 
-            this.outputStream = socket.getOutputStream();
-            this.inputStream = socket.getInputStream();
+            this.outputStream = new PrintWriter(this.socket.getOutputStream(), true);
+            this.inputStream = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 
             handleRequest(getRequestFromClient()); // initial connect request (might remove this, for compatibility reasons, no connect req, just connect).
         }
@@ -64,7 +64,7 @@ public class ClientHandler implements Runnable {
      *
      * @return the input stream
      */
-    public InputStream getInputStream() {
+    public BufferedReader getInputStream() {
         return inputStream;
     }
 
@@ -73,7 +73,7 @@ public class ClientHandler implements Runnable {
      *
      * @return the output stream
      */
-    public OutputStream getOutputStream() {
+    public PrintWriter getOutputStream() {
         return outputStream;
     }
 
@@ -119,24 +119,27 @@ public class ClientHandler implements Runnable {
      */
     @Override
     public void run() {
-        String requestFromCleint;
-        while (socket.isConnected()) {
-            try {
-                // get request from client.
-                requestFromCleint = getRequestFromClient();
-                // System.out.println("req from client: " + requestFromCleint);
-                if (JsonHandler.isJsonString(requestFromCleint)) {
-                    handleRequest(requestFromCleint);
+        try {
+            while (socket != null && socket.isConnected()) {
+                String requestFromClient = getRequestFromClient();
+                if (requestFromClient == null) {
+                    break;
                 }
-            } catch (IOException e) {
-                closeEverything(socket, inputStream, outputStream);
-                break;
+                if (JsonHandler.isJsonString(requestFromClient)) {
+                    synchronized (this) {
+                        handleRequest(requestFromClient);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            closeEverything(socket, inputStream, outputStream);
+            removeClientHandler();
+            if (robot != null) {
+                world.removeRobot(robot);
             }
         }
-        // if client disconnects unexpecedly.
-        closeEverything(socket, inputStream, outputStream);
-        removeClientHandler();
-        world.removeRobot(robot);
     }
 
     /**
@@ -146,11 +149,7 @@ public class ClientHandler implements Runnable {
      * @throws IOException if an I/O error occurs while reading the request
      */
     public String getRequestFromClient() throws IOException {
-        byte[] buffer = new byte[1024];
-        int bytesRead = inputStream.read(buffer);
-        if (bytesRead == -1) { return ""; }
-        String request = new String(buffer, 0, bytesRead); // No data was read, so return an empty string
-        return request;
+        return inputStream.readLine();
     }
 
     /**
@@ -185,7 +184,7 @@ public class ClientHandler implements Runnable {
                     put("message", "robots currently in world");
                     put("robots", robotsList);
                 }}, null);
-                sendToClient(JsonHandler.serializeResponse(message));
+//                sendToClient(JsonHandler.serializeResponse(message));
             }
 
             // if command is 'quit' disconnect everything.
@@ -235,12 +234,7 @@ public class ClientHandler implements Runnable {
      * @param message the message to send
      */
     public void sendToClient(String message) {
-        try {
-            this.outputStream.write(message.getBytes());
-        }
-        catch (IOException e) {
-            closeEverything(socket, inputStream, outputStream);
-        }
+        this.outputStream.println(message);
     }
 
     /**
@@ -257,7 +251,7 @@ public class ClientHandler implements Runnable {
      * @param inputStream   the input stream
      * @param outputStream  the output stream
      */
-    public void closeEverything(Socket socket, InputStream inputStream, OutputStream outputStream) {
+    public void closeEverything(Socket socket, BufferedReader inputStream, PrintWriter outputStream) {
         removeClientHandler();
         try {
             if (inputStream != null) {

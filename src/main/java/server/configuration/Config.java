@@ -11,7 +11,7 @@ public class Config {
     public static int MAX_SHIELDS = 10;
     public static int TILE_SIZE = 16;
     public static int MAX_ROBOTS = 4;
-    public static int VISIBILITY = 70;
+    public static int VISIBILITY = 20;
     public static String OBSTACLE = "none";
 
 

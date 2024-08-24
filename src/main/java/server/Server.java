@@ -38,8 +38,8 @@ public class Server {
         int height = worldSize;
 
         ConfigurationManager.setWorldSize(worldSize);
-        ConfigurationManager.setXConstraint(width);
-        ConfigurationManager.setYConstraint(height);
+        ConfigurationManager.setXConstraint(width - 1);
+        ConfigurationManager.setYConstraint(height - 1);
         ConfigurationManager.setPort(port);
         ConfigurationManager.setObstacles(obstacles);
     }
