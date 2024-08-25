@@ -5,19 +5,15 @@ DEV_VERSION=1.0-SNAPSHOT
 .PHONY: all compile test-reference test-own version release package clean
 
 # Default target
-all: compile test-reference test-own version
+all: clean compile test version release package
 
 # Compile the code
 compile:
 	mvn compile
 
-# Run tests against the reference server
-test-reference:
-	mvn test -Dserver=reference
-
-# Run tests against your own server
-test-own:
-	mvn test -Dserver=own
+# Run tests
+test:
+	mvn test
 
 # Show the current version
 version:

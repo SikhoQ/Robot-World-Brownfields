@@ -89,6 +89,10 @@ public class RestoreTheWorldTest {
     @AfterEach
     void tearDown() throws SQLException {
         if (this.connection != null && !this.connection.isClosed()) {
+            clearDatabase();
+            ConfigurationManager.setWorldSize(1);
+            ConfigurationManager.setXConstraint(1);
+            ConfigurationManager.setYConstraint(1);
             this.connection.close();
         }
     }
@@ -217,7 +221,7 @@ public class RestoreTheWorldTest {
                 }
                 // Add other types of obstacles as necessary
             }
-
+            System.out.println("size: "+worldSize);
             ConfigurationManager.setWorldSize(worldSize);
             ConfigurationManager.setXConstraint(worldSize);
             ConfigurationManager.setYConstraint(worldSize);
@@ -225,6 +229,7 @@ public class RestoreTheWorldTest {
             world.setObstacles(obstacles);
 
             System.out.println("World state restored successfully.");
+
             return true;
 
         } catch (SQLException e) {

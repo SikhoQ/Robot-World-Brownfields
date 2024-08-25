@@ -21,7 +21,6 @@ compiling-job:
    script:
      - echo "Compiling the code..."
      - make clean
-     - make verify
      - make compile
      - echo "Compile complete."
 

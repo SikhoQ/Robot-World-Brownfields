@@ -48,12 +48,11 @@ class ManyWorldsTest {
     void testSaveWorldWithUniqueNames() {
         String uniqueWorldName = "world1";
         String duplicateWorldName = "world2";
-        int uniqueWorldSize = 5;
-        int duplicateWorldSize = 4;
+        int size = 3;
         String obstacle = "pit";
 
         // Save a world with a unique name
-        boolean isFirstSaveSuccessful = saveWorld(uniqueWorldName, uniqueWorldSize);
+        boolean isFirstSaveSuccessful = saveWorld(uniqueWorldName, size);
         assertTrue(isFirstSaveSuccessful, "The unique world should be saved successfully");
 
         // Verify the unique world was actually saved in the database
@@ -61,7 +60,7 @@ class ManyWorldsTest {
         assertTrue(uniqueWorldExists, "The unique world should exist in the database");
 
         // Save another world with a different unique name
-        boolean isSecondSaveSuccessful = saveWorld(duplicateWorldName, duplicateWorldSize);
+        boolean isSecondSaveSuccessful = saveWorld(duplicateWorldName, size);
         assertTrue(isSecondSaveSuccessful, "Another unique world should be saved successfully");
 
         // Verify the second unique world was actually saved in the database
@@ -69,7 +68,7 @@ class ManyWorldsTest {
         assertTrue(secondWorldExists, "The second unique world should exist in the database");
 
         // Attempt to save a world with a duplicate name
-        boolean isDuplicateSaveSuccessful = saveWorld(duplicateWorldName, duplicateWorldSize);
+        boolean isDuplicateSaveSuccessful = saveWorld(duplicateWorldName, size);
         assertFalse(isDuplicateSaveSuccessful, "The world with a duplicate name should not be saved");
 
 //        // Clean up (delete both worlds)

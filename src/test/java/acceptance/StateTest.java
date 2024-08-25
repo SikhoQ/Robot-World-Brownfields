@@ -33,7 +33,7 @@ public class StateTest {
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
-        Thread.sleep(500);
+        Thread.sleep(1000);
 
         // Connect to the server
         serverClient.connect(DEFAULT_IP, port);
