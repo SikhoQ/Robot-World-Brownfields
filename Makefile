@@ -9,7 +9,7 @@ all: clean compile test version release package
 
 # Compile the code
 compile:
-	mvn compile
+	mvn clean install -Dmaven.compiler.source=21 -Dmaven.compiler.target=21 compile
 
 # Run all tests
 test:
