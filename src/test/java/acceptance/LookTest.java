@@ -34,10 +34,6 @@ class LookTest {
                 "-o", obstacle
         );
 
-        // Redirect server's stdout and stderr to the parent process's output streams
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
@@ -62,7 +58,7 @@ class LookTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void emptyWorldSizeOne(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
@@ -117,7 +113,7 @@ class LookTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void emptyWorldSizeTwo(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "2", "none");
         assertTrue(serverClient.isConnected());
@@ -172,7 +168,7 @@ class LookTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void seeObstacle(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "2", "0,1");
         assertTrue(serverClient.isConnected());
@@ -203,7 +199,7 @@ class LookTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     public void seeObstacleAndRobots(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "2", "0,1");
         assertTrue(serverClient.isConnected());

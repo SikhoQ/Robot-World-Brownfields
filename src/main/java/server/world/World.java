@@ -28,7 +28,7 @@ public class World {
     protected Position WORLD_BOTTOM_RIGHT;
     protected Position CENTRE;
 
-    private List<Obstacle> obstacles;
+    private List<Obstacle> obstacles = new ArrayList<>();
     public static ArrayList<Robot> robots;
 
     /**
@@ -37,9 +37,11 @@ public class World {
      */
     public World(){
         robots = new ArrayList<>();
-        this.obstacles = createObstacles();
         WORLD_TOP_LEFT = new Position(-ConfigurationManager.getXConstraint(), ConfigurationManager.getYConstraint());
         WORLD_BOTTOM_RIGHT = new Position(ConfigurationManager.getXConstraint(), -ConfigurationManager.getYConstraint());
+        if (!Config.OBSTACLE.equalsIgnoreCase("none")) {
+            this.obstacles = createObstacles();
+        }
         CENTRE =  new Position(0, 0);
     }
 
@@ -67,7 +69,7 @@ public class World {
 
         String obstacle = Config.OBSTACLE;
 
-        if (!obstacle.equalsIgnoreCase("none") && obstacle.contains(",")) {
+        if (obstacle.contains(",")) {
             try {
                 // need to add logic to get bottom-left since these are top-right. Obstacle size = Config.TILE_SIZE
                 int x = Integer.parseInt(obstacle.split(",")[0]);
@@ -80,6 +82,11 @@ public class World {
             } catch (NumberFormatException e) {
                 System.err.println("Expected integer values for x and y.");
             }
+        } else {
+            final Position obstaclePosition = this.getStartingPosition();
+            if (obstaclePosition != null) {
+                obstacles.add(new SquareObstacle(obstaclePosition.getX(), obstaclePosition.getY()));
+            }
         }
         return obstacles;
     }
@@ -87,7 +94,7 @@ public class World {
     public void setObstacles (List<Obstacle> newObstacles) {
         if (newObstacles.isEmpty()) {
             this.obstacles.clear();
-            ConfigurationManager.setObstacles("(none)");
+            ConfigurationManager.setObstacles("none");
         }
         else {
             this.obstacles = newObstacles;

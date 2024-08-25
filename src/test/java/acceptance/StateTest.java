@@ -54,7 +54,7 @@ public class StateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void robotExistsInWorld(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());

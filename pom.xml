@@ -66,27 +66,12 @@
             <artifactId>javalin</artifactId>
             <version>6.2.0</version>
         </dependency>
-        <!-- Log4j 2 core library -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.20.0</version>
-        </dependency>
-
-        <!-- Log4j 2 API library -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.20.0</version>
-        </dependency>
-
         <!-- Optional: Log4j 2 SLF4J binding if you use SLF4J -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.20.0</version>
         </dependency>
-
         <!-- SQLite JDBC dependency -->
         <dependency>
             <groupId>org.xerial</groupId>

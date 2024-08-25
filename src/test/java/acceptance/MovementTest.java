@@ -31,10 +31,6 @@ public class MovementTest {
                 "-o", obstacle
         );
 
-        // Redirect server's stdout and stderr to the parent process's output streams
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
@@ -59,7 +55,7 @@ public class MovementTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void validForwardMovementShouldSucceed(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a running Robot Worlds server
         // And the world is of size 1x1 (The world is configured or hardcoded to this size)

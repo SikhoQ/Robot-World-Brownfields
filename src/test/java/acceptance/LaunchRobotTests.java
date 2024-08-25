@@ -31,10 +31,6 @@ class LaunchRobotTests {
                 "-o", obstacle
         );
 
-        // Redirect server's stdout and stderr to the parent process's output streams
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
