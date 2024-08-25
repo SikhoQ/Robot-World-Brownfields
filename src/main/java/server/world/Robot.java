@@ -50,13 +50,11 @@ public class Robot {
         this.direction = Direction.NORTH;
         this.bulletDistance = 100;
         this.configurationManager = new ConfigurationManager();
-        System.out.println("above");
         this.position = clientHandler.getWorld().getStartingPosition();
         if (this.position != null) {
             this.clientHandler = clientHandler;
             this.state = new State(position.asArray(), String.valueOf(direction), shields, shots, status).getStateAsHashMap();
         }
-        System.out.println("below");
     }
 
     private int randomInt(int start, int stop) {

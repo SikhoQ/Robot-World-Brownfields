@@ -17,7 +17,6 @@ public class StandardResponse extends Response {
      */
     public StandardResponse(HashMap data, HashMap state) {
         super("OK", data);
-        System.out.println(data.get("message"));
         this.state = state;
     }
 

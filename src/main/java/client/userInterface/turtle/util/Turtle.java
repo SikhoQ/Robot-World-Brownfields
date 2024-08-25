@@ -92,7 +92,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
 
     private void eventLoop()
     {
-        //System.out.println("EVENT LOOP STARTED");
         long time=0;
         while(running)
         {
@@ -104,12 +103,10 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
 
     private void renderLoop()
     {
-        //System.out.println("RENDER LOOP STARTED");
         long time=0;
         while(running)
         {
             time=System.nanoTime();
-            //System.out.println(time);
             if(refreshMode==REFRESH_MODE_ANIMATED) draw();
             if (!waitUntil(time+1000000000/fps)) fps--;
             else if (fps<30) fps++;
@@ -193,11 +190,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
         draw.addKeyListener(turtle);
         draw.requestFocus();
         initColors();
-
-//        GraphicsEnvironment ge;
-//        ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        String[] fontNames = ge.getAvailableFontFamilyNames();
-//        System.out.println(Arrays.toString(fontNames));
 
         (new Thread(turtle,"render")).start();
         (new Thread(turtle,"listen")).start();
@@ -889,7 +881,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             y=(int)point.y;
             try 
             {
-                //System.out.println((new Color(image.getRGB(x, y),true)).getAlpha());
                 return (new Color(image.getRGB(x, y),true)).getAlpha()>50;
             }
             catch(Exception e){return false;}
@@ -1653,11 +1644,9 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             {
                 if (m.getName().equals(methodName))
                 {
-                    //System.out.println(m);
                     works=true;
                     for(Class paramType : m.getParameterTypes())
                     {
-                        //System.out.println(paramType.getName());
                         if (!paramType.getName().equals("double") && !paramType.getName().equals("java.lang.Double") && !paramType.getName().equals("Turtle"))
                         {
                             works=false;
@@ -1669,7 +1658,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             }
             if(works)
             {
-                //System.out.println("Method found!");
             }
             else
             {
@@ -1712,11 +1700,9 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             {
                 if (m.getName().equals(methodName))
                 {
-                    //System.out.println(m);
                     works=true;
                     for(Class paramType : m.getParameterTypes())
                     {
-                        //System.out.println(paramType.getName());
                         if (!paramType.getName().equals("java.lang.String") && !paramType.getName().equals("Turtle"))
                         {
                             works=false;
@@ -1728,7 +1714,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             }
             if(works)
             {
-                //System.out.println("Method found!");
             }
             else
             {
@@ -1843,7 +1828,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             if(turtleStates.lastKey()>time && getStateSpeed(turtleStates.lastEntry().getValue())>0)
             {
                 double percent = 1 - (turtleStates.lastKey() - time) / getStateSpeed(turtleStates.lastEntry().getValue()) / 1000000.0;
-                //System.out.println("trying");
                 Turtle t=getStateTurtle(turtleStates.lastEntry().getValue());
                 double x1=t._location.x,y1=t._location.y,x2=t.__location.x,y2=t.__location.y;
                 x1=(x2-x1)*percent+x1;
@@ -1935,12 +1919,10 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
             {
                 if(t==animatedTurtle)
                 {
-                    //System.out.println(percent);
                     t.drawLine(percent, midscreen);
                     if(t._dotSize>0)t.drawDot(percent, midscreen);
                     if(t.isVisible)t.drawStamp(percent, midscreen,false);
                     if(t._isStamp)t.drawStamp(percent, midscreen,true);
-                    //if(t==selectedTurtle)t.drawCrossHairs(percent,midscreen);
                     try{retrieveState(t2);}
                     catch(Exception e){}
                 }
@@ -2375,7 +2357,6 @@ public class Turtle implements Runnable, ActionListener, MouseListener, MouseMot
 
     private void processKeys()
     {
-        //System.out.println(keysDown);
         TreeSet<String> keysDownCopy=new TreeSet<String>();
         synchronized (keyLock) {keysDownCopy=(TreeSet<String>)keysDown.clone();}
         keysDownCopy.addAll(unprocessedKeys);

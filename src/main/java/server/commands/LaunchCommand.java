@@ -50,13 +50,11 @@ public class LaunchCommand extends Command {
         try {
             this.robot = new Robot(robotName, kind, shields, shots, clientHandler);
             if (this.robot.getPosition() == null) {
-                System.out.println("position is null");
                 return new ErrorResponse("No more space in this world");
             }
         } catch (IllegalArgumentException e) {
             return new ErrorResponse("No more space in this world");
         }
-        System.out.println("robot created");
 
         // if robot with same name already exists, return corresponding error response
         if (clientHandler.getWorld().robotInWorld(this.robot)) {
@@ -71,7 +69,6 @@ public class LaunchCommand extends Command {
 
         // List of all positions in the world
         ArrayList<Position> worldPositions = clientHandler.getWorld().getWorldPositions();
-        System.out.println("world positions: " + worldPositions.size());
 //        Position thisRobotPosition = clientHandler.getRobot().getPosition();
         for (Object object: worldObjects) {
             Robot robot = clientHandler.getRobot();

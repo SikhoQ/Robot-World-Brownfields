@@ -35,7 +35,6 @@ public class BackCommand extends Command {
             message = "At the SOUTH edge";
         }
         else {
-            System.out.println("SUCCESS");
             Position robotPosition = robot.getPosition();
             message = String.format("At position [%d, %d]", robotPosition.getX(), robotPosition.getY());
         }

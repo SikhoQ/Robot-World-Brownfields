@@ -39,7 +39,6 @@ public class ForwardCommand extends Command {
             message = "At the NORTH edge";
         }
         else {
-            System.out.println("SUCCESS");
             Position robotPosition = robot.getPosition();
             message = String.format("At position [%d, %d]", robotPosition.getX(), robotPosition.getY());
         }

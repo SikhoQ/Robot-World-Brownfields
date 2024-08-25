@@ -221,7 +221,6 @@ public class RestoreTheWorldTest {
                 }
                 // Add other types of obstacles as necessary
             }
-            System.out.println("size: "+worldSize);
             ConfigurationManager.setWorldSize(worldSize);
             ConfigurationManager.setXConstraint(worldSize);
             ConfigurationManager.setYConstraint(worldSize);

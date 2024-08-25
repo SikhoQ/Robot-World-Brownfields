@@ -34,7 +34,6 @@ public class JsonHandler {
         try{
             // deserialize json string into JsonNode.
             jsonNode =  objectMapper.readTree(jsonString);
-//            System.out.println(employee.get("name").asText() + "\n" + employee.get("city").asText());
         }
         catch (IOException e) {
             e.printStackTrace();

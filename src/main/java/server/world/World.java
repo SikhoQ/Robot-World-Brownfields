@@ -298,24 +298,17 @@ public class World {
     }
 
     public Position getStartingPosition() {
-        System.out.println("inside get start position");
-        System.out.println("before getting starting position");
         Position startingPosition = new Position(0, 0);
-        System.out.println("after getting starting position: ("+startingPosition.getX()+","+startingPosition.getY()+")");
-        System.out.println("after getting robots inside getStartingPosition");
-        System.out.println("after initial getPosition values");
 
         String positionBlocked = "";
         while (!(positionBlocked = startingPositionBlocked(startingPosition)).equals("free")) {
             if (positionBlocked.equals("no space")) {
-                System.out.println("returning null");
                 return null;
             }
             int randomX = randomInt(-ConfigurationManager.getXConstraint(), ConfigurationManager.getXConstraint());
             int randomY = randomInt(-ConfigurationManager.getYConstraint(), ConfigurationManager.getYConstraint());
             startingPosition = new Position(randomX, randomY);
         }
-        System.out.println("about to return starting position");
         return startingPosition;
     }
 
@@ -344,19 +337,16 @@ public class World {
 
         if (obstaclesInWorld.size() + robotsInWorld.size() == positionsInWorld.size()) {
             JsonHandler.serializeResponse(new ErrorResponse("No more space in this world"));
-            System.out.println("no space");
             return "no space";
         }
 
         for (Robot robot: robotsInWorld) {
-            System.out.println("inside getStartingPosition robotsInWorld for loop");
             if (robot.getPosition().equals(startingPosition)) {
                 return "blocked";
             }
         }
 
         for (Obstacle obstacle: obstaclesInWorld) {
-            System.out.println("inside getStartingPosition obstaclesInWorld for loop");
             Position obstaclePosition = new Position(obstacle.getBottomLeftX(), obstacle.getBottomLeftY());
             if (obstaclePosition.equals(startingPosition)) {
                 return "blocked";
