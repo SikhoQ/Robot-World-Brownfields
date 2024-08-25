@@ -2,7 +2,7 @@ VERSION=0.1.0
 DEV_VERSION=1.0-SNAPSHOT
 
 # Targets
-.PHONY: all compile test-reference test-own version release package clean
+.PHONY: all compile test version release package clean build
 
 # Default target
 all: clean compile test version release package
@@ -11,7 +11,7 @@ all: clean compile test version release package
 compile:
 	mvn compile
 
-# Run tests
+# Run all tests
 test:
 	mvn test
 
@@ -38,7 +38,7 @@ clean:
 	mvn clean
 
 # Build command with type parameter
-build: compile
+build:
 ifeq ($(type),release)
 	$(MAKE) release
 else

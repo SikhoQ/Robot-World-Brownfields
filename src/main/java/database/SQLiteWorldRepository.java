@@ -8,7 +8,7 @@ import java.util.*;
 import java.sql.*;
 
 public class SQLiteWorldRepository implements WorldRepository {
-    private static final String URL = "jdbc:sqlite:RobotWorlds.db";
+    private static final String URL = "jdbc:sqlite:RobotWorlds.db?busy_timeout=5000";
 
     @Override
     public Map<Integer, List<Map<String, List<Integer>>>> loadWorld(String worldName) {
