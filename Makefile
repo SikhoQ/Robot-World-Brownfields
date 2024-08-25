@@ -1,5 +1,5 @@
-VERSION=1.0.0
-DEV_VERSION=0.4.0
+VERSION=4.0.0
+DEV_VERSION=4.0.0
 
 # Targets
 .PHONY: all compile test version release package clean build
