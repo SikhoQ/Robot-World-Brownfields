@@ -14,16 +14,37 @@ class ManyWorldsTest {
     private Connection connection;
 
     @BeforeEach
-    void setup() throws SQLException {
-        // Establish connection to the in-memory H2 database
-        connection = DriverManager.getConnection(DatabaseConnection.getUrl());
+    void setup() {
+        try {
+            this.connection = DriverManager.getConnection(DatabaseConnection.getUrl());
+            clearDatabase();
+            String createWorldTableQuery = "CREATE TABLE IF NOT EXISTS testWorld (" +
+                    "id TEXT PRIMARY KEY NOT NULL," +
+                    "size INTEGER NOT NULL)";
+            String createObjectTableQuery = "CREATE TABLE IF NOT EXISTS testObjects (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "world_id TEXT NOT NULL," +
+                    "type TEXT NOT NULL," +
+                    "x INT NOT NULL," +
+                    "y INT NOT NULL," +
+                    "size INT NOT NULL CHECK (size >= 0)," +
+                    "FOREIGN KEY (world_id) REFERENCES testWorld(id))";
 
-        // Clear the database before each test
-        clearDatabase();
+            try (PreparedStatement statement = this.connection.prepareStatement(createWorldTableQuery)) {
+                statement.execute();
+            }
+
+            try (PreparedStatement statement = this.connection.prepareStatement(createObjectTableQuery)) {
+                statement.execute();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterEach
     void tearDown() throws SQLException {
+        clearDatabase();
         // Close the connection after each test
         if (connection != null && !connection.isClosed()) {
             connection.close();
