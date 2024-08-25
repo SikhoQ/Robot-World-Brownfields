@@ -1,5 +1,5 @@
-VERSION=0.1.0
-DEV_VERSION=1.0-SNAPSHOT
+VERSION=1.0.0
+DEV_VERSION=0.4.0
 
 # Targets
 .PHONY: all compile test version release package clean build
@@ -9,7 +9,7 @@ all: clean compile test version release package
 
 # Compile the code
 compile:
-	mvn clean install -Dmaven.compiler.source=21 -Dmaven.compiler.target=21 compile
+	mvn clean install compile
 
 # Run all tests
 test:
