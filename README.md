@@ -107,6 +107,11 @@ Recommended Action: Practice the DRY rule and reduce assertion blocks.
 - **Running All Tests:**
   - **Command:** `mvn test`
 
+## 4. Web API
+- **GET and POST requests:**
+  - **GET Command:** `curl -X GET http://localhost:7000/world --include`
+  - **POST Command:** `curl --request POST 'http://localhost:7000/launch' -d 'launch' --include	`
+
 
 
 
