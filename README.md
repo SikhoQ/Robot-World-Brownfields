@@ -42,3 +42,29 @@ Create a new branch (git checkout -b feature-xyz).
 Commit your changes (git commit -am 'Add feature xyz').
 Push to the branch (git push origin feature-xyz).
 Create a new Pull Request.
+
+### **To access data**
+
+Install SQLite3
+Run the command below:
+$ sqlite3 RobotWorlds.db
+
+Execute SQLite . tables
+sqlite> .tables
+This will display:
+objects world
+
+Execute the SQLite . headers
+sqlite> .headers on
+
+Execute the SQLite . column
+sqlitee> .mode column
+
+Execute the SQLite . width
+sqlite> .width 16 16 16 16
+
+Select a table from which you want to retrieve data
+sqlite> SELECT * FROM objects; ##to see the objects of the worlds in the database
+sqlite> SELECT * FROM world; ##to see worlds in the database
+
+
