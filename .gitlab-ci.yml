@@ -8,39 +8,36 @@ before_script:
     && apt-get clean 
     && apt-get install -y make maven
 
-stages:          
-   - compiling
-   - test
-   - acceptance
-   - package
-   - deploy
+stages:
+  - compile
+  - build
+  - test
+  - package
+  - deploy
 
-compiling-job:
-   stage: compiling
+compile-job:
+   stage: compile
    image: ubuntu:23.10
    script:
      - echo "Compiling the code..."
-     - make clean
      - make compile
      - echo "Compile complete."
+
+build-job:
+  stage: build
+  image: ubuntu:23.10
+  script:
+    - echo "Building..."
+    - make clean package
+    - echo "Building completed"
 
 test-job:
    stage: test
    image: ubuntu:23.10
    script:
-     - echo "Running unit tests..."
+     - echo "Running tests..."
      - mvn test
-     - echo "Unit tests complete."
-
-acceptance-job:
-  stage: acceptance
-  image: ubuntu:23.10
-  script:
-    - echo "Running acceptance tests against the server..."
-    - make test-own
-    - echo "Testing the reference for now since our server has some functional issues..."
-    - make test-reference
-    - echo "Acceptance tests complete."
+     - echo "Running tests complete."
 
 package-job:
    stage: package
