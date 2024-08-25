@@ -88,11 +88,11 @@ Recommended Action: Practice the DRY rule and reduce assertion blocks.
 ## 1. Overview of Testing Strategy
 - **Types of Tests:**
   - Unit Tests\
-  Purpose: Unit tests are designed to verify the correctness of individual components or functions in isolation.\
+  Purpose: Unit tests are designed to verify the correctness of individual components or functions in isolation.
   - Acceptance Tests\
-  Purpose: Acceptance tests validate that the entire system meets the business requirements and behaves as expected from an end-user perspective.\
+  Purpose: Acceptance tests validate that the entire system meets the business requirements and behaves as expected from an end-user perspective.
 - **Testing Frameworks:**
-  - JUnit (Unit and Integration Tests)
+  - JUnit (Unit and Acceptance Tests)
 
 ## 2. Test Categories and Purpose
 - **Unit Tests:**
