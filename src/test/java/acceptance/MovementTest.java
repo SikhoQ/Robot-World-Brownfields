@@ -33,8 +33,15 @@ public class MovementTest {
 
         serverProcess = processBuilder.start();
 
+        int attempts = 10;
+
+        Thread.sleep(1500);
+
+        while (attempts-- > 0 && !serverProcess.isAlive()) {
+            Thread.sleep(1500);
+            serverProcess = processBuilder.start();
+        }
         // Wait for the server to start
-        Thread.sleep(1000);
 
         // Connect to the server
         serverClient.connect(DEFAULT_IP, port);
