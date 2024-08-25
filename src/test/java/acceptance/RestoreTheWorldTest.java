@@ -28,7 +28,7 @@ public class RestoreTheWorldTest {
     protected Connection connection;
 
     @BeforeEach
-    void setup() throws SQLException {
+    void setup() {
         try {
             this.connection = DriverManager.getConnection(DatabaseConnection.getUrl());
             String createWorldTableQuery = "CREATE TABLE IF NOT EXISTS testWorld (" +

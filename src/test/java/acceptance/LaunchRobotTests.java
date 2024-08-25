@@ -33,18 +33,12 @@ class LaunchRobotTests {
 
         serverProcess = processBuilder.start();
 
-        int attempts = 10;
-
-        Thread.sleep(1500);
-
-        while (attempts-- > 0 && !serverProcess.isAlive()) {
-            Thread.sleep(1500);
-            serverProcess = processBuilder.start();
+        while (true) {
+            try {
+                serverClient.connect(DEFAULT_IP, port);
+                break;
+            } catch (RuntimeException ignored) {}
         }
-        // Wait for the server to start
-
-        // Connect to the server
-        serverClient.connect(DEFAULT_IP, port);
 
         // Verify connection
         assertTrue(serverClient.isConnected(), "Failed to connect to the server");
