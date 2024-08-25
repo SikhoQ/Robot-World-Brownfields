@@ -1,7 +1,12 @@
 
 
 before_script:
-  - apt-get update && apt-get install -y make maven
+  - sudo apt-get update 
+   && sudo apt-get upgrade -y 
+    && sudo apt-get dist-upgrade -y 
+    && sudo apt-get autoremove -y 
+    && sudo apt-get clean 
+    && apt-get install -y make maven
 
 stages:          
    - compiling
@@ -12,7 +17,7 @@ stages:
 
 compiling-job:
    stage: compiling
-   image: ubuntu:20.04
+   image: ubuntu:23.10
    script:
      - echo "Compiling the code..."
      - make clean
@@ -21,14 +26,22 @@ compiling-job:
      - echo "Compile complete."
 
 test-job:
-   stage: acceptance
-   image: ubuntu:20.04
+   stage: test
+   image: ubuntu:23.10
    script:
-     - echo "Running acceptance tests against the server..."
-     - make test-own
-     - echo "Testing the reference for now since our server has some functional issues..."
-     - make test-reference
-     - echo "Acceptance tests complete."
+     - echo "Running unit tests..."
+     - mvn test
+     - echo "Unit tests complete."
+
+acceptance-job:
+  stage: acceptance
+  image: ubuntu:23.10
+  script:
+    - echo "Running acceptance tests against the server..."
+    - make test-own
+    - echo "Testing the reference for now since our server has some functional issues..."
+    - make test-reference
+    - echo "Acceptance tests complete."
 
 package-job:
    stage: package
@@ -38,14 +51,14 @@ package-job:
      - mvn package -DskipTests
      - echo "Packaging complete."
 
-deploy-job:      
-  stage: deploy 
+deploy-job:
+  stage: deploy
   image: docker:27.1.0
   services:
     - docker:dind
   before_script:
     - echo "Logging into Docker repository..."
-    - docker login -u $nnyawo023 -p $wethinkcode_dbn_04
+    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
   script:
     - echo "Building the docker image..."
     - docker build -t nnyawo023/dbn_04brownfields:latest .
@@ -53,8 +66,10 @@ deploy-job:
     - docker push nnyawo023/dbn_04brownfields:latest 
     - echo "Image successfully built and pushed."
 
+cache:
+  paths:
+    - .m2/repository
 
-
-# workflow:
-#   rules:
-#     - if: '$CI_COMMIT_BRANCH == "main"'
+workflow:
+ rules:
+   - if: '$CI_COMMIT_BRANCH == "main"'

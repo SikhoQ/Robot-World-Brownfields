@@ -37,7 +37,7 @@ class LookTest {
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
-        Thread.sleep(700);
+        Thread.sleep(500);
 
         // Connect to the server
         serverClient.connect(DEFAULT_IP, port);
