@@ -1,5 +1,7 @@
 package database;
 
+import database.ConsoleCommands.SaveWorldCommand;
+import database.ConsoleCommands.ServerCommand;
 import server.world.WorldObject;
 
 import java.util.*;
@@ -60,27 +62,9 @@ public class SQLiteWorldRepository implements WorldRepository {
         String objectInsertQuery = "INSERT INTO objects (world_id, type, x, y, size) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(URL)) {
+            ServerCommand saveWorldCommand = new SaveWorldCommand(conn, worldName, worldSize, worldObjects);
             // Save the world
-            try (PreparedStatement stmt = conn.prepareStatement(worldInsertQuery)) {
-                stmt.setString(1, worldName);
-                stmt.setInt(2, worldSize);
-                stmt.executeUpdate();
-            }
-
-            // Save the objects
-            try (PreparedStatement stmt = conn.prepareStatement(objectInsertQuery)) {
-                for (WorldObject obj : worldObjects) {
-                    stmt.setString(1, worldName);
-                    stmt.setString(2, obj.getType());
-                    stmt.setInt(3, obj.getX());
-                    stmt.setInt(4, obj.getY());
-                    stmt.setInt(5, obj.getSize());
-                    stmt.addBatch();
-                }
-                stmt.executeBatch();
-            }
-
-            return true;
+            return saveWorldCommand.execute();
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -89,15 +73,20 @@ public class SQLiteWorldRepository implements WorldRepository {
 
     @Override
     public String removeWorld(String worldName) {
-        String deleteObjectsQuery = "DELETE FROM objects WHERE world_id = ?";
-        String deleteWorldQuery = "DELETE FROM world WHERE id = ?";
+        String clearObjectsQuery = "DELETE FROM objects WHERE world_id = ?";
+        String clearWorldQuery = "DELETE FROM world WHERE id = ?";
+        String deleteWorldQuery = "DROP TABLE ?";
 
         try (Connection conn = DriverManager.getConnection(URL)) {
             // Start a transaction
             conn.setAutoCommit(false);
 
+            if (worldName.equalsIgnoreCase("all")) {
+                return removeEverything(conn);
+            }
+
             // Delete the objects associated with the world
-            try (PreparedStatement stmt = conn.prepareStatement(deleteObjectsQuery)) {
+            try (PreparedStatement stmt = conn.prepareStatement(clearObjectsQuery)) {
                 stmt.setString(1, worldName);
                 stmt.executeUpdate();
                 int updateCount = stmt.getUpdateCount();
@@ -106,7 +95,7 @@ public class SQLiteWorldRepository implements WorldRepository {
             }
 
             // Delete the world itself
-            try (PreparedStatement stmt = conn.prepareStatement(deleteWorldQuery)) {
+            try (PreparedStatement stmt = conn.prepareStatement(clearWorldQuery)) {
                 stmt.setString(1, worldName);
                 int rowsAffected = stmt.executeUpdate();
 
@@ -125,6 +114,31 @@ public class SQLiteWorldRepository implements WorldRepository {
 
         } catch (SQLException ignored) {
             return "not removed";
+        }
+    }
+
+    @Override
+    public String removeEverything(Connection connection) {
+
+        try (Statement statement = connection.createStatement()) {
+            try {
+                DatabaseMetaData metaData = connection.getMetaData();
+                ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
+
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+                    String clearWorldSQL = "DELETE FROM " + tableName;
+                    statement.executeUpdate(clearWorldSQL);
+                }
+            } catch (SQLException ignored) {
+                ignored.printStackTrace();
+                return "error";
+            }
+            connection.commit();
+            return "removed all";
+        } catch (SQLException ignored) {
+            ignored.printStackTrace();
+            return "error";
         }
     }
 }

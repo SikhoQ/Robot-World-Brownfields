@@ -1,18 +1,19 @@
 package server;
 
+import database.DatabaseConnection;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
+import server.WorldApi.ApiServer;
+import server.configuration.ConfigurationManager;
+import server.world.World;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
-import database.DatabaseConnection;
-import server.WorldApi.ApiServer;
-import server.configuration.Config;
-import server.world.World;
-import server.configuration.ConfigurationManager;
-import picocli.CommandLine;
-import picocli.CommandLine.Option;
 
 public class Server {
 
@@ -75,7 +76,8 @@ public class Server {
     public void startServer() {
         try {
             System.out.println("SERVER <" + InetAddress.getLocalHost().getHostAddress() + "> " + ": Listening on port " + port + "...");
-            ServerHandler serverCommands = new ServerHandler(this.world);
+            Scanner scanner = new Scanner(System.in);
+            ServerHandler serverCommands = new ServerHandler(this.world, scanner);
             Thread serverThread = new Thread(serverCommands);
             serverThread.start();
         } catch (UnknownHostException e) {

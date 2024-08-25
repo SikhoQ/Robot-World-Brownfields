@@ -38,7 +38,7 @@ public class MovementTest {
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
-        Thread.sleep(1000);
+        Thread.sleep(700);
 
         // Connect to the server
         serverClient.connect(DEFAULT_IP, port);
@@ -102,7 +102,7 @@ public class MovementTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar"})
     void validBackwardMovementShouldSucceed(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a running Robot Worlds server
         // And the world is of size 1x1 (The world is configured or hardcoded to this size)

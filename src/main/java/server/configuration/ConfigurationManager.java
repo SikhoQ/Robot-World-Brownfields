@@ -1,11 +1,5 @@
 package server.configuration;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import server.json.JsonHandler;
-
-import java.io.File;
-import java.io.IOException;
-
 public class ConfigurationManager {
 
     public ConfigurationManager() {}
@@ -64,6 +58,10 @@ public class ConfigurationManager {
     
     public static int getWorldSize() {
         return Config.WORLD_SIZE;
+    }
+
+    public static void setTileSize(int size) {
+        Config.TILE_SIZE = size;
     }
 
     public static String getObstacles() {

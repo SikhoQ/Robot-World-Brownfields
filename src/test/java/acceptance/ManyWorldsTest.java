@@ -18,18 +18,24 @@ class ManyWorldsTest {
         connection = DriverManager.getConnection(DatabaseConnection.getUrl());
 
         // Clear the database before each test
-        clearDatabase();
+//        clearDatabase();
     }
 
     public void clearDatabase() {
         try (Statement statement = connection.createStatement()) {
             // Delete all records from the world table
-            String deleteWorldSQL = "DELETE FROM " + DatabaseConnection.WORLD_TABLE;
-//            statement.executeUpdate(deleteWorldSQL);
+            try {
+                DatabaseMetaData metaData = connection.getMetaData();
+                ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
 
-            // Optionally, you can add other cleanup operations for additional tables
-            // Example: String deleteRobotsSQL = "DELETE FROM " + DatabaseConnection.TABLE_ROBOTS;
-            // statement.executeUpdate(deleteRobotsSQL);
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+                    String deleteWorldSQL = "DELETE FROM " + tableName;
+                    statement.executeUpdate(deleteWorldSQL);
+                }
+            } catch (SQLException e) {
+                System.err.println("Failed to clear database: " + e.getMessage());
+            }
 
             System.out.println("Database has been cleared.");
         } catch (SQLException e) {

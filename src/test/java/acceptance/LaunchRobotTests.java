@@ -38,7 +38,7 @@ class LaunchRobotTests {
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
-        Thread.sleep(1000);
+        Thread.sleep(700);
 
         // Connect to the server
         serverClient.connect(DEFAULT_IP, port);

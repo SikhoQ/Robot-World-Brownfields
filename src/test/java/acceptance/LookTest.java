@@ -41,7 +41,7 @@ class LookTest {
         serverProcess = processBuilder.start();
 
         // Wait for the server to start
-        Thread.sleep(1000);
+        Thread.sleep(700);
 
         // Connect to the server
         serverClient.connect(DEFAULT_IP, port);
@@ -63,7 +63,7 @@ class LookTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
-    void emptyWorld(String jarPath) throws IOException, InterruptedException {
+    void emptyWorldSizeOne(String jarPath) throws IOException, InterruptedException {
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
@@ -113,6 +113,61 @@ class LookTest {
             assertEquals(0, lookResponse.get("data").get("objects").get(1).get("distance").asInt());
             assertEquals(0, lookResponse.get("data").get("objects").get(2).get("distance").asInt());
             assertEquals(0, lookResponse.get("data").get("objects").get(3).get("distance").asInt());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar", "libs/reference-server-0.2.3.jar"})
+    void emptyWorldSizeTwo(String jarPath) throws IOException, InterruptedException {
+        startServer(jarPath, DEFAULT_PORT, "2", "none");
+        assertTrue(serverClient.isConnected());
+
+        String launchRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"launch\"," +
+                "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
+                "}";
+        JsonNode launchResponse = serverClient.sendRequest(launchRequest);
+
+        assertNotNull(launchResponse.get("result"));
+        assertEquals("OK", launchResponse.get("result").asText());
+
+        String lookRequest = "{" +
+                "  \"robot\": \"HAL\"," +
+                "  \"command\": \"look\"," +
+                "  \"arguments\": []" +
+                "}";
+        JsonNode lookResponse = serverClient.sendRequest(lookRequest);
+
+        assertNotNull(lookResponse.get("result"));
+        assertEquals("OK", lookResponse.get("result").asText());
+
+        assertNotNull(lookResponse.get("data"));
+        assertNotNull(lookResponse.get("data").get("objects"));
+
+        int objectsInWorld = lookResponse.get("data").get("objects").size();
+
+        if (objectsInWorld == 4) {
+            assertEquals("EDGE", lookResponse.get("data").get("objects").get(0).get("type").asText());
+            assertEquals("EDGE", lookResponse.get("data").get("objects").get(1).get("type").asText());
+            assertEquals("EDGE", lookResponse.get("data").get("objects").get(2).get("type").asText());
+            assertEquals("EDGE", lookResponse.get("data").get("objects").get(3).get("type").asText());
+
+            List<String> directions = new ArrayList<>();
+            directions.add("EAST");
+            directions.add("NORTH");
+            directions.add("WEST");
+            directions.add("SOUTH");
+
+            assertTrue(directions.contains(lookResponse.get("data").get("objects").get(0).get("direction").asText()));
+            assertTrue(directions.contains(lookResponse.get("data").get("objects").get(1).get("direction").asText()));
+            assertTrue(directions.contains(lookResponse.get("data").get("objects").get(2).get("direction").asText()));
+            assertTrue(directions.contains(lookResponse.get("data").get("objects").get(3).get("direction").asText()));
+
+            assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
+            assertEquals(1, lookResponse.get("data").get("objects").get(1).get("distance").asInt());
+            assertEquals(1, lookResponse.get("data").get("objects").get(2).get("distance").asInt());
+            assertEquals(1, lookResponse.get("data").get("objects").get(3).get("distance").asInt());
         }
     }
 

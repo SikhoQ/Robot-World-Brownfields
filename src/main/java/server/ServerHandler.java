@@ -1,16 +1,15 @@
 package server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
-
+import database.DatabaseConnection;
 import database.SQLiteWorldRepository;
 import server.configuration.ConfigurationManager;
 import server.json.JsonHandler;
 import server.response.ErrorResponse;
 import server.world.*;
-import database.DatabaseConnection;
-import server.world.WorldObject;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
 
 
 /**
@@ -19,27 +18,27 @@ import server.world.WorldObject;
  * server commands from the console.
  */
 public class ServerHandler implements Runnable {
-    private Scanner scanner;
     private String command;
     private World world;
     private final SQLiteWorldRepository worldRepository;
+    private final Scanner scanner;
 
     /**
      * Constructs a new ServerHandler object.
      *
      * @param world the world instance
      */
-    public ServerHandler(World world) {
+    public ServerHandler(World world, Scanner scanner) {
         this.world = world;
         this.worldRepository = new SQLiteWorldRepository();
+        this.scanner = scanner;
     }
 
     @Override
     public void run() {
-        this.scanner = new Scanner(System.in);
         while(true) {
             try {
-                command =  scanner.nextLine().toLowerCase();
+                command =  this.scanner.nextLine().toLowerCase();
             } catch (NoSuchElementException ignored) {
                 System.exit(1);
             }
@@ -75,7 +74,7 @@ public class ServerHandler implements Runnable {
         System.out.println("Enter name of world to delete from database: ");
         String worldName = scanner.nextLine();
 
-        if (DatabaseConnection.worldExists(worldName)) {
+        if (worldName.equalsIgnoreCase("all") || DatabaseConnection.worldExists(worldName)) {
             String result = deleteWorld(worldName);
             printFeedback(result, worldName);
         } else {
@@ -91,6 +90,9 @@ public class ServerHandler implements Runnable {
         switch (result) {
             case "removed":
                 System.out.println("World '" + worldName + "' was removed successfully.");
+                break;
+            case "removed all":
+                System.out.println("Database was cleared successfully.");
                 break;
             case "no world":
                 System.out.println("World '" + worldName + "' does not exist.");
@@ -151,7 +153,6 @@ public class ServerHandler implements Runnable {
 
             final List<Map<String, List<Integer>>> worldObjects = worldInfo.get(worldSize);
 
-            List<Robot> robotsToAdd = new ArrayList<>();
             List<Obstacle> obstaclesToAdd = new ArrayList<>();
 
             for (Map<String, List<Integer>> oneObject: worldObjects) {
