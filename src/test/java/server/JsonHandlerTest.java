@@ -1,66 +1,59 @@
 package server;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
+import org.junit.jupiter.api.Test;
 import server.json.JsonHandler;
 import server.response.BasicResponse;
 import server.response.Response;
-
-import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the JsonHandler class.
+ */
 class JsonHandlerTest {
 
+    /**
+     * Tests the serialization of a Response object to a JSON string.
+     */
     @Test
     void serializeResponse() {
-        // Create a sample Response object
         Response response = new BasicResponse("Hello, World!");
-
-        // Call the serializeResponse method
         String jsonString = JsonHandler.serializeResponse(response);
-
-        // Verify the serialized JSON string
         assertEquals("{\"result\":\"OK\",\"data\":{\"message\":\"Hello, World!\"}}", jsonString);
     }
 
+    /**
+     * Tests deserialization of a JSON file into a JsonNode object.
+     */
     @Test
     void deserializeJsonFile() throws IOException {
-        // Create a sample JSON file
         File file = new File("src/test/java/server/sample.json");
-
-        // Call the deserializeJsonFile method
         JsonNode jsonNode = JsonHandler.deserializeJsonFile(file);
-
-        // Verify the deserialized JSON node
         assertNotNull(jsonNode);
     }
 
+    /**
+     * Tests deserialization of a JSON string into a JsonNode object.
+     */
     @Test
     void deserializeJsonString() {
-        // Create a sample JSON string
         String jsonString = "{\"message\":\"Hello, World!\"}";
-
-        // Call the deserializeJsonString method
         JsonNode jsonNode = JsonHandler.deserializeJsonTString(jsonString);
-
-        // Verify the deserialized JSON node
         assertNotNull(jsonNode);
         assertEquals("Hello, World!", jsonNode.get("message").asText());
     }
 
+    /**
+     * Tests whether a string is a valid JSON string.
+     */
     @Test
     void isJsonString() {
-        // Valid JSON string
         String validJson = "{\"message\":\"Hello, World!\"}";
-
-        // Invalid JSON string
         String invalidJson = "Hello, World!";
-
-        // Call the isJsonString method
         assertTrue(JsonHandler.isJsonString(validJson));
         assertFalse(JsonHandler.isJsonString(invalidJson));
     }

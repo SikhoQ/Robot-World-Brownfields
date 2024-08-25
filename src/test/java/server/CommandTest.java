@@ -1,73 +1,74 @@
 package server;
 
+import client.commands.*;
+import client.robots.Robot;
+import client.request.Request;
 import org.junit.jupiter.api.Test;
-
-import server.commands.*;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for the Command class and its subclasses.
+ */
 class CommandTest {
 
+    /**
+     * Tests creating a QuitCommand object using the Command.create method.
+     */
     @Test
-    void getName_constructorWithName_returnsName() {
-        Command command = new ConnectCommand();
-        assertEquals("connect", command.getName());
-    }
-
-    // @Test
-    // void getArgument_constructorWithArgument_returnsArgument() {
-    //     Command command = new LaunchCommand("mzee", "argument");
-    //     assertEquals("argument", command.getArgument());
-    // }
-
-    @Test
-    void create_validConnectCommandString_returnsConnectCommandObject() {
-        String connectCommandString = "{\"command\":\"connect\",\"robot\":\"robot1\",\"arguments\":null}";
-        Command command = Command.create(connectCommandString);
-        assertTrue(command instanceof ConnectCommand);
-    }
-
-    // @Test
-    // void create_validLaunchCommandString_returnsLaunchCommandObject() {
-    //     String launchCommandString = "{\"command\":\"launch\",\"robot\":\"robot1\",\"arguments\":\"arg1\"}";
-    //     Command command = Command.create(launchCommandString);
-    //     assertTrue(command instanceof LaunchCommand);
-    // }
-
-    @Test
-    void create_validQuitCommandString_returnsQuitCommandObject() {
-        String quitCommandString = "{\"command\":\"quit\",\"robot\":\"robot1\",\"arguments\":null}";
-        Command command = Command.create(quitCommandString);
+    void create_quitCommand_returnQuitCommandObject() {
+        Command command = Command.create("quit");
         assertTrue(command instanceof QuitCommand);
     }
 
-    // Add more tests for other command types...
-
-    // @Test
-    // void execute_callsClientHandlerExecuteMethod() {
-    //     ClientHandler clientHandler = mock(ClientHandler.class);
-    //     Command command = new ConnectCommand();
-    //     command.execute(clientHandler);
-    //     ((Object) verify(clientHandler, times(1))).executeCommand(clientHandler);
-    // }
-
-    // private Object verify(ClientHandler clientHandler, Object times) {
-    //     return null;
-    // }
-
-    // private Object times(int i) {
-    //     return null;
-    // }
-
-    // private ClientHandler mock(Class<ClientHandler> class1) {
-    //     return null;
-    // }
-
+    /**
+     * Tests creating a LaunchCommand object using the Command.create method with arguments.
+     */
     @Test
-    void toString_returnsExpectedString() {
-        Command command = new ConnectCommand();
-        assertEquals("connect ", command.toString());
+    void create_launchCommandWithArgs_returnLaunchCommandObject() {
+        Command command = Command.create("launch drone1 drone2");
+        assertTrue(command instanceof LaunchCommand);
+        LaunchCommand launchCommand = (LaunchCommand) command;
+        assertEquals("drone1", launchCommand.getKind());
+        assertEquals("launch", launchCommand.getName());
     }
 
+    /**
+     * Tests creating a StateCommand object using the Command.create method.
+     */
+    @Test
+    void create_stateCommand_returnStateCommandObject() {
+        Command command = Command.create("state");
+        assertTrue(command instanceof StateCommand);
+    }
+
+    /**
+     * Tests creating an unsupported command to check for IllegalArgumentException.
+     */
+    @Test
+    void create_unsupportedCommand_throwIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Command.create("unsupported");
+        });
+    }
+
+    /**
+     * Tests the execute method of Command to ensure it returns a Request object.
+     */
+    @Test
+    void execute_executeCommandOnRobot_returnRequestObject() {
+        Command command = new StateCommand();
+        Robot robot = new Robot("hal");
+        Request request = command.execute(robot);
+        assertNotNull(request);
+    }
+
+    /**
+     * Tests the getName method to ensure it returns the command name.
+     */
+    @Test
+    void getName_commandWithName_returnName() {
+        Command command = new QuitCommand();
+        assertEquals("quit", command.getName());
+    }
 }

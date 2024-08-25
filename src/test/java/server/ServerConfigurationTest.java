@@ -5,7 +5,14 @@ import server.world.World;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for server configuration.
+ */
 public class ServerConfigurationTest {
+
+    /**
+     * Tests the default server configuration to ensure default values are set correctly.
+     */
     @Test
     public void testDefaultConfiguration() {
         Server server = new Server();

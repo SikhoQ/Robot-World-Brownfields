@@ -14,6 +14,7 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("acceptance")
 class LookTest {
     private final static int DEFAULT_PORT = 5000;
     private final static String DEFAULT_IP = "localhost";

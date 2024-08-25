@@ -4,6 +4,7 @@ package acceptance;
 import database.DatabaseConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import server.configuration.ConfigurationManager;
 import server.world.Obstacle;
@@ -21,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  * @author sqlitetutorial.net
  */
-public class RestoreTheWorldTest {
+
+@Tag("acceptance")
+public class DBRestoreWorldTest {
     /**
      * Connection to RobotWorlds database
      */

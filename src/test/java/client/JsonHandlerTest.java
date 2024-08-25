@@ -25,7 +25,6 @@ public class JsonHandlerTest {
         Assertions.assertEquals(expectedJsonString, jsonString);
     }
 
-
     @Test
     public void testDeserializeJsonString() {
         // Create a sample JSON string

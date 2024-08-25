@@ -2,6 +2,7 @@ package acceptance;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import database.DatabaseConnection;
 
@@ -9,7 +10,8 @@ import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ManyWorldsTest {
+@Tag("acceptance")
+class DBManyWorldsTest {
 
     private Connection connection;
 
