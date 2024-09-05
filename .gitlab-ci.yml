@@ -55,7 +55,7 @@ deploy-job:
     - docker:dind
   before_script:
     - echo "Logging into Docker repository..."
-    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
   script:
     - echo "Building the docker image..."
     - docker build -t nnyawo023/dbn_04brownfields:latest .
