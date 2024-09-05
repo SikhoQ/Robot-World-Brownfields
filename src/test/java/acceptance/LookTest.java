@@ -60,12 +60,17 @@ class LookTest {
         }
     }
 
+    @DisplayName("robot should see only world edges, at the correct distance, in a size 1 world with no objects when a valid look command is given")
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void emptyWorldSizeOne(String jarPath) throws IOException, InterruptedException {
+        // Given that I am connected to a running Robot Worlds server
+        // And the world has no objects in it
+        // And the world size is 1x1
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
+        // And I have launched a robot into the world
         String launchRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"launch\"," +
@@ -76,6 +81,7 @@ class LookTest {
         assertNotNull(launchResponse.get("result"));
         assertEquals("OK", launchResponse.get("result").asText());
 
+        // When I send a valid look command to the server
         String lookRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"look\"," +
@@ -83,6 +89,7 @@ class LookTest {
                 "}";
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
 
+        // Then it should return only the edges as detected objects
         assertNotNull(lookResponse.get("result"));
         assertEquals("OK", lookResponse.get("result").asText());
 
@@ -108,6 +115,7 @@ class LookTest {
             assertTrue(directions.contains(lookResponse.get("data").get("objects").get(2).get("direction").asText()));
             assertTrue(directions.contains(lookResponse.get("data").get("objects").get(3).get("direction").asText()));
 
+            // and the distances should be 0 steps
             assertEquals(0, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
             assertEquals(0, lookResponse.get("data").get("objects").get(1).get("distance").asInt());
             assertEquals(0, lookResponse.get("data").get("objects").get(2).get("distance").asInt());
@@ -115,12 +123,17 @@ class LookTest {
         }
     }
 
+    @DisplayName("robot should see only world edges, at the correct distance, in a size 2 world with no objects when a valid look command is given")
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void emptyWorldSizeTwo(String jarPath) throws IOException, InterruptedException {
+        // Given that I am connected to a running Robot Worlds server
+        // And the world has no objects in it
+        // And the world size is 2x2
         startServer(jarPath, DEFAULT_PORT, "2", "none");
         assertTrue(serverClient.isConnected());
 
+        // And I have launched a robot into the world
         String launchRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"launch\"," +
@@ -131,6 +144,7 @@ class LookTest {
         assertNotNull(launchResponse.get("result"));
         assertEquals("OK", launchResponse.get("result").asText());
 
+        // When I send a valid look command to the server
         String lookRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"look\"," +
@@ -138,6 +152,7 @@ class LookTest {
                 "}";
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
 
+        // Then it should return only the edges as detected objects
         assertNotNull(lookResponse.get("result"));
         assertEquals("OK", lookResponse.get("result").asText());
 
@@ -163,6 +178,7 @@ class LookTest {
             assertTrue(directions.contains(lookResponse.get("data").get("objects").get(2).get("direction").asText()));
             assertTrue(directions.contains(lookResponse.get("data").get("objects").get(3).get("direction").asText()));
 
+            // and the distances should be 1 step
             assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
             assertEquals(1, lookResponse.get("data").get("objects").get(1).get("distance").asInt());
             assertEquals(1, lookResponse.get("data").get("objects").get(2).get("distance").asInt());
@@ -170,9 +186,14 @@ class LookTest {
         }
     }
 
+    @DisplayName("robot should see an obstacle in a size 2 world, at the correct distance, when a valid look command is given")
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void seeObstacle(String jarPath) throws IOException, InterruptedException {
+        // Given that I am connected to a running Robot Worlds server
+        // And the world has an obstacle at position [0,1]
+        // And the world size is 2x2
+        // And I have launched a robot into the world
         startServer(jarPath, DEFAULT_PORT, "2", "0,1");
         assertTrue(serverClient.isConnected());
 
@@ -186,6 +207,7 @@ class LookTest {
         assertNotNull(launchResponse.get("result"));
         assertEquals("OK", launchResponse.get("result").asText());
 
+        // When I send a valid look command to the server
         String lookRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"look\"," +
@@ -193,20 +215,28 @@ class LookTest {
                 "}";
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
 
+        // Then I should see the obstacle at [0,1]
         String direction = lookResponse.get("data").get("objects").get(3).get("direction").asText();
 
+        // And the distance should be 1 step
         if (Objects.equals(direction, "North")) {
             assertEquals("OBSTACLE", lookResponse.get("data").get("objects").get(0).get("type").asText());
             assertEquals(1, lookResponse.get("data").get("objects").get(0).get("distance").asInt());
         }
     }
 
+
+    @DisplayName("robot should see an obstacle and robots in a size 2 world, at the correct distances, when a valid look command is given")
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     public void seeObstacleAndRobots(String jarPath) throws IOException, InterruptedException {
+        // Given that I am connected to a running Robot Worlds server
+        // And the world has an obstacle at position [0,1]
+        // And the world size is 2x2
         startServer(jarPath, DEFAULT_PORT, "2", "0,1");
         assertTrue(serverClient.isConnected());
 
+        // And I have launched 8 robots into the world
         String launchRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"launch\"," +
@@ -214,22 +244,26 @@ class LookTest {
                 "}";
         JsonNode launchResponse = serverClient.sendRequest(launchRequest);
 
-        for(int i = 1; i <= 8; i++) {
+        for(int i = 1; i <= 7; i++) {
             assertTrue(serverClient.isConnected());
 
             String launchMoreRobots = "{" +
-                    "  \"robot\": \"HAL\"," +
+                    "  \"robot\": \"HAL " + i + "\"," +
                     "  \"command\": \"launch\"," +
                     "  \"arguments\": [\"shooter\",\"5\",\"5\"]" +
                     "}";
             JsonNode response = serverClient.sendRequest(launchMoreRobots);
         }
+
+        // When I send a valid look command with the first robot
         String lookRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"look\"," +
                 "  \"arguments\": []" +
                 "}";
         JsonNode lookResponse = serverClient.sendRequest(lookRequest);
+
+        // Then I should see the obstacle and robots at their correct distances in the world
         String direction = lookResponse.get("data").get("objects").get(3).get("direction").asText();
 
         if (Objects.equals(direction, "North")) {

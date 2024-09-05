@@ -228,11 +228,11 @@ class LaunchRobotTests {
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void worldWithoutObstaclesFull(String jarPath) throws IOException, InterruptedException {
-//        Given a world of size 2x2
+        // Given a world of size 2x2
         startServer(jarPath, DEFAULT_PORT, "2", "none");
         assertTrue(serverClient.isConnected());
 
-//        and I have successfully launched 9 robots into the world
+        // and I have successfully launched 9 robots into the world
         for (int x = 1; x < 10; x++) {
             String request = "{" +
                     "\"robot\": \"HAL " + x + "\"," +
@@ -241,7 +241,7 @@ class LaunchRobotTests {
                     "}";
             serverClient.sendRequest(request);
         }
-//        When I launch one more robot
+        // When I launch one more robot
         String request2 = "{" +
                 "  \"robot\": \"HAL 10\"," +
                 "  \"command\": \"launch\"," +
@@ -250,7 +250,7 @@ class LaunchRobotTests {
         JsonNode response = serverClient.sendRequest(request2);
 
 
-//        Then I should get an error response back with the message "No more space in this world"
+        // Then I should get an error response back with the message "No more space in this world"
         assertNotNull(response.get("result"));
         assertEquals("ERROR", response.get("result").asText());
 

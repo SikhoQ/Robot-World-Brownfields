@@ -1,9 +1,6 @@
 package acceptance;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import database.DatabaseConnection;
 
 import java.sql.*;
@@ -69,25 +66,30 @@ class DBManyWorldsTest {
         }
     }
 
+    @DisplayName("Saving worlds with unique names should succeed")
     @Test
     void testSaveWorldWithUniqueNames() {
+        // Given that I have an existing robot worlds database
+        // And it is set up with relevant tables
+        // And the tables are empty
         String uniqueWorldName = "world1";
         String duplicateWorldName = "world2";
         int size = 3;
 
-        // Save a world with a unique name
+        // When I save a world in an empty database table
         assertTrue(saveWorld(uniqueWorldName, size), "The unique world should be saved successfully");
 
-        // Verify the unique world was actually saved in the database
+        // Then the world should exist in the database
         assertTrue(checkWorldExists(uniqueWorldName), "The unique world should exist in the database");
 
-        // Save another world with a different unique name
+        // When I save a world with a unique name
         assertTrue(saveWorld(duplicateWorldName, size), "Another unique world should be saved successfully");
 
-        // Verify the second unique world was actually saved in the database
+        // Then the world should exist in the database
         assertTrue(checkWorldExists(duplicateWorldName), "The second unique world should exist in the database");
 
-        // Attempt to save a world with a duplicate name
+        // When I save a world with a duplicate name
+        // The world should not exist in the database
         assertFalse(saveWorld(duplicateWorldName, size), "The world with a duplicate name should not be saved");
     }
 

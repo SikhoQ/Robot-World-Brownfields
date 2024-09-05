@@ -56,11 +56,13 @@ public class MovementTest {
         }
     }
 
+    @DisplayName("valid forward command should return OK result with correct robot position")
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void validForwardMovementShouldSucceed(String jarPath) throws IOException, InterruptedException {
         // Given that I am connected to a running Robot Worlds server
-        // And the world is of size 1x1 (The world is configured or hardcoded to this size)
+        // And the world has no objects in it
+        // And the world is of size 1x1
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
@@ -99,6 +101,7 @@ public class MovementTest {
 
     }
 
+    @DisplayName("valid back command should return OK result with correct robot position")
     @ParameterizedTest
     @ValueSource(strings = {"out/artifacts/Server_jar/RobotWorld.jar"})
     void validBackwardMovementShouldSucceed(String jarPath) throws IOException, InterruptedException {

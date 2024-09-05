@@ -2,10 +2,7 @@ package acceptance;
 
 
 import database.DatabaseConnection;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import server.configuration.ConfigurationManager;
 import server.world.Obstacle;
 import server.world.SquareObstacle;
@@ -122,26 +119,25 @@ public class DBRestoreWorldTest {
         }
     }
 
-    @Test
-    public void databaseConnectionTest() {
-        // setup method connects to db before each test
-       assertTrue(true);
-    }
     /**
      * check if table exists and that it has records
      */
 
+    @DisplayName("table 'testWorld' should exist in database")
     @Test
     public void ExistingTableTest() {
+        // Given that I have an existing database
+        // And the database has 2 tables 'testWorld' and 'testObjects'
         try {
             DatabaseMetaData metaData = connection.getMetaData();
 
-            // Check if the 'testWorld' table exists
+            // When I run a SQLite command to check if the tables exist
+            // Then 'testWorld' table should be found in the database
             ResultSet resultSet = metaData.getTables(null, null, "testWorld", new String[]{"TABLE"});
             boolean worldTableExists = resultSet.next();
             assertTrue(worldTableExists, "The 'testWorld' table should exist in the database.");
 
-            // Check if the 'testObjects' table exists
+            // And 'testObjects' table should also be found in the database
             resultSet = metaData.getTables(null, null, "testObjects", new String[]{"TABLE"});
             boolean obstaclesTableExists = resultSet.next();
             assertTrue(obstaclesTableExists, "The 'testObjects' table should exist in the database.");
@@ -157,7 +153,7 @@ public class DBRestoreWorldTest {
     /**
      * check if passing the restore command launches a robot with saved world state
      */
-
+    @DisplayName("restoring an existing world in the database should succeed")
     @Test
     public void restoreTest() {
         try {
@@ -244,8 +240,14 @@ public class DBRestoreWorldTest {
     /**
      * check if table has records
      */
+    @DisplayName("database tables should have records")
     @Test
     public void RecordsExistTest() {
+        // Given that I have an existing database
+        // And the database has 2 tables 'testWorld' and 'testObjects'
+        // And the tables have records
+        // When I check if the tables have records
+        // Then there should be records found in the tables
         String getWorldRecordsQuery = "SELECT COUNT(*) FROM testWorld";
         String getObjectRecordsQuery = "SELECT COUNT(*) FROM testObjects";
 

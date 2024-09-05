@@ -56,13 +56,17 @@ public class RobotStateTest {
         }
     }
 
+    @DisplayName("valid state command of existing robot should return OK result with correct robot state")
     @ParameterizedTest
     @ValueSource(strings = {"libs/reference-server-0.2.3.jar", "out/artifacts/Server_jar/RobotWorld.jar"})
     void robotExistsInWorld(String jarPath) throws IOException, InterruptedException {
+        // Given that I am connected to a running Robot Worlds server
+        // And the world is of size 1x1
+        // And the world has no objects in it
+        // And I have launched a robot into the world
         startServer(jarPath, DEFAULT_PORT, "1", "none");
         assertTrue(serverClient.isConnected());
 
-        //    Given that I already exist in the World server
         String launchRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"launch\"," +
@@ -73,7 +77,7 @@ public class RobotStateTest {
         assertNotNull(launchResponse.get("result"));
         assertEquals("OK", launchResponse.get("result").asText());
 
-        //    When I send a Valid state request to the Server
+        // When I send a valid state command to the Server
         String stateRequest = "{" +
                 "  \"robot\": \"HAL\"," +
                 "  \"command\": \"state\"," +
@@ -81,10 +85,10 @@ public class RobotStateTest {
                 "}";
         JsonNode stateResponse = serverClient.sendRequest(stateRequest);
 
-        //    Then I should get a valid response from the server
+        // Then I should get a valid response from the server
         assertNotNull(stateResponse.get("result"));
         assertEquals("OK", stateResponse.get("result").asText());
-        //    And I should get the state of the robot
+        // And I should get the correct state of the robot
         assertNotNull(stateResponse.get("state"));
         assertNotNull(stateResponse.get("state").get("position"));
         assertEquals(0, stateResponse.get("state").get("position").get(0).asInt());
